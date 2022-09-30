@@ -8,7 +8,11 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
 	public void createUser(HashMap param);
 
-	public HashMap readUserByUserId(HashMap<String, String> param);
+	public HashMap readUserInfoByUserId(HashMap<String, String> param);
 
+	public HashMap readUserInfoByUserPhone(HashMap<String, String> param);
+	
 	public HashMap readQuestionByQuestionId(HashMap<String, String> param);
+
+	public void updateMyUserInfo(HashMap<String, String> param);
 }

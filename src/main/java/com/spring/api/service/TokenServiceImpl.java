@@ -44,7 +44,7 @@ public class TokenServiceImpl implements TokenService{
 			throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
 		}
 		
-		HashMap<String,String> user = userMapper.readUserByUserId(param);
+		HashMap<String,String> user = userMapper.readUserInfoByUserId(param);
 		
 		if(user==null) {
 			throw new CustomException(UserError.NOT_FOUND_USER);
@@ -63,7 +63,8 @@ public class TokenServiceImpl implements TokenService{
 			String user_accesstoken = JwtTokenProvider.createToken(authentication,true);
 			String user_refreshtoken = JwtTokenProvider.createToken(authentication,false);
 			
-			redisTemplate.opsForValue().set(user_id, user_refreshtoken, JwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
+			redisTemplate.opsForValue().set(user_id+"_user_accesstoken", user_accesstoken, JwtTokenProvider.getAccesstokenExpirationTime(),TimeUnit.MILLISECONDS);
+			redisTemplate.opsForValue().set(user_id+"_user_refreshtoken", user_refreshtoken, JwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
 			
 			response.addHeader("user_accesstoken", user_accesstoken);
 			response.addHeader("user_refreshtoken", user_refreshtoken);
@@ -83,14 +84,17 @@ public class TokenServiceImpl implements TokenService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = JwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		redisTemplate.delete(user_id);
-		redisTemplate.opsForValue().set(user_accesstoken, "invalid", JwtTokenProvider.getAccesstokenExpirationTime(),TimeUnit.MILLISECONDS);
+		redisTemplate.delete(user_id+"_user_accesstoken");
+		redisTemplate.delete(user_id+"_user_refreshtoken");
 	}
 
 	@Override
 	public void updateToken(HttpServletRequest request, HttpServletResponse response) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_refreshtoken = request.getHeader("user_refreshtoken");
+		String user_id = JwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		String stored_user_accesstoken = redisTemplate.opsForValue().get(user_id+"_user_accesstoken");
 		
 		if(!StringUtils.hasText(user_accesstoken)) {
 			throw new CustomException(AuthError.NOT_FOUND_USER_ACCESSTOKEN);
@@ -98,12 +102,13 @@ public class TokenServiceImpl implements TokenService{
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
 		}else if(!JwtTokenProvider.getTokenType(user_accesstoken).equals("user_accesstoken")) {
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
-		}else if(redisTemplate.opsForValue().get(user_accesstoken)!=null) {
+		}else if(stored_user_accesstoken==null) {
+			throw new CustomException(AuthError.NOT_FOUND_STORED_USER_ACCESSTOKEN);
+		}else if(!stored_user_accesstoken.equals(user_accesstoken)) {
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
 		}
 		
-		String user_id = JwtTokenProvider.getUserIdFromJWT(user_accesstoken);
-		String stored_user_refreshtoken = redisTemplate.opsForValue().get(user_id);
+		String stored_user_refreshtoken = redisTemplate.opsForValue().get(user_id+"_user_refreshtoken");
 		
 		if(!StringUtils.hasText(user_refreshtoken)) {
 			throw new CustomException(AuthError.NOT_FOUND_USER_REFRESHTOKEN);
@@ -122,8 +127,8 @@ public class TokenServiceImpl implements TokenService{
 		String new_user_accesstoken = JwtTokenProvider.createToken(authentication, true);
 		String new_user_refreshtoken = JwtTokenProvider.createToken(authentication, false);
 		
-		redisTemplate.opsForValue().set(user_accesstoken, "invalid", JwtTokenProvider.getAccesstokenExpirationTime(),TimeUnit.MILLISECONDS);
-		redisTemplate.opsForValue().set(user_id, new_user_refreshtoken, JwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
+		redisTemplate.opsForValue().set(user_id+"_user_accesstoken", new_user_accesstoken, JwtTokenProvider.getAccesstokenExpirationTime(),TimeUnit.MILLISECONDS);
+		redisTemplate.opsForValue().set(user_id+"_user_refreshtoken", new_user_refreshtoken, JwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
 		
 		response.addHeader("user_accesstoken", new_user_accesstoken);
 		response.addHeader("user_refreshtoken", new_user_refreshtoken);

@@ -10,8 +10,10 @@ public enum AuthError implements Code{
 	
 	INVALID_USER_ACCESSTOKEN("AUTH_10003","유효하지 않은 액세스 토큰",HttpStatus.UNAUTHORIZED),
 	INVALID_USER_REFRESHTOKEN("AUTH_10004","유효하지 않은 리프레쉬 토큰",HttpStatus.UNAUTHORIZED),
+	NOT_FOUND_STORED_USER_ACCESSTOKEN("AUTH_10005","현재 사용중인 액세스 토큰 없음",HttpStatus.UNAUTHORIZED),
+	NOT_FOUND_STORED_USER_REFRESHTOKEN("AUTH_10006","현재 사용중인 리프레쉬 토큰 없음",HttpStatus.UNAUTHORIZED),
 	
-	NOT_FOUND_STORED_USER_REFRESHTOKEN("AUTH_10005","저장되지 않은 리프레쉬 토큰",HttpStatus.UNAUTHORIZED);
+	NOT_IN_USE_USER_ACCESSTOKEN("AUTH_10007","사용중인 액세스 토큰이 아님",HttpStatus.UNAUTHORIZED);
 	
 	
 	private String code, message;

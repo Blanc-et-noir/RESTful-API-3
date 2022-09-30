@@ -15,8 +15,11 @@ public enum UserError implements Code{
 	USER_PW_NOT_EQUAL_TO_USER_PW_CHECK("USER_10007","두 비밀번호가 서로 일치하지 않음",HttpStatus.BAD_REQUEST),
 	
 	DUPLICATE_USER_ID("USER_10008","이미 사용중인 사용자 ID",HttpStatus.BAD_REQUEST),
-	INVALID_QUESTION_ID("USER_10009","유효하지 않은 비밀번호 찾기 질문 ID",HttpStatus.BAD_REQUEST);
-	
+	DUPLICATE_USER_PHONE("USER_10009","이미 사용중인 사용자 전화번호",HttpStatus.BAD_REQUEST),
+	INVALID_QUESTION_ID("USER_10010","유효하지 않은 비밀번호 찾기 질문 ID",HttpStatus.BAD_REQUEST),
+	USER_PW_AND_QUESTION_ID_AND_QUESTION_ANSWER_ARE_NEEDED_AT_THE_SAME_TIME("USER_10011","비밀번호, 비밀번호 찾기 질문 ID 및 답이 모두 필요함",HttpStatus.BAD_REQUEST),
+	QUESTION_ANSWER_NOT_EQUAL_TO_OLD_QUESTION_ANSWER("USER_10012","비밀번호 찾기 질문의 답이 서로 일치하지 않음",HttpStatus.BAD_REQUEST),
+	QUESTION_ANSWER_IS_NEEDED("USER_10013","비밀번호 찾기 질문의 답이 필요함", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

@@ -2,10 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.spring.api.mapper.UserMapper">
-	<select id="readUserByUserId" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+	<select id="readUserInfoByUserId" resultType="java.util.HashMap" parameterType="java.util.HashMap">
 		SELECT *
 		FROM users
 		WHERE user_id = #{user_id};
+	</select>
+	
+	<select id="readUserInfoByUserPhone" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT *
+		FROM users
+		WHERE user_phone = #{user_phone};
 	</select>
 	
 	<select id="readQuestionByQuestionId" resultType="java.util.HashMap" parameterType="java.util.HashMap">
@@ -18,4 +24,18 @@
 		INSERT INTO users
 		VALUES(#{user_id},#{user_pw},#{user_name},#{user_phone},#{user_salt},'ROLE_USER',#{question_id},#{question_answer})
 	</insert>
+	
+	<update id="updateMyUserInfo" parameterType="java.util.HashMap">
+		UPDATE users
+		<set>
+			user_id = user_id,
+			<if test="new_user_pw != null">user_pw = #{new_user_pw},</if>
+			<if test="new_user_name != null">user_name = #{new_user_name},</if>
+			<if test="new_user_phone != null">user_phone = #{new_user_phone},</if>
+			<if test="new_question_id != null">question_id = #{new_question_id},</if>
+			<if test="new_question_answer != null">question_answer = #{new_question_answer},</if>
+			<if test="new_user_salt != null">user_salt = #{new_user_salt}</if>
+		</set>
+		WHERE user_id = #{user_id}
+	</update>
 </mapper>

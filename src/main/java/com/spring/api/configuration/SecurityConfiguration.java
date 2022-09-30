@@ -38,11 +38,16 @@ public class SecurityConfiguration {
         .authorizeRequests()
         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
         .antMatchers(HttpMethod.OPTIONS).permitAll()
+        
         .antMatchers(HttpMethod.POST,"/api/v1/tokens").permitAll()
         .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()
-        .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/tokens").authenticated()
         .antMatchers(HttpMethod.DELETE,"/api/v1/tokens").authenticated()
+        
+        .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
+        
+        .antMatchers(HttpMethod.PUT,"/api/v1/users/me").authenticated()
+        
         .anyRequest().denyAll().and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .addFilterBefore(new JwtAuthenticationFilter(redisTemplate), UsernamePasswordAuthenticationFilter.class)

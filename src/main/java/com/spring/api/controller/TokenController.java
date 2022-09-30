@@ -28,7 +28,6 @@ public class TokenController {
 		HashMap user = tokenService.createToken(request, response, param);
 		result.put("flag", true);
 		result.put("message", "토큰 발급 성공");
-		result.put("user", user);
 		result.put("timestamp", TimeUtil.getTimestamp());
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
