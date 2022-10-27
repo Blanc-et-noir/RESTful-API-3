@@ -8,9 +8,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.api.jwt.JwtTokenProvider;
@@ -22,7 +24,7 @@ public class TokenController {
 	@Autowired
 	TokenService tokenService;
 
-	@RequestMapping(value="/api/v1/tokens",method=RequestMethod.POST)
+	@PostMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> createToken(HttpServletRequest request, HttpServletResponse response, @RequestBody HashMap<String,String> param){
 		HashMap result = new HashMap();
 		HashMap user = tokenService.createToken(request, response, param);
@@ -32,7 +34,7 @@ public class TokenController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
-	@RequestMapping(value="/api/v1/tokens",method=RequestMethod.GET)
+	@GetMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> readToken(HttpServletRequest request){
 		HashMap result = new HashMap();
 		result.put("flag", true);
@@ -42,7 +44,7 @@ public class TokenController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/api/v1/tokens",method=RequestMethod.PUT)
+	@PutMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> updateToken(HttpServletRequest request, HttpServletResponse response){
 		tokenService.updateToken(request, response);
 		
@@ -53,7 +55,7 @@ public class TokenController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/api/v1/tokens",method=RequestMethod.DELETE)
+	@DeleteMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> deleteToken(HttpServletRequest request){
 		tokenService.deleteToken(request);
 		

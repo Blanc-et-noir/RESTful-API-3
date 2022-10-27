@@ -7,9 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.api.service.UserService;
@@ -19,7 +19,7 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
-	@RequestMapping(value="/api/v1/users",method=RequestMethod.POST)
+	@PostMapping("/api/v1/users")
 	public ResponseEntity<HashMap> createUserInfo(@RequestBody HashMap<String,String> param){
 		userService.createUser(param);
 		
@@ -29,7 +29,7 @@ public class UserController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/api/v1/users/me",method=RequestMethod.PUT)
+	@PutMapping("/api/v1/users/me")
 	public ResponseEntity<HashMap> updateMyUserInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.updateMyUserInfo(request,param);
 		
