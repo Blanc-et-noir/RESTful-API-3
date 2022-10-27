@@ -36,7 +36,7 @@ public class TokenServiceImpl implements TokenService{
     private RedisTemplate<String, String> redisTemplate;
 	
 	@Override
-	public HashMap createToken(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws CustomException {
+	public void createToken(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws CustomException {
 		String user_id = param.get("user_id");
 		String user_pw = param.get("user_pw");
 		
@@ -76,7 +76,7 @@ public class TokenServiceImpl implements TokenService{
 		user.remove("user_salt");
 		user.remove("question_answer");
 		
-		return user;
+		return;
 	}
 
 	@Override

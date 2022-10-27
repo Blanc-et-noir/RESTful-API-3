@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.api.service.UserService;
+import com.spring.api.util.ResultUtil;
 
 @RestController
 public class UserController {
@@ -23,9 +24,8 @@ public class UserController {
 	public ResponseEntity<HashMap> createUserInfo(@RequestBody HashMap<String,String> param){
 		userService.createUser(param);
 		
-		HashMap result = new HashMap();
-		result.put("flag", true);
-		result.put("message", "회원 가입 성공");
+		HashMap result = ResultUtil.createResultMap("회원 가입 성공");
+		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
@@ -33,9 +33,8 @@ public class UserController {
 	public ResponseEntity<HashMap> updateMyUserInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.updateMyUserInfo(request,param);
 		
-		HashMap result = new HashMap();
-		result.put("flag", true);
-		result.put("message", "회원 정보 변경 성공");
+		HashMap result = ResultUtil.createResultMap("회원 정보 변경 성공");
+		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 }
