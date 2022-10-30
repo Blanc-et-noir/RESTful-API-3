@@ -29,6 +29,7 @@ public class JwtAuthenticationDeniedHandler implements AccessDeniedHandler{
     	result.put("code", customException.getCode());
     	result.put("message", customException.getMessage());
     	result.put("timestamp", TimeUtil.getTimestamp());
+
         response.getWriter().print(result);
 	}
 }

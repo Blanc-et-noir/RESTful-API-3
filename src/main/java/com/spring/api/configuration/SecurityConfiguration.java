@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.spring.api.filter.JwtAuthenticationFilter;
 import com.spring.api.handler.JwtAuthenticationDeniedHandler;
 import com.spring.api.handler.JwtAuthenticationEntryPoint;
+import com.spring.api.jwt.JwtTokenProvider;
 
 @Configuration
 public class SecurityConfiguration {
@@ -27,7 +28,9 @@ public class SecurityConfiguration {
 	@Autowired
 	private JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler;
 	@Autowired
-	RedisTemplate<String, String> redisTemplate;
+	private RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
 	
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -50,7 +53,7 @@ public class SecurityConfiguration {
         
         .anyRequest().denyAll().and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilterBefore(new JwtAuthenticationFilter(redisTemplate), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new JwtAuthenticationFilter(redisTemplate,jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
         .accessDeniedHandler(jwtAuthenticationDeniedHandler);
         

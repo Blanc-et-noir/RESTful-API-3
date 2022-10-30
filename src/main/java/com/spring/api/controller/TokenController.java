@@ -22,22 +22,24 @@ import com.spring.api.util.ResultUtil;
 @RestController
 public class TokenController {
 	@Autowired
-	TokenService tokenService;
-
+	private TokenService tokenService;
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
+	
 	@PostMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> createToken(HttpServletRequest request, HttpServletResponse response, @RequestBody HashMap<String,String> param){
 		tokenService.createToken(request, response, param);
 		
-		HashMap result = ResultUtil.createResultMap("토큰 발급 성공");
+		HashMap result = ResultUtil.createResultMap("토큰 발급 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> readToken(HttpServletRequest request){
-		HashMap result = ResultUtil.createResultMap("토큰 조회 성공");
+		HashMap result = ResultUtil.createResultMap("토큰 조회 성공",true);
 		
-		result.put("user_id", JwtTokenProvider.getUserIdFromJWT(request.getHeader("user_accesstoken")));
+		result.put("user_id", jwtTokenProvider.getUserIdFromJWT(request.getHeader("user_accesstoken")));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
@@ -46,7 +48,7 @@ public class TokenController {
 	public ResponseEntity<HashMap> updateToken(HttpServletRequest request, HttpServletResponse response){
 		tokenService.updateToken(request, response);
 		
-		HashMap result = ResultUtil.createResultMap("토큰 갱신 성공");
+		HashMap result = ResultUtil.createResultMap("토큰 갱신 성공",true);
 
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
@@ -55,7 +57,7 @@ public class TokenController {
 	public ResponseEntity<HashMap> deleteToken(HttpServletRequest request){
 		tokenService.deleteToken(request);
 		
-		HashMap result = ResultUtil.createResultMap("토큰 삭제 성공");
+		HashMap result = ResultUtil.createResultMap("토큰 삭제 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

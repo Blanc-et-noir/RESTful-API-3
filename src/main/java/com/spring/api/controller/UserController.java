@@ -24,7 +24,7 @@ public class UserController {
 	public ResponseEntity<HashMap> createUserInfo(@RequestBody HashMap<String,String> param){
 		userService.createUser(param);
 		
-		HashMap result = ResultUtil.createResultMap("회원 가입 성공");
+		HashMap result = ResultUtil.createResultMap("회원 가입 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
@@ -32,8 +32,7 @@ public class UserController {
 	@PutMapping("/api/v1/users/me")
 	public ResponseEntity<HashMap> updateMyUserInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.updateMyUserInfo(request,param);
-		
-		HashMap result = ResultUtil.createResultMap("회원 정보 변경 성공");
+		HashMap result = ResultUtil.createResultMap("회원 정보 변경 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

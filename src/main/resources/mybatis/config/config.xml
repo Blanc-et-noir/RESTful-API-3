@@ -2,7 +2,9 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-  <mappers>
-    <mapper resource="users.xml"/>
-  </mappers>
+	<typeAliases>
+		<typeAlias type="java.util.HashMap" alias="HashMap"/>	
+		<typeAlias type="com.spring.api.entity.UserEntity" alias="UserEntity"/>
+		<typeAlias type="com.spring.api.entity.QuestionEntity" alias="QuestionEntity"/>
+	</typeAliases>
 </configuration>

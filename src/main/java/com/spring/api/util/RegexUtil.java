@@ -9,10 +9,9 @@ public class RegexUtil {
 	public final static String UUID_REGEX = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}";
 	public final static String USER_NAME_REGEX = "^[가-힣]{2,5}$";
 	public final static String DATE_REGEX = "^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$";
-	
+	public final static String USER_GENDER_REGEX = "[mfMF]";
 	public final static int QUESTION_ANSWER_MAX_BYTES = 120;
-	
-	
+
 	public static boolean checkBytes(String str, final int maxLength) {
 		if(!StringUtils.hasText(str)) {
 			return false;

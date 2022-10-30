@@ -27,6 +27,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     	result.put("code", customException.getCode());
     	result.put("message", customException.getMessage());
     	result.put("timestamp", TimeUtil.getTimestamp());
+    	
         response.getWriter().print(result);
     }
 }
