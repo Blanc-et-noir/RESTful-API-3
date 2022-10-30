@@ -6,6 +6,6 @@
     <select id="findUserByIdAndPw" resultType="UserEntity" parameterType="HashMap">
         SELECT *
         FROM users
-        WHERE user_id = #{user_id} AND user_pw = #{user_pw};
+        WHERE user_id = #{user_id} AND user_pw = #{user_pw} AND AND user_status = 'N'
     </select>
 </mapper>

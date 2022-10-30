@@ -5,13 +5,13 @@
 	<select id="readUserInfoByUserId" resultType="UserEntity" parameterType="HashMap">
 		SELECT *
 		FROM users
-		WHERE user_id = #{user_id};
+		WHERE user_id = #{user_id} AND user_status = 'N'
 	</select>
 	
 	<select id="readUserInfoByUserPhone" resultType="UserEntity" parameterType="HashMap">
 		SELECT *
 		FROM users
-		WHERE user_phone = #{user_phone};
+		WHERE user_phone = #{user_phone} AND user_status = 'N';
 	</select>
 	
 	<select id="readQuestionByQuestionId" resultType="QuestionEntity" parameterType="HashMap">
@@ -46,6 +46,6 @@
 			<if test="new_user_salt != null">user_salt = #{new_user_salt}</if>
 			<if test="new_user_gender != null">user_gender = UPPER(#{new_user_gender}),</if>
 		</set>
-		WHERE user_id = #{user_id}
+		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 </mapper>
