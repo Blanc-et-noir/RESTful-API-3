@@ -15,6 +15,8 @@ public interface UserMapper {
 
 	public UserEntity readUserInfoByUserPhone(String user_phone);
 	
+	public UserEntity readUserInfoByNotWithdrawedUserId(String user_id);
+	
 	public QuestionEntity readQuestionByQuestionId(int question_id);
 
 	public void updateMyUserInfo(HashMap<String, String> param);

@@ -100,11 +100,7 @@ public class UserServiceImpl implements UserService{
 		
 		if(new_user_phone!=null) {
 			checkUtil.checkUserPhoneRegex(new_user_phone);
-
-			if(userMapper.readUserInfoByUserPhone(new_user_phone)!=null) {
-				throw new CustomException(UserError.DUPLICATE_USER_PHONE);
-			}
-
+			checkUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
 			param.put("new_user_phone", new_user_phone);
 		}
 		

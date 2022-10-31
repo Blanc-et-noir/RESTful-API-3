@@ -104,7 +104,7 @@ public class CheckUtil {
 	}
 	
 	public UserEntity isUserExistent(String user_id) {		
-		UserEntity userEntity = userMapper.readUserInfoByUserId(user_id);
+		UserEntity userEntity = userMapper.readUserInfoByNotWithdrawedUserId(user_id);
 		
 		if(userEntity==null) {
 			throw new CustomException(UserError.NOT_FOUND_USER);
