@@ -11,11 +11,15 @@ import com.spring.api.entity.UserEntity;
 public interface UserMapper {
 	public void createUser(HashMap param);
 
-	public UserEntity readUserInfoByUserId(HashMap<String, String> param);
+	public UserEntity readUserInfoByUserId(String user_id);
 
-	public UserEntity readUserInfoByUserPhone(HashMap<String, String> param);
+	public UserEntity readUserInfoByUserPhone(String user_phone);
 	
-	public QuestionEntity readQuestionByQuestionId(HashMap<String, String> param);
+	public QuestionEntity readQuestionByQuestionId(int question_id);
 
 	public void updateMyUserInfo(HashMap<String, String> param);
+	
+	public void updateUserLoginTime(String user_id);
+	
+	public void updateUserLogoutTime(String user_id);
 }

@@ -49,12 +49,9 @@ public class UserServiceImpl implements UserService{
 		checkUtil.checkQuestionIdRegex(question_id);
 		checkUtil.checkQuestionAnswerBytes(question_answer);
 		checkUtil.checkUserGender(user_gender);
-		
-		UserEntity userEntity = userMapper.readUserInfoByUserId(param);
-		checkUtil.checkUserIsNull(userEntity);
-
-		QuestionEntity questionEntity = userMapper.readQuestionByQuestionId(param);
-		checkUtil.checkQuestionIsNotNull(questionEntity);
+		checkUtil.isUserIdDuplicate(userMapper.readUserInfoByUserId(user_id));
+		checkUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(user_phone));
+		checkUtil.isQuestionExistent(Integer.parseInt(question_id));
 		
 		String user_salt = SHA.getSalt();
 		param.put("user_pw", SHA.DSHA512(user_pw, user_salt));
@@ -68,6 +65,11 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public void updateMyUserInfo(HttpServletRequest request, HashMap<String, String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		param.put("user_id", user_id);
+		
+		String new_user_gender = param.get("new_user_gender");
 		String new_user_pw = param.get("new_user_pw");
 		String new_user_pw_check = param.get("new_user_pw_check");
 		String new_user_name = param.get("new_user_name");
@@ -75,17 +77,12 @@ public class UserServiceImpl implements UserService{
 		String new_question_id = param.get("new_question_id");
 		String new_question_answer = param.get("new_question_answer");
 		String question_answer = param.get("question_answer");
-		String user_accesstoken = request.getHeader("user_accesstoken");
-		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		param.put("user_id", user_id);
-		UserEntity userEntity = userMapper.readUserInfoByUserId(param);
+		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 		
-		String old_question_answer = userEntity.getQuestion_answer();
-		String old_user_salt = userEntity.getUser_salt();
-		
-		checkUtil.checkUserIsNotNull(userEntity);
-		
+		String user_phone = userEntity.getUser_id();
+		String user_salt = userEntity.getUser_salt();
+
 		if(new_user_pw!=null&&new_user_pw_check!=null) {
 			checkUtil.checkUserPwRegex(new_user_pw);
 			checkUtil.checkUserPwRegex(new_user_pw_check);
@@ -94,31 +91,35 @@ public class UserServiceImpl implements UserService{
 		
 		if(new_user_name!=null) {
 			checkUtil.checkUserNameRegex(new_user_name);
+			param.put("user_name", new_user_name);
+		}
+		
+		if(new_user_gender!=null) {
+			checkUtil.checkUserGender(new_user_gender);
+			param.put("user_gender", new_user_gender);
 		}
 		
 		if(new_user_phone!=null) {
 			checkUtil.checkUserPhoneRegex(new_user_phone);
-			
-			param.put("user_phone", new_user_phone);
-			if(userMapper.readUserInfoByUserPhone(param)!=null) {
+
+			if(userMapper.readUserInfoByUserPhone(new_user_phone)!=null) {
 				throw new CustomException(UserError.DUPLICATE_USER_PHONE);
 			}
+			param.put("new_user_phone", new_user_phone);
 		}
 		
 		if(new_user_pw!=null&&new_question_id!=null&&new_question_answer!=null) {
 			checkUtil.checkQuestionIdRegex(new_question_id);
 			checkUtil.checkQuestionAnswerBytes(new_question_answer);
-			checkUtil.checkQuestionAnswerBytes(old_question_answer);
-			checkUtil.checkUserQuestionAnswerAndOldQuestionAnswer(SHA.DSHA512(question_answer.replaceAll(" ", ""), old_user_salt), old_question_answer);
-			
-			param.put("question_id", new_question_id);
-			checkUtil.checkQuestionIsNotNull(userMapper.readQuestionByQuestionId(param));
+			checkUtil.checkQuestionAnswerBytes(question_answer);
+			checkUtil.checkUserQuestionAnswerAndOldQuestionAnswer(SHA.DSHA512(question_answer.replaceAll(" ", ""), user_salt), userEntity.getQuestion_answer());
+			checkUtil.isQuestionExistent(Integer.parseInt(new_question_id));
 			
 			String new_user_salt = SHA.getSalt();
+			param.put("new_question_id", new_question_id);
 			param.put("new_user_salt", new_user_salt);
 			param.put("new_user_pw", SHA.DSHA512(new_user_pw, new_user_salt));
-			param.put("new_question_answer", SHA.DSHA512(new_question_answer.replaceAll(" ", ""), new_user_salt));
-			
+			param.put("new_question_answer", SHA.DSHA512(new_question_answer.replaceAll(" ", ""), new_user_salt));			
 		}else if(new_user_pw==null&&new_question_id==null&&new_question_answer==null) {
 			
 		}else {

@@ -1,5 +1,7 @@
 package com.spring.api.util;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -10,11 +12,14 @@ import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
+import com.spring.api.mapper.UserMapper;
 
 @Component
 public class CheckUtil {
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+	@Autowired
+	private UserMapper userMapper;
 	
 	public void checkAccessToken(String stored_user_accesstoken, String user_accesstoken) {
 		if(!StringUtils.hasText(user_accesstoken)) {
@@ -100,21 +105,33 @@ public class CheckUtil {
 		}
 	}
 	
-	public void checkUserIsNotNull(UserEntity userEntity) {
+	public UserEntity isUserExistent(String user_id) {		
+		UserEntity userEntity = userMapper.readUserInfoByUserId(user_id);
+		
 		if(userEntity==null) {
 			throw new CustomException(UserError.NOT_FOUND_USER);
 		}
+		
+		return userEntity;
 	}
 	
-	public void checkUserIsNull(UserEntity userEntity) {
+	public void isUserIdDuplicate(UserEntity userEntity) {
 		if(userEntity!=null) {
 			throw new CustomException(UserError.DUPLICATE_USER_ID);
 		}
 	}
 	
-	public void checkQuestionIsNotNull(QuestionEntity questionEntity) {
+	public void isUserPhoneDuplicate(UserEntity userEntity) {
+		if(userEntity!=null) {
+			throw new CustomException(UserError.DUPLICATE_USER_PHONE);
+		}
+	}
+	
+	public void isQuestionExistent(int question_id) {
+		QuestionEntity questionEntity = userMapper.readQuestionByQuestionId(question_id);
+		
 		if(questionEntity==null) {
-			throw new CustomException(UserError.INVALID_QUESTION_ID);
+			throw new CustomException(UserError.NOT_FOUND_QUESTION);
 		}
 	}
 }

@@ -15,19 +15,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.auth.UserAuthentication;
+import com.spring.api.code.UserError;
+import com.spring.api.dto.UserDTO;
 import com.spring.api.encrypt.SHA;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
-import com.spring.api.mapper.TokenMapper;
 import com.spring.api.mapper.UserMapper;
 import com.spring.api.util.CheckUtil;
 
 @Service("tokenService")
 @Transactional
 public class TokenServiceImpl implements TokenService{
-	@Autowired
-	private TokenMapper tokenMapper;
 	@Autowired
 	private UserMapper userMapper;
 	@Autowired
@@ -43,16 +42,15 @@ public class TokenServiceImpl implements TokenService{
 		String user_pw = param.get("user_pw");
 		
 		checkUtil.checkUserIdRegex(user_id);
-		
-		UserEntity userEntity = userMapper.readUserInfoByUserId(param);
-		
-		checkUtil.checkUserIsNotNull(userEntity);
 		checkUtil.checkUserPwRegex(user_pw);
 		
-		String user_salt = userEntity.getUser_salt();
-		user_pw = SHA.DSHA512(user_pw, user_salt);
+		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 		
-		checkUtil.checkUserPwAndPwCheck(user_pw, userEntity.getUser_pw());
+		if(!userEntity.getUser_pw().equals(SHA.DSHA512(user_pw, userEntity.getUser_salt()))) {
+			throw new CustomException(UserError.NOT_FOUND_USER);
+		}
+		
+		userMapper.updateUserLoginTime(user_id);
 		
 		Authentication authentication = new UserAuthentication(userEntity.getUser_id(), null, Arrays.asList(new SimpleGrantedAuthority(userEntity.getUser_role())));
 		
@@ -73,6 +71,10 @@ public class TokenServiceImpl implements TokenService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
+		checkUtil.isUserExistent(user_id);
+
+		userMapper.updateUserLogoutTime(user_id);
+		
 		redisTemplate.delete(user_id+"_user_accesstoken");
 		redisTemplate.delete(user_id+"_user_refreshtoken");
 		
@@ -83,9 +85,10 @@ public class TokenServiceImpl implements TokenService{
 	public void updateToken(HttpServletRequest request, HttpServletResponse response) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_refreshtoken = request.getHeader("user_refreshtoken");
-		
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
+		checkUtil.isUserExistent(user_id);
+
 		String stored_user_accesstoken = redisTemplate.opsForValue().get(user_id+"_user_accesstoken");
 		String stored_user_refreshtoken = redisTemplate.opsForValue().get(user_id+"_user_refreshtoken");
 		
@@ -104,5 +107,15 @@ public class TokenServiceImpl implements TokenService{
 		response.addHeader("user_refreshtoken", new_user_refreshtoken);
 		
 		return;
+	}
+
+	@Override
+	public UserDTO readToken(HttpServletRequest request) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		UserEntity userEntity = checkUtil.isUserExistent(user_id);
+		
+		return new UserDTO(userEntity);
 	}
 }

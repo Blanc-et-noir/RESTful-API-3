@@ -1,6 +1,6 @@
 package com.spring.api.entity;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,11 +22,11 @@ public class UserEntity {
 	private String user_cert;
 	private String user_status;
 	
-	private Date user_login_time;
-	private Date user_logout_time;
-	private Date user_register_time;
-	private Date user_withdraw_time;
-	private Date user_pass_change_time;
+	private Timestamp user_login_time;
+	private Timestamp user_logout_time;
+	private Timestamp user_register_time;
+	private Timestamp user_withdraw_time;
+	private Timestamp user_pw_change_time;
 	
 	private int question_id;
 	private String question_answer;

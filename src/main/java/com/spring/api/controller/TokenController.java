@@ -39,7 +39,7 @@ public class TokenController {
 	public ResponseEntity<HashMap> readToken(HttpServletRequest request){
 		HashMap result = ResultUtil.createResultMap("토큰 조회 성공",true);
 		
-		result.put("user_id", jwtTokenProvider.getUserIdFromJWT(request.getHeader("user_accesstoken")));
+		result.put("user", tokenService.readToken(request));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
