@@ -29,5 +29,6 @@ public class UserEntity {
 	private Timestamp user_pw_change_time;
 	
 	private int question_id;
+	private String question_content;
 	private String question_answer;
 }

@@ -4,13 +4,13 @@
 <mapper namespace="com.spring.api.mapper.UserMapper">
 	<select id="readUserInfoByUserId" resultType="UserEntity" parameterType="String">
 		SELECT *
-		FROM users
+		FROM users NATURAL JOIN questions
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</select>
 	
 	<select id="readUserInfoByUserPhone" resultType="UserEntity" parameterType="String">
 		SELECT *
-		FROM users
+		FROM users NATURAL JOIN questions
 		WHERE user_phone = #{user_phone} AND user_status = 'N';
 	</select>
 	
@@ -44,7 +44,7 @@
 				question_id = #{new_question_id},
 				question_answer = #{new_question_answer},
 				user_salt = #{new_user_salt},
-				user_pass_change_time = NOW()
+				user_pw_change_time = NOW()
 			</if>			
 			<if test="new_user_gender != null">user_gender = UPPER(#{new_user_gender}),</if>
 		</set>

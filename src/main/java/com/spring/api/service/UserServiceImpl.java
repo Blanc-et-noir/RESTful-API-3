@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.code.UserError;
 import com.spring.api.encrypt.SHA;
-import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
@@ -105,6 +104,7 @@ public class UserServiceImpl implements UserService{
 			if(userMapper.readUserInfoByUserPhone(new_user_phone)!=null) {
 				throw new CustomException(UserError.DUPLICATE_USER_PHONE);
 			}
+
 			param.put("new_user_phone", new_user_phone);
 		}
 		

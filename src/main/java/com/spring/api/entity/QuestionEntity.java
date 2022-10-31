@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionEntity {
+public class QuestionEntity {	
 	private int question_id;
 	private String question_content;
 }

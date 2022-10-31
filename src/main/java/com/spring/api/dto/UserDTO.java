@@ -24,6 +24,7 @@ public class UserDTO {
 	private String user_pw_change_time;
 	
 	private int question_id;
+	private String question_content;
 	
 	private String nvl(Object obj) {
 		return obj!=null?obj.toString():null;
@@ -46,5 +47,6 @@ public class UserDTO {
 		this.user_pw_change_time = nvl(userEntity.getUser_pw_change_time());
 		
 		this.question_id = userEntity.getQuestion_id();
+		this.question_content = userEntity.getQuestion_content();
 	}
 }
