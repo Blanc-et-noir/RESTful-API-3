@@ -43,15 +43,9 @@ public class SecurityConfiguration {
         .antMatchers(HttpMethod.OPTIONS).permitAll()
         
         .antMatchers(HttpMethod.POST,"/api/v1/tokens").permitAll()
-        .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()
-        .antMatchers(HttpMethod.GET,"/api/v1/tokens").authenticated()
-        .antMatchers(HttpMethod.DELETE,"/api/v1/tokens").authenticated()
-        
+        .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()        
         .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
-        
-        .antMatchers(HttpMethod.PUT,"/api/v1/users/me").authenticated()
-        
-        .anyRequest().denyAll().and()
+        .anyRequest().authenticated().and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .addFilterBefore(new JwtAuthenticationFilter(redisTemplate,jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)

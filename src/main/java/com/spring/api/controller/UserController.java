@@ -26,14 +26,33 @@ public class UserController {
 		
 		HashMap result = ResultUtil.createResultMap("회원 가입 성공",true);
 		
-		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/api/v1/users/me")
 	public ResponseEntity<HashMap> updateMyUserInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.updateMyUserInfo(request,param);
+		
 		HashMap result = ResultUtil.createResultMap("회원 정보 변경 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@PostMapping("/api/v1/users/me/followings")
+	public ResponseEntity<HashMap> createFollowingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
+		userService.createFollowingInfo(request,param);
+		
+		HashMap result = ResultUtil.createResultMap("회원 팔로우 성공",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/api/v1/users/me/blockings")
+	public ResponseEntity<HashMap> createBlockingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
+		userService.createBlockingInfo(request,param);
+		
+		HashMap result = ResultUtil.createResultMap("회원 블락 성공",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 }

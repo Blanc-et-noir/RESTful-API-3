@@ -6,5 +6,7 @@
 		<typeAlias type="java.util.HashMap" alias="HashMap"/>	
 		<typeAlias type="com.spring.api.entity.UserEntity" alias="UserEntity"/>
 		<typeAlias type="com.spring.api.entity.QuestionEntity" alias="QuestionEntity"/>
+		<typeAlias type="com.spring.api.entity.FollowingEntity" alias="FollowingEntity"/>
+		<typeAlias type="com.spring.api.entity.BlockingEntity" alias="BlockingEntity"/>
 	</typeAliases>
 </configuration>

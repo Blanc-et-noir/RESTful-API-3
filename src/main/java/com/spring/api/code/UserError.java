@@ -18,10 +18,16 @@ public enum UserError implements Code{
 	
 	DUPLICATE_USER_ID("USER_10009","이미 사용중인 사용자 ID",HttpStatus.BAD_REQUEST),
 	DUPLICATE_USER_PHONE("USER_10010","이미 사용중인 사용자 전화번호",HttpStatus.BAD_REQUEST),
+	DUPLICATE_FOLLOWING_INFO("USER_10011","이미 팔로우된 사용자",HttpStatus.BAD_REQUEST),
+	DUPLICATE_BLOCKING_INFO("USER_10011","이미 블락된 사용자",HttpStatus.BAD_REQUEST),
 	NOT_FOUND_QUESTION("USER_10011","비밀번호 찾기 질문 정보 없음",HttpStatus.BAD_REQUEST),
 	USER_PW_AND_QUESTION_ID_AND_QUESTION_ANSWER_ARE_NEEDED_AT_THE_SAME_TIME("USER_10012","비밀번호, 비밀번호 찾기 질문 ID 및 답이 모두 필요함",HttpStatus.BAD_REQUEST),
+	
+	SOURCE_USER_ID_EQUAL_TO_TARGET_USER_ID("USER_10013","다른 사용자의 ID 필요",HttpStatus.BAD_REQUEST),
 	QUESTION_ANSWER_NOT_EQUAL_TO_OLD_QUESTION_ANSWER("USER_10013","비밀번호 찾기 질문의 답이 서로 일치하지 않음",HttpStatus.BAD_REQUEST),
-	QUESTION_ANSWER_IS_NEEDED("USER_10014","비밀번호 찾기 질문의 답이 필요함", HttpStatus.BAD_REQUEST);
+	QUESTION_ANSWER_IS_NEEDED("USER_10014","비밀번호 찾기 질문의 답이 필요함", HttpStatus.BAD_REQUEST),
+	NUMBER_OF_FOLLOWING_INFO_EXCEED_LIMIT("USER_10014","팔로우 제한 초과", HttpStatus.BAD_REQUEST),
+	NUMBER_OF_BLOCKING_INFO_EXCEED_LIMIT("USER_10014","블락 제한 초과", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

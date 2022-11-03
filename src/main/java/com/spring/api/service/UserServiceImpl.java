@@ -129,4 +129,46 @@ public class UserServiceImpl implements UserService{
 		
 		return;
 	}
+
+	@Override
+	public void createFollowingInfo(HttpServletRequest request, HashMap<String, String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		String target_user_id = param.get("target_user_id");
+		
+		param.put("source_user_id", source_user_id);
+		
+		checkUtil.checkUserIdRegex(target_user_id);
+		checkUtil.isSourceUserIdAndTargetUserIdSame(source_user_id, target_user_id);
+		checkUtil.checkNumberOfFollowingInfo(source_user_id);
+		checkUtil.isNotBlocked(source_user_id, target_user_id);
+		checkUtil.isNotFollowed(source_user_id, target_user_id);
+		checkUtil.isUserExistent(source_user_id);
+		checkUtil.isUserExistent(target_user_id);
+
+		userMapper.createFollowingInfo(param);
+		
+		return;
+	}
+
+	@Override
+	public void createBlockingInfo(HttpServletRequest request, HashMap<String, String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		String target_user_id = param.get("target_user_id");
+		
+		param.put("source_user_id", source_user_id);
+		
+		checkUtil.checkUserIdRegex(target_user_id);
+		checkUtil.isSourceUserIdAndTargetUserIdSame(source_user_id, target_user_id);
+		checkUtil.checkNumberOfBlockingInfo(source_user_id);
+		checkUtil.isNotBlocked(source_user_id, target_user_id);
+		checkUtil.isNotFollowed(source_user_id, target_user_id);
+		checkUtil.isUserExistent(source_user_id);
+		checkUtil.isUserExistent(target_user_id);
+		
+		userMapper.createBlockingInfo(param);
+		
+		return;
+	}
 }

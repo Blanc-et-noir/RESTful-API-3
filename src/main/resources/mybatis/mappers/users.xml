@@ -26,6 +26,30 @@
 		WHERE question_id = ${question_id}
 	</select>
 	
+	<select id="readFollowingInfoByBothUserId" resultType="FollowingEntity" parameterType="HashMap">
+		SELECT *
+		FROM followings
+		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
+	</select>
+	
+	<select id="readBlockingInfoByBothUserId" resultType="BlockingEntity" parameterType="HashMap">
+		SELECT *
+		FROM blockings
+		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
+	</select>
+	
+	<select id="readFollowingInfoBySourceUserId" resultType="FollowingEntity" parameterType="String">
+		SELECT *
+		FROM followings
+		WHERE source_user_id = #{source_user_id}
+	</select>
+	
+	<select id="readBlockingInfoBySourceUserId" resultType="BlockingEntity" parameterType="String">
+		SELECT *
+		FROM blockings
+		WHERE source_user_id = #{source_user_id}
+	</select>
+	
 	<insert id="createUser" parameterType="HashMap">
 		INSERT INTO users(
 			user_id,
@@ -38,6 +62,14 @@
 			question_answer
 		)
 		VALUES(#{user_id},#{user_pw},#{user_name},#{user_phone},#{user_salt},UPPER(#{user_gender}),#{question_id},#{question_answer})
+	</insert>
+	
+	<insert id="createFollowingInfo">
+		INSERT INTO followings(source_user_id,target_user_id) VALUES(#{source_user_id},#{target_user_id})
+	</insert>
+	
+	<insert id="createBlockingInfo">
+		INSERT INTO blockings(source_user_id,target_user_id) VALUES(#{source_user_id},#{target_user_id})
 	</insert>
 	
 	<update id="updateMyUserInfo" parameterType="HashMap">

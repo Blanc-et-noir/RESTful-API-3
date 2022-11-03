@@ -34,7 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     	String user_accesstoken = getUserAccesstokenFromRequest(request);
         String stored_user_accesstoken = null;
-        
     	String user_id = null;
     	
         if(!StringUtils.hasText(user_accesstoken)) {
@@ -56,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-
+        
         filterChain.doFilter(request, response);
     }
 

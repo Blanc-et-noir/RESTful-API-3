@@ -8,4 +8,8 @@ public interface UserService{
 	public void createUser(HashMap<String,String> param) throws RuntimeException;
 
 	public void updateMyUserInfo(HttpServletRequest request, HashMap<String, String> param);
+
+	public void createFollowingInfo(HttpServletRequest request, HashMap<String, String> param);
+	
+	public void createBlockingInfo(HttpServletRequest request, HashMap<String, String> param);
 }

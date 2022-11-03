@@ -1,5 +1,7 @@
 package com.spring.api.util;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -18,6 +20,9 @@ public class CheckUtil {
 	private JwtTokenProvider jwtTokenProvider;
 	@Autowired
 	private UserMapper userMapper;
+	
+	private final int FOLLOWING_LIMIT = 5;
+	private final int BLOCKING_LIMIT = 5;
 	
 	public void checkAccessToken(String stored_user_accesstoken, String user_accesstoken) {
 		if(!StringUtils.hasText(user_accesstoken)) {
@@ -131,5 +136,43 @@ public class CheckUtil {
 		if(questionEntity==null) {
 			throw new CustomException(UserError.NOT_FOUND_QUESTION);
 		}
+	}
+	
+	public void isSourceUserIdAndTargetUserIdSame(String source_user_id, String target_user_id) {
+		if(source_user_id.equals(target_user_id)) {
+			throw new CustomException(UserError.SOURCE_USER_ID_EQUAL_TO_TARGET_USER_ID);
+		}
+	}
+
+	public void checkNumberOfFollowingInfo(String source_user_id) {
+		if(userMapper.readFollowingInfoBySourceUserId(source_user_id).size()>=FOLLOWING_LIMIT) {
+			throw new CustomException(UserError.NUMBER_OF_FOLLOWING_INFO_EXCEED_LIMIT);
+		}
+	}
+
+	public void checkNumberOfBlockingInfo(String source_user_id) {
+		if(userMapper.readBlockingInfoBySourceUserId(source_user_id).size()>=BLOCKING_LIMIT) {
+			throw new CustomException(UserError.NUMBER_OF_BLOCKING_INFO_EXCEED_LIMIT);
+		}
+	}
+	
+	public void isNotBlocked(String source_user_id, String target_user_id) {
+		HashMap param = new HashMap();
+		param.put("source_user_id", source_user_id);
+		param.put("target_user_id", target_user_id);
+		
+		if(userMapper.readBlockingInfoByBothUserId(param) != null) {
+			throw new CustomException(UserError.DUPLICATE_BLOCKING_INFO);
+		}		
+	}
+	
+	public void isNotFollowed(String source_user_id, String target_user_id) {
+		HashMap param = new HashMap();
+		param.put("source_user_id", source_user_id);
+		param.put("target_user_id", target_user_id);
+		
+		if(userMapper.readFollowingInfoByBothUserId(param) != null) {
+			throw new CustomException(UserError.DUPLICATE_FOLLOWING_INFO);
+		}		
 	}
 }
