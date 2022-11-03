@@ -57,7 +57,7 @@ public class TokenServiceImpl implements TokenService{
 		String user_accesstoken = jwtTokenProvider.createToken(authentication,true);
 		String user_refreshtoken = jwtTokenProvider.createToken(authentication,false);
 		
-		redisTemplate.opsForValue().set(user_id+"_user_accesstoken", user_accesstoken, jwtTokenProvider.getAccesstokenExpirationTime(),TimeUnit.MILLISECONDS);
+		redisTemplate.opsForValue().set(user_id+"_user_accesstoken", user_accesstoken, jwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
 		redisTemplate.opsForValue().set(user_id+"_user_refreshtoken", user_refreshtoken, jwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
 		
 		response.addHeader("user_accesstoken", user_accesstoken);
