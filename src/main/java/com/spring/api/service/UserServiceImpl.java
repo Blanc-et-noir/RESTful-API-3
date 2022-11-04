@@ -84,7 +84,8 @@ public class UserServiceImpl implements UserService{
 		
 		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 		String user_salt = userEntity.getUser_salt();
-
+		String user_refreshtoken = userEntity.getUser_refreshtoken();
+		
 		if(new_user_pw!=null&&new_user_pw_check!=null) {
 			checkUtil.checkUserPwRegex(new_user_pw);
 			checkUtil.checkUserPwRegex(new_user_pw_check);
@@ -127,8 +128,8 @@ public class UserServiceImpl implements UserService{
 
 		userMapper.updateMyUserInfo(param);
 		
-		redisUtil.delete(user_id+"_user_accesstoken");
-		redisUtil.delete(user_id+"_user_refreshtoken");
+		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
+		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
 		
 		return;
 	}
