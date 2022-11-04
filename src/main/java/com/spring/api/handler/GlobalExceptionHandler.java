@@ -2,6 +2,7 @@ package com.spring.api.handler;
 
 import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,9 +13,16 @@ import com.spring.api.util.ResultUtil;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	private final ResultUtil resultUtil;
+	
+	@Autowired
+	GlobalExceptionHandler(ResultUtil resultUtil){
+		this.resultUtil = resultUtil;
+	}
+	
 	@ExceptionHandler({CustomException.class})
 	public ResponseEntity<HashMap> handleCustomException(CustomException e) {		
-		HashMap result = ResultUtil.createResultMap(e.getMessage(), false);
+		HashMap result = resultUtil.createResultMap(e.getMessage(), false);
 		
 		result.put("code", e.getCode());
 		
@@ -23,7 +31,7 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler({Exception.class})
 	public ResponseEntity<HashMap> handleException(Exception e) {
-		HashMap result = ResultUtil.createResultMap("서버 내부 에러", false);
+		HashMap result = resultUtil.createResultMap("서버 내부 에러", false);
 
 		result.put("code", "SERVER_10000");
 

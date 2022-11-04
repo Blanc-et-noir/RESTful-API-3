@@ -31,4 +31,7 @@ public class UserEntity {
 	private int question_id;
 	private String question_content;
 	private String question_answer;
+	
+	private String user_accesstoken;
+	private String user_refreshtoken;
 }

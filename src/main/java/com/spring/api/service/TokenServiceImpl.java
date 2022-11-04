@@ -2,13 +2,11 @@ package com.spring.api.service;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -23,18 +21,23 @@ import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.UserMapper;
 import com.spring.api.util.CheckUtil;
+import com.spring.api.util.RedisUtil;
 
 @Service("tokenService")
 @Transactional
 public class TokenServiceImpl implements TokenService{
+	private final UserMapper userMapper;
+    private final RedisUtil redisUtil;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final CheckUtil checkUtil;
+	
 	@Autowired
-	private UserMapper userMapper;
-	@Autowired
-    private RedisTemplate<String, String> redisTemplate;
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
-	@Autowired
-	private CheckUtil checkUtil;
+	TokenServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, RedisUtil redisUtil, CheckUtil checkUtil){
+		this.userMapper = userMapper;
+		this.jwtTokenProvider = jwtTokenProvider;
+		this.redisUtil = redisUtil;
+		this.checkUtil = checkUtil;
+	}
 	
 	@Override
 	public void createToken(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws CustomException {
@@ -50,15 +53,21 @@ public class TokenServiceImpl implements TokenService{
 			throw new CustomException(UserError.NOT_FOUND_USER);
 		}
 		
-		userMapper.updateUserLoginTime(user_id);
-		
 		Authentication authentication = new UserAuthentication(userEntity.getUser_id(), null, Arrays.asList(new SimpleGrantedAuthority(userEntity.getUser_role())));
 		
 		String user_accesstoken = jwtTokenProvider.createToken(authentication,true);
 		String user_refreshtoken = jwtTokenProvider.createToken(authentication,false);
 		
-		redisTemplate.opsForValue().set(user_id+"_user_accesstoken", user_accesstoken, jwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
-		redisTemplate.opsForValue().set(user_id+"_user_refreshtoken", user_refreshtoken, jwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
+		String old_user_accesstoken = userEntity.getUser_accesstoken();
+		String old_user_refreshtoken = userEntity.getUser_refreshtoken();
+		
+		param.put("user_accesstoken", user_accesstoken);
+		param.put("user_refreshtoken", user_refreshtoken);
+		param.put("user_id", user_id);
+		userMapper.updateUserLoginTime(param);
+		
+		redisUtil.setData(old_user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(old_user_accesstoken));
+		redisUtil.setData(old_user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(old_user_refreshtoken));
 		
 		response.addHeader("user_accesstoken", user_accesstoken);
 		response.addHeader("user_refreshtoken", user_refreshtoken);
@@ -71,12 +80,15 @@ public class TokenServiceImpl implements TokenService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		checkUtil.isUserExistent(user_id);
+		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 
+		String old_user_accesstoken = userEntity.getUser_accesstoken();
+		String old_user_refreshtoken = userEntity.getUser_refreshtoken();
+		
 		userMapper.updateUserLogoutTime(user_id);
 		
-		redisTemplate.delete(user_id+"_user_accesstoken");
-		redisTemplate.delete(user_id+"_user_refreshtoken");
+		redisUtil.setData(old_user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(old_user_accesstoken));
+		redisUtil.setData(old_user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(old_user_refreshtoken));
 		
 		return;
 	}
@@ -87,24 +99,30 @@ public class TokenServiceImpl implements TokenService{
 		String user_refreshtoken = request.getHeader("user_refreshtoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		checkUtil.isUserExistent(user_id);
+		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 
-		String stored_user_accesstoken = redisTemplate.opsForValue().get(user_id+"_user_accesstoken");
-		String stored_user_refreshtoken = redisTemplate.opsForValue().get(user_id+"_user_refreshtoken");
+		String old_user_accesstoken = userEntity.getUser_accesstoken();
+		String old_user_refreshtoken = userEntity.getUser_refreshtoken();
 		
-		checkUtil.checkAccessToken(stored_user_accesstoken, user_accesstoken);
-		checkUtil.checkRefreshToken(stored_user_refreshtoken, user_refreshtoken);
+		HashMap param = new HashMap();
+		param.put("user_id", user_id);
+		param.put("user_accesstoken", user_accesstoken);
+		param.put("user_refreshtoken", user_refreshtoken);
+		userMapper.updateToken(param);
+
+		checkUtil.checkAccessToken(old_user_accesstoken, user_accesstoken);
+		checkUtil.checkRefreshToken(old_user_refreshtoken, user_refreshtoken);
 		
 		Authentication authentication = new UserAuthentication(user_id, null, null);
 		
 		String new_user_accesstoken = jwtTokenProvider.createToken(authentication, true);
 		String new_user_refreshtoken = jwtTokenProvider.createToken(authentication, false);
 		
-		redisTemplate.opsForValue().set(user_id+"_user_accesstoken", new_user_accesstoken, jwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
-		redisTemplate.opsForValue().set(user_id+"_user_refreshtoken", new_user_refreshtoken, jwtTokenProvider.getRefreshtokenExpirationTime(),TimeUnit.MILLISECONDS);
-		
 		response.addHeader("user_accesstoken", new_user_accesstoken);
 		response.addHeader("user_refreshtoken", new_user_refreshtoken);
+		
+		redisUtil.setData(old_user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(old_user_accesstoken));
+		redisUtil.setData(old_user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(old_user_refreshtoken));
 		
 		return;
 	}

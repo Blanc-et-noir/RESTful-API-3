@@ -16,18 +16,23 @@ import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.UserMapper;
 import com.spring.api.util.CheckUtil;
+import com.spring.api.util.RedisUtil;
 
 @Service("userService")
 @Transactional
 public class UserServiceImpl implements UserService{
+	private final UserMapper userMapper;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final CheckUtil checkUtil;
+    private final RedisUtil redisUtil;
+	
 	@Autowired
-	private UserMapper userMapper;
-	@Autowired
-    private RedisTemplate<String, String> redisTemplate;
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
-	@Autowired
-	private CheckUtil checkUtil;
+	UserServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, CheckUtil checkUtil, RedisUtil redisUtil){
+		this.userMapper = userMapper;
+		this.jwtTokenProvider = jwtTokenProvider;
+		this.checkUtil = checkUtil;
+		this.redisUtil = redisUtil;
+	}
 	
 	public void createUser(HashMap<String,String> param) throws CustomException {
 		String user_id = param.get("user_id");
@@ -124,8 +129,8 @@ public class UserServiceImpl implements UserService{
 
 		userMapper.updateMyUserInfo(param);
 		
-		redisTemplate.delete(user_id+"_user_accesstoken");
-		redisTemplate.delete(user_id+"_user_refreshtoken");
+		redisUtil.delete(user_id+"_user_accesstoken");
+		redisUtil.delete(user_id+"_user_refreshtoken");
 		
 		return;
 	}

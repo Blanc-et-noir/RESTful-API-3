@@ -82,22 +82,28 @@
 				question_id = #{new_question_id},
 				question_answer = #{new_question_answer},
 				user_salt = #{new_user_salt},
-				user_pw_change_time = NOW()
+				user_pw_change_time = NOW(),
 			</if>			
-			<if test="new_user_gender != null">user_gender = UPPER(#{new_user_gender}),</if>
+			<if test="new_user_gender != null">user_gender = #{new_user_gender},</if>
 		</set>
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 	
-	<update id="updateUserLoginTime" parameterType="String">
+	<update id="updateUserLoginTime" parameterType="HashMap">
 		UPDATE users
-		SET user_login_time = NOW()
+		SET user_login_time = NOW(), user_accesstoken = #{user_accesstoken}, user_refreshtoken = #{user_refreshtoken}
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 	
 	<update id="updateUserLogoutTime" parameterType="String">
 		UPDATE users
-		SET user_logout_time = NOW()
+		SET user_logout_time = NOW(), user_accesstoken = null, user_refreshtoken = null
+		WHERE user_id = #{user_id} AND user_status = 'N'
+	</update>
+	
+	<update id="updateToken" parameterType="HashMap">
+		UPDATE users
+		SET user_accesstoken = #{user_accesstoken}, user_refreshtoken = #{user_refreshtoken}
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 </mapper>

@@ -24,7 +24,7 @@ public interface UserMapper {
 
 	public void updateMyUserInfo(HashMap<String, String> param);
 	
-	public void updateUserLoginTime(String user_id);
+	public void updateUserLoginTime(HashMap param);
 	
 	public void updateUserLogoutTime(String user_id);
 	
@@ -39,4 +39,6 @@ public interface UserMapper {
 	public List<BlockingEntity> readBlockingInfoBySourceUserId(String source_user_id);
 
 	public void createBlockingInfo(HashMap param);
+
+	public void updateToken(HashMap param);
 }

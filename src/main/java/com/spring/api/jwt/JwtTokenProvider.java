@@ -80,4 +80,17 @@ public class JwtTokenProvider {
     		return "INVALID";
     	}        
     }
+    
+    public long getRemainingTime(String token) {
+    	try {
+    		long time = Jwts.parser().setSigningKey(PRIVATE_KEY).parseClaimsJws(token).getBody().getExpiration().getTime() - new Date().getTime();
+    		if(time>0) {
+    			return time;
+    		}else {
+    			return 0;
+    		}
+    	}catch(Exception e) {
+    		return 0;
+    	}
+    }
 }

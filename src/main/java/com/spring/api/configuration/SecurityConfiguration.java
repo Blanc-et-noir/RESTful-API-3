@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,19 +19,32 @@ import com.spring.api.filter.JwtAuthenticationFilter;
 import com.spring.api.handler.JwtAuthenticationDeniedHandler;
 import com.spring.api.handler.JwtAuthenticationEntryPoint;
 import com.spring.api.jwt.JwtTokenProvider;
+import com.spring.api.util.RedisUtil;
 
 @Configuration
 public class SecurityConfiguration {
-	@Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-	@Autowired
-	private JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler;
-	@Autowired
-	private RedisTemplate<String, String> redisTemplate;
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private final JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler;
+	private final RedisUtil redisUtil;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	
-    @Bean
+	@Autowired
+	SecurityConfiguration(
+			RedisUtil redisUtil, 
+			JwtTokenProvider jwtTokenProvider, 
+			JwtAuthenticationFilter jwtAuthenticationFilter, 
+			JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
+			JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler){
+		
+		this.redisUtil = redisUtil;
+		this.jwtTokenProvider = jwtTokenProvider;
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+		this.jwtAuthenticationDeniedHandler = jwtAuthenticationDeniedHandler;	
+	}
+	
+	@Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
         .httpBasic().disable()
@@ -42,12 +54,13 @@ public class SecurityConfiguration {
         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
         .antMatchers(HttpMethod.OPTIONS).permitAll()
         
+        
         .antMatchers(HttpMethod.POST,"/api/v1/tokens").permitAll()
         .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()        
         .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
         .anyRequest().authenticated().and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilterBefore(new JwtAuthenticationFilter(redisTemplate,jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
         .accessDeniedHandler(jwtAuthenticationDeniedHandler);
         

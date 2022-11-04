@@ -15,29 +15,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.service.TokenService;
 import com.spring.api.util.ResultUtil;
 
 @RestController
 public class TokenController {
+	private final TokenService tokenService;
+	private final ResultUtil resultUtil;
+	
 	@Autowired
-	private TokenService tokenService;
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+	TokenController(TokenService tokenService, ResultUtil resultUtil){
+		this.tokenService = tokenService;
+		this.resultUtil = resultUtil;
+	}
 	
 	@PostMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> createToken(HttpServletRequest request, HttpServletResponse response, @RequestBody HashMap<String,String> param){
 		tokenService.createToken(request, response, param);
 		
-		HashMap result = ResultUtil.createResultMap("토큰 발급 성공",true);
+		HashMap result = resultUtil.createResultMap("토큰 발급 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/api/v1/tokens")
 	public ResponseEntity<HashMap> readToken(HttpServletRequest request){
-		HashMap result = ResultUtil.createResultMap("토큰 조회 성공",true);
+		HashMap result = resultUtil.createResultMap("토큰 조회 성공",true);
 		
 		result.put("user", tokenService.readToken(request));
 		
@@ -48,7 +51,7 @@ public class TokenController {
 	public ResponseEntity<HashMap> updateToken(HttpServletRequest request, HttpServletResponse response){
 		tokenService.updateToken(request, response);
 		
-		HashMap result = ResultUtil.createResultMap("토큰 갱신 성공",true);
+		HashMap result = resultUtil.createResultMap("토큰 갱신 성공",true);
 
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
@@ -57,7 +60,7 @@ public class TokenController {
 	public ResponseEntity<HashMap> deleteToken(HttpServletRequest request){
 		tokenService.deleteToken(request);
 		
-		HashMap result = ResultUtil.createResultMap("토큰 삭제 성공",true);
+		HashMap result = resultUtil.createResultMap("토큰 삭제 성공",true);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
