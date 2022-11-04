@@ -25,7 +25,9 @@ public enum UserError implements Code{
 	QUESTION_ANSWER_NOT_EQUAL_TO_OLD_QUESTION_ANSWER("USER_10013","비밀번호 찾기 질문의 답이 서로 일치하지 않음",HttpStatus.BAD_REQUEST),
 	QUESTION_ANSWER_IS_NEEDED("USER_10014","비밀번호 찾기 질문의 답이 필요함", HttpStatus.BAD_REQUEST),
 	NUMBER_OF_FOLLOWING_INFO_EXCEED_LIMIT("USER_10014","팔로우 제한 초과", HttpStatus.BAD_REQUEST),
-	NUMBER_OF_BLOCKING_INFO_EXCEED_LIMIT("USER_10014","블락 제한 초과", HttpStatus.BAD_REQUEST);
+	NUMBER_OF_BLOCKING_INFO_EXCEED_LIMIT("USER_10014","블락 제한 초과", HttpStatus.BAD_REQUEST),
+	IS_NOT_FOLLOWED_USER_ID("USER_10016","팔로우중인 사용자 ID 아님", HttpStatus.BAD_REQUEST),
+	IS_NOT_BLOCKED_USER_ID("USER_10017","블락중인 사용자 ID 아님", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

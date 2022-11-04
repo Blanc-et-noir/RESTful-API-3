@@ -12,4 +12,8 @@ public interface UserService{
 	public void createFollowingInfo(HttpServletRequest request, HashMap<String, String> param);
 	
 	public void createBlockingInfo(HttpServletRequest request, HashMap<String, String> param);
+
+	public void deleteFollowingInfo(HttpServletRequest request, HashMap<String, String> param);
+
+	public void deleteBlockingInfo(HttpServletRequest request, HashMap<String, String> param);
 }

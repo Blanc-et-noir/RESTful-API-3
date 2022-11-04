@@ -30,15 +30,17 @@ public interface UserMapper {
 	
 	public FollowingEntity readFollowingInfoByBothUserId(HashMap param);
 
-	public void createFollowingInfo(HashMap param);
-
 	public List<FollowingEntity> readFollowingInfoBySourceUserId(String source_user_id);
 
 	public BlockingEntity readBlockingInfoByBothUserId(HashMap param);
 
 	public List<BlockingEntity> readBlockingInfoBySourceUserId(String source_user_id);
 
+	
+	public void createFollowingInfo(HashMap param);
 	public void createBlockingInfo(HashMap param);
-
+	public void deleteFollowingInfoByBothUserId(HashMap param);
+	public void deleteBlockingInfoByBothUserId(HashMap param);
+	
 	public void updateToken(HashMap param);
 }

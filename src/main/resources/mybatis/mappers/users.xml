@@ -106,4 +106,14 @@
 		SET user_accesstoken = #{user_accesstoken}, user_refreshtoken = #{user_refreshtoken}
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
+	
+	<delete id="deleteFollowingInfoByBothUserId" parameterType="HashMap">
+		DELETE FROM followings
+		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
+	</delete>
+	
+	<delete id="deleteBlockingInfoByBothUserId" parameterType="HashMap">
+		DELETE FROM blockings
+		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
+	</delete>
 </mapper>

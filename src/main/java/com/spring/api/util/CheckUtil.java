@@ -151,7 +151,7 @@ public class CheckUtil {
 		}
 	}
 	
-	public void isSourceUserIdAndTargetUserIdSame(String source_user_id, String target_user_id) {
+	public void isSourceUserIdAndTargetUserIdNotSame(String source_user_id, String target_user_id) {
 		if(source_user_id.equals(target_user_id)) {
 			throw new CustomException(UserError.SOURCE_USER_ID_EQUAL_TO_TARGET_USER_ID);
 		}
@@ -176,7 +176,7 @@ public class CheckUtil {
 		
 		if(userMapper.readBlockingInfoByBothUserId(param) != null) {
 			throw new CustomException(UserError.DUPLICATE_BLOCKING_INFO);
-		}		
+		}
 	}
 	
 	public void isNotFollowed(String source_user_id, String target_user_id) {
@@ -186,6 +186,26 @@ public class CheckUtil {
 		
 		if(userMapper.readFollowingInfoByBothUserId(param) != null) {
 			throw new CustomException(UserError.DUPLICATE_FOLLOWING_INFO);
-		}		
+		}
+	}
+	
+	public void isBlocked(String source_user_id, String target_user_id) {
+		HashMap param = new HashMap();
+		param.put("source_user_id", source_user_id);
+		param.put("target_user_id", target_user_id);
+		
+		if(userMapper.readBlockingInfoByBothUserId(param) == null) {
+			throw new CustomException(UserError.IS_NOT_BLOCKED_USER_ID);
+		}
+	}
+	
+	public void isFollowed(String source_user_id, String target_user_id) {
+		HashMap param = new HashMap();
+		param.put("source_user_id", source_user_id);
+		param.put("target_user_id", target_user_id);
+		
+		if(userMapper.readFollowingInfoByBothUserId(param) == null) {
+			throw new CustomException(UserError.IS_NOT_FOLLOWED_USER_ID);
+		}
 	}
 }

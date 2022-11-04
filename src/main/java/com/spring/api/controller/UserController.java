@@ -65,7 +65,7 @@ public class UserController {
 	
 	@DeleteMapping("/api/v1/users/me/followings")
 	public ResponseEntity<HashMap> deleteFollowingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
-		//userService.deleteFollowingInfo(request,param);
+		userService.deleteFollowingInfo(request,param);
 		
 		HashMap result = resultUtil.createResultMap("회원 팔로우 해제 성공",true);
 		
@@ -74,7 +74,7 @@ public class UserController {
 	
 	@DeleteMapping("/api/v1/users/me/blockings")
 	public ResponseEntity<HashMap> deleteBlockingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
-		//userService.deleteBlockingInfo(request,param);
+		userService.deleteBlockingInfo(request,param);
 		
 		HashMap result = resultUtil.createResultMap("회원 블락 해제 성공",true);
 		
