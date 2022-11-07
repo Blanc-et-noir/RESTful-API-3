@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.api.mapper.MessageMapper">
+	<select id="readUsersByUserIds" resultType="UserEntity" parameterType="List">
+		SELECT *
+		FROM users
+		WHERE user_id IN <foreach collection="user_ids" separator="," open="(" close=")" item="user_id">user_id</foreach> AND user_status = 'N'
+	</select>
+
+	<select id="readMessageTypeByMessageTypeId" resultType="HashMap" parameterType="Integer">
+		SELECT *
+		FROM message_types
+		WHERE message_type_id = #{message_type_id}
+	</select>
+
+	<select id="readUsersByNotBlockedUserIds" resultType="String" parameterType="HashMap">
+		SELECT user_id
+		FROM users
+		WHERE
+			user_status = 'N' AND
+			user_id IN <foreach collection="message_receiver_user_ids" separator="," open="(" close=")" item="user_id">#{user_id}</foreach> AND
+			user_id NOT IN (SELECT source_user_id FROM blockings WHERE target_user_id = #{message_sender_user_id})
+	</select>
+
+	<select id="readNewMessageId" resultType="Integer">
+		SELECT NEXTVAL(seq_message_id)
+	</select>
+
+	<insert id="createBulkMessage" parameterType="HashMap">
+		INSERT INTO messages VALUES(${message_id},${message_type_id},#{message_title},#{message_content})
+	</insert>
+	
+	<insert id="createMessageSenderInfo" parameterType="HashMap">
+		INSERT INTO message_senders(message_id, message_sender_user_id) VALUES(${message_id},#{message_sender_user_id})
+	</insert>
+	
+	<insert id="createMessageReceiverInfo" parameterType="HashMap">
+		INSERT INTO message_receivers(message_id, message_receiver_user_id) VALUES
+		<foreach collection="message_receiver_user_ids" item="id" separator=",">(${message_id},#{id,jdbcType=VARCHAR})</foreach>
+	</insert>
+</mapper>

@@ -16,6 +16,8 @@ public class RegexUtil {
 	private final String DATE_REGEX = "^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$";
 	private final String USER_GENDER_REGEX = "[mfMF]";
 	private final int QUESTION_ANSWER_MAX_BYTES = 120;
+	private final int MESSAGE_TITLE_MAX_BYTES = 120;
+	private final int MESSAGE_CONTENT_MAX_BYTES = 600;
 	
 	public boolean checkBytes(String str, final int maxLength) {
 		if(!StringUtils.hasText(str)) {

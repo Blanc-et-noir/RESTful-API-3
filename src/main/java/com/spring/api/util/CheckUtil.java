@@ -1,6 +1,7 @@
 package com.spring.api.util;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -8,17 +9,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.spring.api.code.AuthError;
+import com.spring.api.code.MessageError;
 import com.spring.api.code.UserError;
+import com.spring.api.entity.MessageEntity;
 import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
+import com.spring.api.mapper.MessageMapper;
 import com.spring.api.mapper.UserMapper;
 
 @Component
 public class CheckUtil {
 	private JwtTokenProvider jwtTokenProvider;
 	private UserMapper userMapper;
+	private MessageMapper messageMapper;
     private RedisTemplate<String, String> redisTemplate;
     private RegexUtil regexUtil;
     
@@ -26,8 +31,9 @@ public class CheckUtil {
 	private final int BLOCKING_LIMIT = 5;
 
 	@Autowired
-	CheckUtil(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, RedisTemplate redisTemplate, RegexUtil regexUtil){
+	CheckUtil(UserMapper userMapper,MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, RedisTemplate redisTemplate, RegexUtil regexUtil){
 		this.userMapper = userMapper;
+		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.redisTemplate = redisTemplate;
 		this.regexUtil = regexUtil;
@@ -68,6 +74,20 @@ public class CheckUtil {
 	public void checkUserIdRegex(String user_id) {
 		if(!regexUtil.checkRegex(user_id, regexUtil.getUSER_ID_REGEX())) {
 			throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
+		}
+	}
+	
+	public void checkUserIdsRegex(List<String> user_ids) {
+		for(String user_id : user_ids) {
+			if(!regexUtil.checkRegex(user_id, regexUtil.getUSER_ID_REGEX())) {
+				throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
+			}
+		}
+	}
+	
+	public void areUserIdsNotEmpty(List<String> user_ids) {
+		if(user_ids.isEmpty()||user_ids.size()<=0) {
+			throw new CustomException(MessageError.ARE_USER_IDS_EMPTY);
 		}
 	}
 	
@@ -115,9 +135,29 @@ public class CheckUtil {
 		}
 	}
 	
+	public void checkMessageTypeIdRegex(String message_type_id) {
+		try {
+			Integer.parseInt(message_type_id);
+		}catch(Exception e) {
+			throw new CustomException(MessageError.MESSAGE_TYPE_ID_NOT_MATCHED_TO_REGEX);
+		}
+	}
+	
 	public void checkQuestionAnswerBytes(String question_answer) {
 		if(!regexUtil.checkBytes(question_answer, regexUtil.getQUESTION_ANSWER_MAX_BYTES())) {
 			throw new CustomException(UserError.QUESTION_ANSWER_EXCEED_MAX_BYTES);
+		}
+	}
+	
+	public void checkMessageTitleBytes(String message_title) {
+		if(!regexUtil.checkBytes(message_title, regexUtil.getMESSAGE_TITLE_MAX_BYTES())) {
+			throw new CustomException(MessageError.MESSAGE_TITLE_EXCEED_MAX_BYTES);
+		}
+	}
+	
+	public void checkMessageContentBytes(String message_content) {
+		if(!regexUtil.checkBytes(message_content, regexUtil.getMESSAGE_CONTENT_MAX_BYTES())) {
+			throw new CustomException(MessageError.MESSAGE_CONTENT_EXCEED_MAX_BYTES);
 		}
 	}
 	
@@ -148,6 +188,12 @@ public class CheckUtil {
 		
 		if(questionEntity==null) {
 			throw new CustomException(UserError.NOT_FOUND_QUESTION);
+		}
+	}
+	
+	public void isMessageTypeExistent(int message_type_id) {
+		if(messageMapper.readMessageTypeByMessageTypeId(message_type_id)==null) {
+			throw new CustomException(MessageError.NOT_FOUND_MESSAGE_TYPE);
 		}
 	}
 	
@@ -206,6 +252,12 @@ public class CheckUtil {
 		
 		if(userMapper.readFollowingInfoByBothUserId(param) == null) {
 			throw new CustomException(UserError.IS_NOT_FOLLOWED_USER_ID);
+		}
+	}
+	
+	public void areUsersExistent(List<String> user_ids) {
+		if(messageMapper.readUsersByUserIds(user_ids).size()<user_ids.size()) {
+			throw new CustomException(UserError.NOT_FOUND_USER);
 		}
 	}
 }

@@ -3,7 +3,8 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<typeAliases>
-		<typeAlias type="java.util.HashMap" alias="HashMap"/>	
+		<typeAlias type="java.util.HashMap" alias="HashMap"/>
+		<typeAlias type="java.util.List" alias="List"/>
 		<typeAlias type="com.spring.api.entity.UserEntity" alias="UserEntity"/>
 		<typeAlias type="com.spring.api.entity.QuestionEntity" alias="QuestionEntity"/>
 		<typeAlias type="com.spring.api.entity.FollowingEntity" alias="FollowingEntity"/>

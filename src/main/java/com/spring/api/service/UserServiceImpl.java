@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService{
 		
 		checkUtil.checkUserIdRegex(target_user_id);
 		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		checkUtil.isUserExistent(source_user_id);
+		//checkUtil.isUserExistent(source_user_id);
 		checkUtil.isUserExistent(target_user_id);
 		checkUtil.checkNumberOfFollowingInfo(source_user_id);
 		checkUtil.isNotBlocked(source_user_id, target_user_id);
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService{
 		
 		checkUtil.checkUserIdRegex(target_user_id);
 		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		checkUtil.isUserExistent(source_user_id);
+		//checkUtil.isUserExistent(source_user_id);
 		checkUtil.isUserExistent(target_user_id);
 		checkUtil.checkNumberOfBlockingInfo(source_user_id);
 		checkUtil.isNotBlocked(source_user_id, target_user_id);
@@ -185,7 +185,7 @@ public class UserServiceImpl implements UserService{
 		param.put("source_user_id", source_user_id);
 		checkUtil.checkUserIdRegex(target_user_id);
 		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		checkUtil.isUserExistent(source_user_id);
+		//checkUtil.isUserExistent(source_user_id);
 		checkUtil.isUserExistent(target_user_id);
 		checkUtil.isFollowed(source_user_id, target_user_id);
 		
@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService{
 		param.put("source_user_id", source_user_id);
 		checkUtil.checkUserIdRegex(target_user_id);
 		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		checkUtil.isUserExistent(source_user_id);
+		//checkUtil.isUserExistent(source_user_id);
 		checkUtil.isUserExistent(target_user_id);
 		checkUtil.isBlocked(source_user_id, target_user_id);
 		
