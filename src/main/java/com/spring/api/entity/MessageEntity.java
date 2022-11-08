@@ -1,6 +1,7 @@
 package com.spring.api.entity;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,6 @@ public class MessageEntity {
 	private String message_sender_status;
 	private String message_receiver_status;
 	
-	private Date message_sender_time;
-	private Date message_receiver_time;
+	private Timestamp message_sender_time;
+	private Timestamp message_receiver_time;
 }

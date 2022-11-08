@@ -5,7 +5,7 @@
 	<select id="readUsersByUserIds" resultType="UserEntity" parameterType="List">
 		SELECT *
 		FROM users
-		WHERE user_id IN <foreach collection="user_ids" separator="," open="(" close=")" item="user_id">user_id</foreach> AND user_status = 'N'
+		WHERE user_id IN <foreach collection="message_receiver_user_ids" separator="," open="(" close=")" item="message_receiver_user_id">#{message_receiver_user_id}</foreach> AND user_status = 'N'
 	</select>
 
 	<select id="readMessageTypeByMessageTypeId" resultType="HashMap" parameterType="Integer">
@@ -19,12 +19,36 @@
 		FROM users
 		WHERE
 			user_status = 'N' AND
-			user_id IN <foreach collection="message_receiver_user_ids" separator="," open="(" close=")" item="user_id">#{user_id}</foreach> AND
+			user_id IN <foreach collection="message_receiver_user_ids" separator="," open="(" close=")" item="message_receiver_user_id">#{message_receiver_user_id}</foreach> AND
 			user_id NOT IN (SELECT source_user_id FROM blockings WHERE target_user_id = #{message_sender_user_id})
 	</select>
 
-	<select id="readNewMessageId" resultType="Integer">
+	<select id="readNewMessageId" resultType="Integer" parameterType="HashMap">
 		SELECT NEXTVAL(seq_message_id)
+	</select>
+	
+	<select id="countMessages" resultType="Integer" parameterType="HashMap">
+		SELECT COUNT(*) "max_page"
+		FROM messages NATURAL JOIN (
+			SELECT *
+			FROM ${message_box}
+			WHERE ${owner_user_id} = #{user_id} AND ${owner_message_status} = 'N'
+		) r NATURAL JOIN ${other_message_box}
+		WHERE ${flag} LIKE CONCAT('%',#{search},'%')
+	</select>
+	
+	<select id="readBulkMessage" resultType="MessageEntity" parameterType="HashMap">
+		SELECT *
+		FROM messages 
+		NATURAL JOIN message_types 
+		NATURAL JOIN (
+			SELECT *
+			FROM ${message_box}
+			WHERE ${owner_user_id} = #{user_id} AND ${owner_message_status} = 'N'
+		) r NATURAL JOIN ${other_message_box}
+		WHERE ${flag} LIKE CONCAT('%',#{search},'%')
+		ORDER BY message_id ${order}
+		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
 	</select>
 
 	<insert id="createBulkMessage" parameterType="HashMap">
@@ -37,6 +61,6 @@
 	
 	<insert id="createMessageReceiverInfo" parameterType="HashMap">
 		INSERT INTO message_receivers(message_id, message_receiver_user_id) VALUES
-		<foreach collection="message_receiver_user_ids" item="id" separator=",">(${message_id},#{id,jdbcType=VARCHAR})</foreach>
+		<foreach collection="message_receiver_user_ids" item="message_receiver_user_id" separator=",">(${message_id},#{message_receiver_user_id})</foreach>
 	</insert>
 </mapper>

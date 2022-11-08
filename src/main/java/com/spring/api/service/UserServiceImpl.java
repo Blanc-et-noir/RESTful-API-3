@@ -15,7 +15,7 @@ import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.UserMapper;
-import com.spring.api.util.CheckUtil;
+import com.spring.api.util.UserCheckUtil;
 import com.spring.api.util.RedisUtil;
 
 @Service("userService")
@@ -23,11 +23,11 @@ import com.spring.api.util.RedisUtil;
 public class UserServiceImpl implements UserService{
 	private final UserMapper userMapper;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final CheckUtil checkUtil;
+	private final UserCheckUtil checkUtil;
     private final RedisUtil redisUtil;
 	
 	@Autowired
-	UserServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, CheckUtil checkUtil, RedisUtil redisUtil){
+	UserServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, UserCheckUtil checkUtil, RedisUtil redisUtil){
 		this.userMapper = userMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.checkUtil = checkUtil;

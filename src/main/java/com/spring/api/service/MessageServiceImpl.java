@@ -1,6 +1,7 @@
 package com.spring.api.service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.spring.api.dto.MessageDTO;
+import com.spring.api.entity.MessageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.MessageMapper;
-import com.spring.api.util.CheckUtil;
+import com.spring.api.util.MessageCheckUtil;
 import com.spring.api.util.RedisUtil;
 
 @Service("messageService")
@@ -21,14 +23,14 @@ import com.spring.api.util.RedisUtil;
 public class MessageServiceImpl implements MessageService{
 	private final MessageMapper messageMapper;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final CheckUtil checkUtil;
+	private final MessageCheckUtil messageCheckUtil;
     private final RedisUtil redisUtil;
 	
 	@Autowired
-	MessageServiceImpl(MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, CheckUtil checkUtil, RedisUtil redisUtil){
+	MessageServiceImpl(MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, MessageCheckUtil MessageCheckUtil, RedisUtil redisUtil){
 		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
-		this.checkUtil = checkUtil;
+		this.messageCheckUtil = MessageCheckUtil;
 		this.redisUtil = redisUtil;
 	}
 	
@@ -42,16 +44,16 @@ public class MessageServiceImpl implements MessageService{
 		String message_title = (String) param.get("message_title");
 		String message_content = (String) param.get("message_content");
 		
-		checkUtil.checkMessageTypeIdRegex(message_type_id);
-		checkUtil.checkMessageTitleBytes(message_title);
-		checkUtil.checkMessageContentBytes(message_content);
+		messageCheckUtil.checkMessageTypeIdRegex(message_type_id);
+		messageCheckUtil.checkMessageTitleBytes(message_title);
+		messageCheckUtil.checkMessageContentBytes(message_content);
 		
 		List<String> message_receiver_user_ids = (List<String>) param.get("message_receiver_user_ids");
 		
-		checkUtil.areUserIdsNotEmpty(message_receiver_user_ids);
-		checkUtil.checkUserIdsRegex(message_receiver_user_ids);
-		checkUtil.areUsersExistent(message_receiver_user_ids);
-		checkUtil.isMessageTypeExistent(Integer.parseInt(message_type_id));
+		messageCheckUtil.areTheNumberOfUserIdsProper(message_receiver_user_ids);
+		messageCheckUtil.checkUserIdsRegex(message_receiver_user_ids);
+		messageCheckUtil.areUsersExistent(message_receiver_user_ids);
+		messageCheckUtil.isMessageTypeExistent(Integer.parseInt(message_type_id));
 		
 		int message_id = messageMapper.readNewMessageId();
 		param.put("message_id", message_id);
@@ -87,7 +89,47 @@ public class MessageServiceImpl implements MessageService{
 
 	@Override
 	public List<MessageDTO> readBulkMessage(HttpServletRequest request, HashMap<String, String> param) {
-		// TODO Auto-generated method stub
-		return null;
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		param.put("user_id", user_id);
+		
+		String message_box = messageCheckUtil.checkMessageBox(param.get("message_box"));
+		String flag = messageCheckUtil.checkFlag(param.get("flag"), message_box);
+		String search = messageCheckUtil.checkSearch(flag,param.get("search"));
+		String order = messageCheckUtil.checkOrderRegex(param.get("order"));
+		String page = param.get("page");
+		
+		messageCheckUtil.checkSearch(flag,search);
+		
+		param.put("message_box", message_box);
+		
+		if(message_box.equalsIgnoreCase("message_receivers")) {
+			param.put("owner_user_id", "message_receiver_user_id");
+			param.put("owner_message_status", "message_receiver_status");
+			param.put("other_message_box", "message_senders");
+		}else {
+			param.put("owner_user_id", "message_sender_user_id");
+			param.put("owner_message_status", "message_sender_status");
+			param.put("other_message_box", "message_receivers");
+		}
+		
+		param.put("flag", flag);
+		param.put("search", search);
+		param.put("order", order);
+		
+		final int MAX_PAGE = messageMapper.countMessages(param);
+		
+		int limit = messageCheckUtil.checkLimitRegex(param.get("limit"));	
+		messageCheckUtil.checkPageRegex(MAX_PAGE, limit, page);
+		
+		param.put("offset", Integer.parseInt(page)*limit+"");
+		
+		List<MessageDTO> messages = new LinkedList<MessageDTO>();
+		
+		for(MessageEntity messageEntity : messageMapper.readBulkMessage(param)) {
+			messages.add(new MessageDTO(messageEntity));
+		}
+		
+		return messages;
 	}
 }

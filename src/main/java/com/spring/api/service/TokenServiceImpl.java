@@ -20,7 +20,7 @@ import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.UserMapper;
-import com.spring.api.util.CheckUtil;
+import com.spring.api.util.UserCheckUtil;
 import com.spring.api.util.RedisUtil;
 
 @Service("tokenService")
@@ -29,10 +29,10 @@ public class TokenServiceImpl implements TokenService{
 	private final UserMapper userMapper;
     private final RedisUtil redisUtil;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final CheckUtil checkUtil;
+	private final UserCheckUtil checkUtil;
 	
 	@Autowired
-	TokenServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, RedisUtil redisUtil, CheckUtil checkUtil){
+	TokenServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, RedisUtil redisUtil, UserCheckUtil checkUtil){
 		this.userMapper = userMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.redisUtil = redisUtil;
@@ -100,7 +100,7 @@ public class TokenServiceImpl implements TokenService{
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
 		UserEntity userEntity = checkUtil.isUserExistent(user_id);
-
+		
 		String old_user_accesstoken = userEntity.getUser_accesstoken();
 		String old_user_refreshtoken = userEntity.getUser_refreshtoken();
 		

@@ -66,6 +66,7 @@ public class MessageController {
 	public ResponseEntity<HashMap> readBulkMessage(HttpServletRequest request, @RequestParam HashMap<String,String> param){
 		
 		HashMap result = resultUtil.createResultMap("메세지 읽기 성공",true);
+		result.put("messages", messageService.readBulkMessage(request, param));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

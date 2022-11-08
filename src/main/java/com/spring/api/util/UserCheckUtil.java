@@ -20,7 +20,7 @@ import com.spring.api.mapper.MessageMapper;
 import com.spring.api.mapper.UserMapper;
 
 @Component
-public class CheckUtil {
+public class UserCheckUtil {
 	private JwtTokenProvider jwtTokenProvider;
 	private UserMapper userMapper;
 	private MessageMapper messageMapper;
@@ -29,9 +29,10 @@ public class CheckUtil {
     
 	private final int FOLLOWING_LIMIT = 5;
 	private final int BLOCKING_LIMIT = 5;
-
+	private final int MESSAGE_RECEIVER_USER_ID_LIMIT = 10;
+	
 	@Autowired
-	CheckUtil(UserMapper userMapper,MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, RedisTemplate redisTemplate, RegexUtil regexUtil){
+	UserCheckUtil(UserMapper userMapper,MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, RedisTemplate redisTemplate, RegexUtil regexUtil){
 		this.userMapper = userMapper;
 		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
@@ -76,21 +77,7 @@ public class CheckUtil {
 			throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
 		}
 	}
-	
-	public void checkUserIdsRegex(List<String> user_ids) {
-		for(String user_id : user_ids) {
-			if(!regexUtil.checkRegex(user_id, regexUtil.getUSER_ID_REGEX())) {
-				throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
-			}
-		}
-	}
-	
-	public void areUserIdsNotEmpty(List<String> user_ids) {
-		if(user_ids.isEmpty()||user_ids.size()<=0) {
-			throw new CustomException(MessageError.ARE_USER_IDS_EMPTY);
-		}
-	}
-	
+
 	public void checkUserPwRegex(String user_pw) {
 		if(!regexUtil.checkRegex(user_pw, regexUtil.getUSER_PW_REGEX())) {
 			throw new CustomException(UserError.USER_PW_NOT_MATCHED_TO_REGEX);
@@ -134,32 +121,14 @@ public class CheckUtil {
 			throw new CustomException(UserError.QUESTION_ID_NOT_MATCHED_TO_REGEX);
 		}
 	}
-	
-	public void checkMessageTypeIdRegex(String message_type_id) {
-		try {
-			Integer.parseInt(message_type_id);
-		}catch(Exception e) {
-			throw new CustomException(MessageError.MESSAGE_TYPE_ID_NOT_MATCHED_TO_REGEX);
-		}
-	}
+
 	
 	public void checkQuestionAnswerBytes(String question_answer) {
 		if(!regexUtil.checkBytes(question_answer, regexUtil.getQUESTION_ANSWER_MAX_BYTES())) {
 			throw new CustomException(UserError.QUESTION_ANSWER_EXCEED_MAX_BYTES);
 		}
 	}
-	
-	public void checkMessageTitleBytes(String message_title) {
-		if(!regexUtil.checkBytes(message_title, regexUtil.getMESSAGE_TITLE_MAX_BYTES())) {
-			throw new CustomException(MessageError.MESSAGE_TITLE_EXCEED_MAX_BYTES);
-		}
-	}
-	
-	public void checkMessageContentBytes(String message_content) {
-		if(!regexUtil.checkBytes(message_content, regexUtil.getMESSAGE_CONTENT_MAX_BYTES())) {
-			throw new CustomException(MessageError.MESSAGE_CONTENT_EXCEED_MAX_BYTES);
-		}
-	}
+
 	
 	public UserEntity isUserExistent(String user_id) {		
 		UserEntity userEntity = userMapper.readUserInfoByNotWithdrawedUserId(user_id);
@@ -191,11 +160,7 @@ public class CheckUtil {
 		}
 	}
 	
-	public void isMessageTypeExistent(int message_type_id) {
-		if(messageMapper.readMessageTypeByMessageTypeId(message_type_id)==null) {
-			throw new CustomException(MessageError.NOT_FOUND_MESSAGE_TYPE);
-		}
-	}
+
 	
 	public void isSourceUserIdAndTargetUserIdNotSame(String source_user_id, String target_user_id) {
 		if(source_user_id.equals(target_user_id)) {
@@ -252,12 +217,6 @@ public class CheckUtil {
 		
 		if(userMapper.readFollowingInfoByBothUserId(param) == null) {
 			throw new CustomException(UserError.IS_NOT_FOLLOWED_USER_ID);
-		}
-	}
-	
-	public void areUsersExistent(List<String> user_ids) {
-		if(messageMapper.readUsersByUserIds(user_ids).size()<user_ids.size()) {
-			throw new CustomException(UserError.NOT_FOUND_USER);
 		}
 	}
 }
