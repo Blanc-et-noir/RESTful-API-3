@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,6 +78,24 @@ public class UserController {
 		userService.deleteBlockingInfo(request,param);
 		
 		HashMap result = resultUtil.createResultMap("회원 블락 해제 성공",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("/api/v1/users/me/followings")
+	public ResponseEntity<HashMap> readFollowingInfo(HttpServletRequest request){
+		HashMap result = resultUtil.createResultMap("회원 팔로우 목록 조회 성공",true);
+		
+		result.put("followings", userService.readFollowingInfo(request));
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("/api/v1/users/me/blockings")
+	public ResponseEntity<HashMap> readBlockingInfo(HttpServletRequest request){
+		HashMap result = resultUtil.createResultMap("회원 블락 목록 조회 성공",true);
+		
+		result.put("blockings", userService.readBlockingInfo(request));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

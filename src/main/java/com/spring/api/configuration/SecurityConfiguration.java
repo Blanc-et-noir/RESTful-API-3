@@ -52,13 +52,14 @@ public class SecurityConfiguration {
         .cors().configurationSource(configurationSource()).and()
         .authorizeRequests()
         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+        
         .antMatchers(HttpMethod.OPTIONS).permitAll()
-        
-        
         .antMatchers(HttpMethod.POST,"/api/v1/tokens").permitAll()
-        .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()        
+        .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()
+        .antMatchers(HttpMethod.GET,"/api/v1/tokens").permitAll()
         .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
         .anyRequest().authenticated().and()
+        
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)

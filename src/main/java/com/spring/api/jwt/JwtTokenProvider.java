@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -61,12 +62,18 @@ public class JwtTokenProvider {
     }
     
     public String getUserIdFromJWT(String token) {
-        Claims claims = Jwts.parser()
-            .setSigningKey(PRIVATE_KEY)
-            .parseClaimsJws(token)
-            .getBody();
+    	try {
+    		Claims claims = Jwts.parser()
+    	            .setSigningKey(PRIVATE_KEY)
+    	            .parseClaimsJws(token)
+    	            .getBody();
 
-        return claims.getSubject();
+    	        return claims.getSubject();
+    	}catch(ExpiredJwtException  e) {
+    		return (String) e.getClaims().getSubject();
+    	}catch(Exception e) {
+    		return "INVALID";
+    	}
     }
     
     public String getTokenType(String token) {
@@ -76,9 +83,11 @@ public class JwtTokenProvider {
     	            .parseClaimsJws(token)
     	            .getBody();
     		return (String) claims.get("token_type");
+    	}catch(ExpiredJwtException  e) {
+    		return (String) e.getClaims().get("token_type");
     	}catch(Exception e) {
     		return "INVALID";
-    	}        
+    	}
     }
     
     public long getRemainingTime(String token) {

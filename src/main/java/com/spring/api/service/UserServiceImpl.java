@@ -1,22 +1,24 @@
 package com.spring.api.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.code.UserError;
 import com.spring.api.encrypt.SHA;
+import com.spring.api.entity.BlockingEntity;
+import com.spring.api.entity.FollowingEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.UserMapper;
-import com.spring.api.util.UserCheckUtil;
 import com.spring.api.util.RedisUtil;
+import com.spring.api.util.UserCheckUtil;
 
 @Service("userService")
 @Transactional
@@ -212,5 +214,21 @@ public class UserServiceImpl implements UserService{
 		userMapper.deleteBlockingInfoByBothUserId(param);
 		
 		return;
+	}
+
+	@Override
+	public List<FollowingEntity> readFollowingInfo(HttpServletRequest request) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		return userMapper.readFollowingInfoBySourceUserId(source_user_id);
+	}
+
+	@Override
+	public List<BlockingEntity> readBlockingInfo(HttpServletRequest request) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		return userMapper.readBlockingInfoBySourceUserId(source_user_id);
 	}
 }
