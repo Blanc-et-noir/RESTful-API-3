@@ -20,8 +20,8 @@ import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.UserMapper;
-import com.spring.api.util.UserCheckUtil;
 import com.spring.api.util.RedisUtil;
+import com.spring.api.util.UserCheckUtil;
 
 @Service("tokenService")
 @Transactional
@@ -128,12 +128,17 @@ public class TokenServiceImpl implements TokenService{
 	}
 
 	@Override
-	public UserDTO readToken(HttpServletRequest request) {
+	public HashMap readToken(HttpServletRequest request) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
 		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 		
-		return new UserDTO(userEntity);
+		HashMap tokenInfo = new HashMap();
+		tokenInfo.put("token_owner", jwtTokenProvider.getUserIdFromJWT(user_accesstoken));
+		tokenInfo.put("token_type", jwtTokenProvider.getTokenType(user_accesstoken));
+		tokenInfo.put("token_remaining_time_of_seconds", jwtTokenProvider.getRemainingTime(user_accesstoken)/1000);
+		
+		return tokenInfo;
 	}
 }

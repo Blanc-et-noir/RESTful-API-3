@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.spring.api.dto.DetailedMessageDTO;
 import com.spring.api.dto.MessageDTO;
 import com.spring.api.entity.MessageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
@@ -76,13 +77,7 @@ public class MessageServiceImpl implements MessageService{
 	}
 
 	@Override
-	public void deleteBulkMessage(HttpServletRequest request, HashMap<String, String> param) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public MessageDTO readMessage(HttpServletRequest request, HashMap<String, String> param, String message_id) {
+	public DetailedMessageDTO readMessage(HttpServletRequest request, HashMap<String, String> param, String message_id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

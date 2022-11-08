@@ -14,5 +14,5 @@ public interface TokenService{
 
 	public void updateToken(HttpServletRequest request, HttpServletResponse response);
 
-	public UserDTO readToken(HttpServletRequest request);
+	public HashMap readToken(HttpServletRequest request);
 }

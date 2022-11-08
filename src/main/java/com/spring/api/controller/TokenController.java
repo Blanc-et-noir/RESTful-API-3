@@ -42,7 +42,7 @@ public class TokenController {
 	public ResponseEntity<HashMap> readToken(HttpServletRequest request){
 		HashMap result = resultUtil.createResultMap("토큰 조회 성공",true);
 		
-		result.put("user", tokenService.readToken(request));
+		result.put("token", tokenService.readToken(request));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
