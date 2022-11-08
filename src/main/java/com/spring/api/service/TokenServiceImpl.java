@@ -65,6 +65,7 @@ public class TokenServiceImpl implements TokenService{
 		param.put("user_refreshtoken", user_refreshtoken);
 		param.put("user_id", user_id);
 		userMapper.updateUserLoginTime(param);
+		userMapper.updateUserTokensToNewTokens(param);
 		
 		redisUtil.setData(old_user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(old_user_accesstoken));
 		redisUtil.setData(old_user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(old_user_refreshtoken));
@@ -85,7 +86,11 @@ public class TokenServiceImpl implements TokenService{
 		String old_user_accesstoken = userEntity.getUser_accesstoken();
 		String old_user_refreshtoken = userEntity.getUser_refreshtoken();
 		
+		HashMap param = new HashMap();
+		param.put("user_id", user_id);
+		
 		userMapper.updateUserLogoutTime(user_id);
+		userMapper.updateUserTokensToNull(param);
 		
 		redisUtil.setData(old_user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(old_user_accesstoken));
 		redisUtil.setData(old_user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(old_user_refreshtoken));
@@ -108,8 +113,9 @@ public class TokenServiceImpl implements TokenService{
 		param.put("user_id", user_id);
 		param.put("user_accesstoken", user_accesstoken);
 		param.put("user_refreshtoken", user_refreshtoken);
-		userMapper.updateToken(param);
 
+		userMapper.updateUserTokensToNewTokens(param);
+		
 		checkUtil.checkAccessToken(old_user_accesstoken, user_accesstoken);
 		checkUtil.checkRefreshToken(old_user_refreshtoken, user_refreshtoken);
 		

@@ -64,6 +64,11 @@
 		VALUES(#{user_id},#{user_pw},#{user_name},#{user_phone},#{user_salt},UPPER(#{user_gender}),#{question_id},#{question_answer})
 	</insert>
 	
+	<insert id="createUserTime" parameterType="HashMap">
+		INSERT INTO user_times(user_id, user_register_time, user_pw_change_time)
+		VALUES(#{user_id},NOW(),NOW())
+	</insert>
+	
 	<insert id="createFollowingInfo">
 		INSERT INTO followings(source_user_id,target_user_id) VALUES(#{source_user_id},#{target_user_id})
 	</insert>
@@ -82,26 +87,37 @@
 				question_id = #{new_question_id},
 				question_answer = #{new_question_answer},
 				user_salt = #{new_user_salt},
-				user_pw_change_time = NOW(),
 			</if>			
 			<if test="new_user_gender != null">user_gender = #{new_user_gender},</if>
 		</set>
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 	
+	<update id="updateUserPwChangeTime" parameterType="HashMap">
+		UPDATE user_times
+		SET user_pw_change_time = NOW()
+		WHERE user_id = #{user_id}
+	</update>
+	
 	<update id="updateUserLoginTime" parameterType="HashMap">
-		UPDATE users
-		SET user_login_time = NOW(), user_accesstoken = #{user_accesstoken}, user_refreshtoken = #{user_refreshtoken}
-		WHERE user_id = #{user_id} AND user_status = 'N'
+		UPDATE user_times
+		SET user_login_time = NOW()
+		WHERE user_id = #{user_id}
 	</update>
 	
 	<update id="updateUserLogoutTime" parameterType="String">
+		UPDATE user_times
+		SET user_logout_time = NOW()
+		WHERE user_id = #{user_id}
+	</update>
+	
+	<update id="updateUserTokensToNull" parameterType="HashMap">
 		UPDATE users
-		SET user_logout_time = NOW(), user_accesstoken = null, user_refreshtoken = null
+		SET user_accesstoken = NULL, user_refreshtoken = NULL
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 	
-	<update id="updateToken" parameterType="HashMap">
+	<update id="updateUserTokensToNewTokens" parameterType="HashMap">
 		UPDATE users
 		SET user_accesstoken = #{user_accesstoken}, user_refreshtoken = #{user_refreshtoken}
 		WHERE user_id = #{user_id} AND user_status = 'N'

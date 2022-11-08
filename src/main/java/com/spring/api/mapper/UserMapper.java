@@ -42,5 +42,11 @@ public interface UserMapper {
 	public void deleteFollowingInfoByBothUserId(HashMap param);
 	public void deleteBlockingInfoByBothUserId(HashMap param);
 	
-	public void updateToken(HashMap param);
+	public void updateUserPwChangeTime(HashMap<String, String> param);
+
+	public void createUserTime(HashMap<String, String> param);
+	
+	public void updateUserTokensToNull(HashMap param);
+	
+	public void updateUserTokensToNewTokens(HashMap param);
 }

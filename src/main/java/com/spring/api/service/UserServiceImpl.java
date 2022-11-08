@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService{
 		param.put("question_answer", SHA.DSHA512(question_answer.replaceAll(" ", ""), user_salt));
 		
 		userMapper.createUser(param);
-		
+		userMapper.createUserTime(param);
 		return;
 	}
 
@@ -119,7 +119,9 @@ public class UserServiceImpl implements UserService{
 			param.put("new_question_id", new_question_id);
 			param.put("new_user_salt", new_user_salt);
 			param.put("new_user_pw", SHA.DSHA512(new_user_pw, new_user_salt));
-			param.put("new_question_answer", SHA.DSHA512(new_question_answer.replaceAll(" ", ""), new_user_salt));			
+			param.put("new_question_answer", SHA.DSHA512(new_question_answer.replaceAll(" ", ""), new_user_salt));	
+			
+			userMapper.updateUserPwChangeTime(param);
 		}else if(new_user_pw==null&&new_question_id==null&&new_question_answer==null) {
 			
 		}else {
