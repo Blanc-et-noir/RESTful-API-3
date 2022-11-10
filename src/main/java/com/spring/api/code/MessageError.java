@@ -17,7 +17,9 @@ public enum MessageError implements Code{
 	FLAG_NOT_MATCHED_TO_REGEX("MESSAGE_10010","메세지 검색 기준이 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	USER_ID_NOT_MATCHED_TO_REGEX("MESSAGE_10011","사용자 ID가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	SEARCH_EXCEED_MAX_BYTES("MESSAGE_10012","메세지 검색 내용이 1 ~ 120 바이트 크기여야함",HttpStatus.BAD_REQUEST),
-	ORDER_NOT_MATCHED_TO_REGEX("MESSAGE_10013","메세지 조회 순서가 형식에 맞지 않음",HttpStatus.BAD_REQUEST);
+	ORDER_NOT_MATCHED_TO_REGEX("MESSAGE_10013","메세지 조회 순서가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
+	MESSAGE_ID_NOT_MATCHED_TO_REGEX("MESSAGE_10014","메세지 ID가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
+	NOT_FOUND_MESSAGE("MESSAGE_10015","메세지 정보 없음",HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

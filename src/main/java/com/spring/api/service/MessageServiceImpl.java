@@ -17,7 +17,6 @@ import com.spring.api.entity.MessageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.MessageMapper;
 import com.spring.api.util.MessageCheckUtil;
-import com.spring.api.util.RedisUtil;
 
 @Service("messageService")
 @Transactional
@@ -25,14 +24,12 @@ public class MessageServiceImpl implements MessageService{
 	private final MessageMapper messageMapper;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final MessageCheckUtil messageCheckUtil;
-    private final RedisUtil redisUtil;
 	
 	@Autowired
-	MessageServiceImpl(MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, MessageCheckUtil MessageCheckUtil, RedisUtil redisUtil){
+	MessageServiceImpl(MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, MessageCheckUtil MessageCheckUtil){
 		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.messageCheckUtil = MessageCheckUtil;
-		this.redisUtil = redisUtil;
 	}
 	
 	@Override
@@ -71,9 +68,17 @@ public class MessageServiceImpl implements MessageService{
 	}
 
 	@Override
-	public void deleteMessage(HttpServletRequest request, HashMap<String, String> param, String message_id) {
-		// TODO Auto-generated method stub
+	public void deleteMessage(HttpServletRequest request, HashMap<String,String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		String message_id = param.get("message_id");
+		param.put("user_id", user_id);
 		
+		messageCheckUtil.checkMessageIdRegex(message_id);
+		MessageEntity messageEntity = messageCheckUtil.isMessageExistent(param);
+		
+		messageMapper.deleteMessageBySenderId(param);
+		messageMapper.deleteMessageByReceiverId(param);
 	}
 
 	@Override

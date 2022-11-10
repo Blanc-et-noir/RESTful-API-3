@@ -1,5 +1,6 @@
 package com.spring.api.util;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,14 +9,13 @@ import org.springframework.stereotype.Component;
 
 import com.spring.api.code.MessageError;
 import com.spring.api.code.UserError;
+import com.spring.api.entity.MessageEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.MessageMapper;
 import com.spring.api.mapper.UserMapper;
 
-import antlr.StringUtils;
 import io.jsonwebtoken.lang.Strings;
-import io.netty.util.internal.StringUtil;
 
 @Component
 public class MessageCheckUtil {
@@ -172,6 +172,24 @@ public class MessageCheckUtil {
 			return "ASC";
 		}else {
 			throw new CustomException(MessageError.ORDER_NOT_MATCHED_TO_REGEX);
+		}
+	}
+	
+	public void checkMessageIdRegex(String message_id) {
+		try {
+			Integer.parseInt(message_id);
+		}catch(Exception e) {
+			throw new CustomException(MessageError.MESSAGE_ID_NOT_MATCHED_TO_REGEX);
+		}
+	}
+
+	public MessageEntity isMessageExistent(HashMap param) {
+		MessageEntity messageEntity = messageMapper.readMessageByMessageIdAndUserId(param);
+		
+		if(messageEntity==null) {
+			throw new CustomException(MessageError.NOT_FOUND_MESSAGE);
+		}else {
+			return messageEntity;
 		}
 	}
 }

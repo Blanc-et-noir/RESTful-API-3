@@ -219,4 +219,14 @@ public class UserCheckUtil {
 			throw new CustomException(UserError.IS_NOT_FOLLOWED_USER_ID);
 		}
 	}
+
+	public UserEntity isUserRegistered(String target_user_id) {
+		UserEntity userEntity = userMapper.readUserInfoByUserId(target_user_id);
+		
+		if(userEntity==null) {
+			throw new CustomException(UserError.NOT_FOUND_USER);
+		}
+		
+		return userEntity;
+	}
 }

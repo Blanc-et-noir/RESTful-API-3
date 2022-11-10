@@ -10,7 +10,7 @@ import com.spring.api.dto.MessageDTO;
 
 public interface MessageService{	
 	public void createBulkMessage(HttpServletRequest request, HashMap<String,Object> param);
-	public void deleteMessage(HttpServletRequest request, HashMap<String,String> param, String message_id);
+	public void deleteMessage(HttpServletRequest request, HashMap<String,String> param);
 	public DetailedMessageDTO readMessage(HttpServletRequest request, HashMap<String,String> param, String message_id);
 	public List<MessageDTO> readBulkMessage(HttpServletRequest request, HashMap<String,String> param);
 }

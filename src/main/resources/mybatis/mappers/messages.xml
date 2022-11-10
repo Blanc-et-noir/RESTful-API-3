@@ -50,9 +50,15 @@
 		ORDER BY message_id ${order}
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
 	</select>
+	
+	<select id="readMessageByMessageIdAndUserId" resultType="MessageEntity" parameterType="HashMap">
+		SELECT *
+		FROM messages NATURAL JOIN message_senders NATURAL JOIN message_receivers
+		WHERE message_id = ${message_id} AND (message_sender_status='N' AND message_sender_user_id = #{user_id} OR message_receiver_status='N' AND message_receiver_user_id = #{user_id})
+	</select>
 
 	<insert id="createBulkMessage" parameterType="HashMap">
-		INSERT INTO messages VALUES(${message_id},${message_type_id},#{message_title},#{message_content})
+		INSERT INTO messages VALUES(${message_id},${message_type_id},#{message_title},#{message_content}, NOW())
 	</insert>
 	
 	<insert id="createMessageSenderInfo" parameterType="HashMap">
@@ -63,4 +69,16 @@
 		INSERT INTO message_receivers(message_id, message_receiver_user_id) VALUES
 		<foreach collection="message_receiver_user_ids" item="message_receiver_user_id" separator=",">(${message_id},#{message_receiver_user_id})</foreach>
 	</insert>
+	
+	<update id="deleteMessageBySenderId" parameterType="HashMap">
+		UPDATE message_senders
+		SET message_sender_status = 'Y'
+		WHERE message_id = ${message_id} AND message_sender_user_id = #{user_id} AND message_sender_status = 'N'
+	</update>
+	
+	<update id="deleteMessageByReceiverId" parameterType="HashMap">
+		UPDATE message_receivers
+		SET message_receiver_status = 'Y'
+		WHERE message_id = ${message_id} AND message_receiver_user_id = #{user_id} AND message_receiver_status = 'N'
+	</update>
 </mapper>

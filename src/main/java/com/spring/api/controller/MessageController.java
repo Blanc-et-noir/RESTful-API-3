@@ -39,17 +39,13 @@ public class MessageController {
 	}
 	
 	@DeleteMapping("/api/v1/messages/me/{message_id}")
-	public ResponseEntity<HashMap> deleteMessage(HttpServletRequest request, @RequestBody HashMap<String,String> param, @PathVariable String message_id){
+	public ResponseEntity<HashMap> deleteMessage(HttpServletRequest request, @PathVariable("message_id") String message_id){
 		
 		HashMap result = resultUtil.createResultMap("메세지 삭제 성공",true);
-		
-		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
-	}
-	
-	@DeleteMapping("/api/v1/messages/me")
-	public ResponseEntity<HashMap> deleteBulkMessage(HttpServletRequest request, @RequestBody HashMap<String,String> param){
-		
-		HashMap result = resultUtil.createResultMap("메세지 삭제 성공",true);
+		HashMap param = new HashMap();
+		param.put("message_id", message_id);
+
+		messageService.deleteMessage(request, param);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

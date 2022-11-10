@@ -190,7 +190,7 @@ public class UserServiceImpl implements UserService{
 		checkUtil.checkUserIdRegex(target_user_id);
 		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
 		//checkUtil.isUserExistent(source_user_id);
-		checkUtil.isUserExistent(target_user_id);
+		checkUtil.isUserRegistered(target_user_id);
 		checkUtil.isFollowed(source_user_id, target_user_id);
 		
 		userMapper.deleteFollowingInfoByBothUserId(param);
@@ -208,7 +208,7 @@ public class UserServiceImpl implements UserService{
 		checkUtil.checkUserIdRegex(target_user_id);
 		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
 		//checkUtil.isUserExistent(source_user_id);
-		checkUtil.isUserExistent(target_user_id);
+		checkUtil.isUserRegistered(target_user_id);
 		checkUtil.isBlocked(source_user_id, target_user_id);
 		
 		userMapper.deleteBlockingInfoByBothUserId(param);

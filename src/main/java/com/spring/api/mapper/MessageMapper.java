@@ -19,4 +19,7 @@ public interface MessageMapper {
 	public void createMessageReceiverInfo(HashMap param);
 	public int countMessages(HashMap<String, String> param);
 	public List<MessageEntity> readBulkMessage(HashMap<String, String> param);
+	public MessageEntity readMessageByMessageIdAndUserId(HashMap param);
+	public void deleteMessageBySenderId(HashMap<String, String> param);
+	public void deleteMessageByReceiverId(HashMap<String, String> param);
 }
