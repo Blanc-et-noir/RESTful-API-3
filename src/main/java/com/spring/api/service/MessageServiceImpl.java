@@ -82,9 +82,15 @@ public class MessageServiceImpl implements MessageService{
 	}
 
 	@Override
-	public DetailedMessageDTO readMessage(HttpServletRequest request, HashMap<String, String> param, String message_id) {
-		// TODO Auto-generated method stub
-		return null;
+	public DetailedMessageDTO readMessage(HttpServletRequest request, HashMap<String, String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		String message_id = param.get("message_id");
+		param.put("user_id", user_id);
+		
+		MessageEntity messageEntity = messageCheckUtil.isMessageExistent(param);
+		
+		return new DetailedMessageDTO(messageEntity);
 	}
 
 	@Override

@@ -53,7 +53,7 @@
 	
 	<select id="readMessageByMessageIdAndUserId" resultType="MessageEntity" parameterType="HashMap">
 		SELECT *
-		FROM messages NATURAL JOIN message_senders NATURAL JOIN message_receivers
+		FROM messages NATURAL JOIN message_types NATURAL JOIN message_senders NATURAL JOIN message_receivers
 		WHERE message_id = ${message_id} AND (message_sender_status='N' AND message_sender_user_id = #{user_id} OR message_receiver_status='N' AND message_receiver_user_id = #{user_id})
 	</select>
 

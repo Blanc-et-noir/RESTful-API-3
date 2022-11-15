@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 public class DetailedMessageDTO {
 	private int message_id;
-	private int message_type_id;
 	
 	private String message_title;
 	private String message_type_content;
@@ -24,7 +23,6 @@ public class DetailedMessageDTO {
 	
 	public DetailedMessageDTO(MessageEntity messageEntity){
 		this.message_id = messageEntity.getMessage_id();
-		this.message_type_id = messageEntity.getMessage_type_id();
 		this.message_title = messageEntity.getMessage_title();
 		this.message_content = messageEntity.getMessage_content();
 		this.message_type_content = messageEntity.getMessage_type_content();

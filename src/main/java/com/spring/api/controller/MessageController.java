@@ -38,7 +38,7 @@ public class MessageController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping("/api/v1/messages/me/{message_id}")
+	@DeleteMapping("/api/v1/messages/{message_id}")
 	public ResponseEntity<HashMap> deleteMessage(HttpServletRequest request, @PathVariable("message_id") String message_id){
 		
 		HashMap result = resultUtil.createResultMap("메세지 삭제 성공",true);
@@ -50,10 +50,14 @@ public class MessageController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@GetMapping("/api/v1/messages/me/{message_id}")
-	public ResponseEntity<HashMap> readMessage(HttpServletRequest request, @RequestParam HashMap<String,String> param, @PathVariable String message_id){
+	@GetMapping("/api/v1/messages/{message_id}")
+	public ResponseEntity<HashMap> readMessage(HttpServletRequest request, @PathVariable String message_id){
 		
 		HashMap result = resultUtil.createResultMap("메세지 읽기 성공",true);
+		HashMap param = new HashMap();
+		param.put("message_id", message_id);
+		
+		result.put("message", messageService.readMessage(request, param));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
