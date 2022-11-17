@@ -18,6 +18,8 @@ public class RegexUtil {
 	private final int QUESTION_ANSWER_MAX_BYTES = 120;
 	private final int MESSAGE_TITLE_MAX_BYTES = 120;
 	private final int MESSAGE_CONTENT_MAX_BYTES = 600;
+	private final int ITEM_NAME_MAX_BYTES = 120;
+	private final int ITEM_DESCRIPTION_MAX_BYTES = 3000;
 	
 	public boolean checkBytes(String str, final int maxLength) {
 		if(!StringUtils.hasText(str)) {

@@ -1,0 +1,44 @@
+package com.spring.api.code;
+
+import org.springframework.http.HttpStatus;
+
+public enum ItemError implements Code{
+	
+	NOT_FOUND_USER("ITEM_10000","사용자 정보 없음", HttpStatus.BAD_REQUEST),
+	USER_ID_NOT_MATCHED_TO_REGEX("ITEM_10001","사용자 ID가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	USER_PW_NOT_MATCHED_TO_REGEX("ITEM_10002","사용자 PW가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	USER_NAME_NOT_MATCHED_TO_REGEX("ITEM_10003","사용자 이름이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	USER_PHONE_NOT_MATCHED_TO_REGEX("ITEM_10004","사용자 전화번호가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	
+	
+	ITEM_PRICE_NOT_MATCHED_TO_REGEX("ITEM_10002","상품 가격이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	ITEM_NUMBER_NOT_MATCHED_TO_REGEX("ITEM_10003","상품 수량이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	ITEM_PRICE_OUT_OF_RANGE("ITEM_10004","상품 가격은 1 ~ 100,000,000원 범위여야함", HttpStatus.BAD_REQUEST),
+	ITEM_NUMBER_OUT_OF_RANGE("ITEM_10005","상품 수량은 1 ~ 100,000,000개 범위여야함", HttpStatus.BAD_REQUEST),
+	ITEM_NAME_EXCEED_MAX_BYTES("ITEM_10006","상품 이름은 1 ~ 120 바이트 크기여야함", HttpStatus.BAD_REQUEST),
+	ITEM_DESCRIPTION_EXCEED_MAX_BYTES("ITEM_10007","상품 설명은 1 ~ 3000 바이트 크기여야함", HttpStatus.BAD_REQUEST);
+	
+	private String code, message;
+	private HttpStatus httpStatus;
+	
+	ItemError(String code, String message, HttpStatus httpStatus){
+		this.code = code;
+		this.message = message;
+		this.httpStatus = httpStatus;
+	}
+	
+	@Override
+	public java.lang.String getCode() {
+		return this.code;
+	}
+
+	@Override
+	public java.lang.String getMessage() {
+		return this.message;
+	}
+
+	@Override
+	public HttpStatus getHttpStatus() {
+		return httpStatus;
+	} 
+}

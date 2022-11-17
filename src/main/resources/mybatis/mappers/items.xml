@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.api.mapper.ItemMapper">
+	<select id="readNewItemId" resultType="Integer">
+		SELECT NEXTVAL(seq_item_id)
+	</select>
+	
+	<insert id="createItem" parameterType="HashMap">
+		INSERT INTO items
+		VALUES(${item_id},#{item_name},#{item_description},${item_price},${item_number},NOW(),'N',#{user_id})
+	</insert>
+	
+	<insert id="createItemImages" parameterType="HashMap">
+		INSERT INTO item_images VALUES
+		<foreach collection="image_files" separator="," item="image">
+			(NEXTVAL(seq_item_image_id),#{image.item_image_original_name},#{image.item_image_stored_name},#{image.item_image_extension},${image.item_image_size},'N',${item_id})
+		</foreach>
+	</insert>
+</mapper>

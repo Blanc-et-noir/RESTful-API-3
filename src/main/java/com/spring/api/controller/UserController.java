@@ -99,4 +99,12 @@ public class UserController {
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
+	
+	@DeleteMapping("/api/v1/users/me")
+	public ResponseEntity<HashMap> deleteMyUserInfo(HttpServletRequest request){
+		
+		HashMap result = resultUtil.createResultMap("회원 탈퇴 성공",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
 }
