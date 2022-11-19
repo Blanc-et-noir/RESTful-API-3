@@ -10,5 +10,6 @@
 		<typeAlias type="com.spring.api.entity.FollowingEntity" alias="FollowingEntity"/>
 		<typeAlias type="com.spring.api.entity.BlockingEntity" alias="BlockingEntity"/>
 		<typeAlias type="com.spring.api.entity.MessageEntity" alias="MessageEntity"/>
+		<typeAlias type="com.spring.api.entity.ItemEntity" alias="ItemEntity"/>
 	</typeAliases>
 </configuration>

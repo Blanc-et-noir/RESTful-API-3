@@ -16,7 +16,12 @@ public enum ItemError implements Code{
 	ITEM_PRICE_OUT_OF_RANGE("ITEM_10004","상품 가격은 1 ~ 100,000,000원 범위여야함", HttpStatus.BAD_REQUEST),
 	ITEM_NUMBER_OUT_OF_RANGE("ITEM_10005","상품 수량은 1 ~ 100,000,000개 범위여야함", HttpStatus.BAD_REQUEST),
 	ITEM_NAME_EXCEED_MAX_BYTES("ITEM_10006","상품 이름은 1 ~ 120 바이트 크기여야함", HttpStatus.BAD_REQUEST),
-	ITEM_DESCRIPTION_EXCEED_MAX_BYTES("ITEM_10007","상품 설명은 1 ~ 3000 바이트 크기여야함", HttpStatus.BAD_REQUEST);
+	ITEM_DESCRIPTION_EXCEED_MAX_BYTES("ITEM_10007","상품 설명은 1 ~ 3000 바이트 크기여야함", HttpStatus.BAD_REQUEST),
+	PAGE_OUT_OF_RANGE("ITEM_10005","상품 조회 페이지가 범위를 벗어남",HttpStatus.BAD_REQUEST),
+	PAGE_NOT_MATCHED_TO_REGEX("ITEM_10006","상품 조회 페이지가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
+	LIMIT_OUT_OF_RANGE("ITEM_10007","상품 조회 크기가 범위를 벗어남",HttpStatus.BAD_REQUEST),
+	LIMIT_NOT_MATCHED_TO_REGEX("ITEM_10008","상품 조회 크기가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
+	HASHTAG_EXCEED_MAX_BYTES("ITEM_10009","해쉬태그는 1 ~ 120 바이트 크기여야함", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

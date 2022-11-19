@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import com.spring.api.dto.ItemDTO;
+import com.spring.api.entity.ItemEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
 import com.spring.api.util.ItemCheckUtil;
-
-import ch.qos.logback.core.util.FileUtil;
 
 @Service("itemService")
 @Transactional
@@ -103,5 +103,36 @@ public class ItemServiceImpl implements ItemService{
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public List<ItemDTO> readItems(HttpServletRequest request, HashMap param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		List<String> hashtags = (List<String>)param.get("hashtags");
+		itemCheckUtil.checkHashtagsRegex(hashtags);
+		
+		if(hashtags!=null) {
+			param.put("hashtags_size", hashtags.size());
+			System.out.println(hashtags.size());
+		}
+		
+		
+		
+		int MAX_PAGE = itemMapper.countItems(param);
+		int limit = itemCheckUtil.checkLimitRegex((String)param.get("limit"));
+		int page = itemCheckUtil.checkPageRegex(MAX_PAGE,limit,(String)param.get("page"));
+
+		param.put("offset", page*limit+"");
+		
+		List<ItemEntity> list = itemMapper.readItems(param);
+		
+		List<ItemDTO> items = new LinkedList<ItemDTO>();
+		
+		for(ItemEntity itemEntity : list) {
+			items.add(new ItemDTO(itemEntity));
+		}
+		
+		return items;
 	}
 }

@@ -9,12 +9,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.api.code.ItemError;
+import com.spring.api.code.MessageError;
 import com.spring.api.exception.CustomException;
 
 @Component
 public class ItemCheckUtil {
 	private RegexUtil regexUtil;
 	private HashMap<String,Boolean> extensions;
+	private final int MAX_LIMIT = 50;
+	private final int MIN_LIMIT = 10;
+	private final int HASHTAG_MAX_BYTES = 60;
 	
 	@Autowired
 	ItemCheckUtil(RegexUtil regexUtil){
@@ -73,5 +77,51 @@ public class ItemCheckUtil {
 				itor.remove();
 			}
 		}
+	}
+	
+	public int checkPageRegex(int MAX_PAGE, int limit, String page) {
+		try {
+			int num = Integer.parseInt(page);
+			
+			if(num==0) {
+				return num;
+			}else if(!(num<MAX_PAGE*1.0/limit)) {
+				throw new CustomException(ItemError.PAGE_OUT_OF_RANGE);
+			}else {
+				return num;
+			}
+			
+		}catch(Exception e) {
+			throw new CustomException(ItemError.PAGE_NOT_MATCHED_TO_REGEX);
+		}
+	}
+
+	public int checkLimitRegex(String limit) {
+		int val = 0;
+		
+		try {
+			val = Integer.parseInt(limit);
+		}catch(Exception e) {			
+			throw new CustomException(ItemError.LIMIT_NOT_MATCHED_TO_REGEX);
+		}
+		
+		if(!(val>=MIN_LIMIT&&val<=MAX_LIMIT)) {
+			throw new CustomException(ItemError.LIMIT_OUT_OF_RANGE);
+		}
+		
+		return val;
+	}
+
+	public void checkHashtagsRegex(List<String> hashtags) {
+		if(hashtags != null) {
+			Iterator<String> itor = hashtags.iterator();
+			
+			while(itor.hasNext()) {
+				String hashtag = itor.next();
+				if(!regexUtil.checkBytes(hashtag, HASHTAG_MAX_BYTES)) {
+					throw new CustomException(ItemError.HASHTAG_EXCEED_MAX_BYTES);
+				}
+			}
+		}		
 	}
 }

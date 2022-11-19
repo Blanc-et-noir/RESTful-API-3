@@ -51,8 +51,11 @@ public class ItemController {
 	}
 	
 	@GetMapping("/api/v1/items")
-	public void readItems(HttpServletRequest request, @RequestParam HashMap param) {
+	public ResponseEntity<HashMap> readItems(HttpServletRequest request, @RequestParam HashMap param) {
+		HashMap result = resultUtil.createResultMap("상품 목록 조회 성공",true);
+		result.put("items",itemService.readItems(request, param));
 		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@GetMapping("/api/v1/items{item_id}/images")
