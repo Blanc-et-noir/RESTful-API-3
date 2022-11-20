@@ -1,6 +1,7 @@
 package com.spring.api.service;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,19 +110,15 @@ public class ItemServiceImpl implements ItemService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		List<String> hashtags = (List<String>)param.get("hashtags");
+		List<String> hashtags = Arrays.asList(request.getParameterValues("hashtags"));
 		itemCheckUtil.checkHashtagsRegex(hashtags);
 		
 		if(hashtags!=null) {
-			param.put("hashtags_size", hashtags.size());
-			System.out.println(hashtags.size());
+			param.put("hashtags", hashtags);
 		}
 		
-		
-		
-		int MAX_PAGE = itemMapper.countItems(param);
 		int limit = itemCheckUtil.checkLimitRegex((String)param.get("limit"));
-		int page = itemCheckUtil.checkPageRegex(MAX_PAGE,limit,(String)param.get("page"));
+		int page = itemCheckUtil.checkPageRegex((String)param.get("page"));
 
 		param.put("offset", page*limit+"");
 		

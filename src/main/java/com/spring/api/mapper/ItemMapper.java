@@ -12,6 +12,5 @@ public interface ItemMapper {
 	public int readNewItemId();
 	public void createItem(HashMap param);
 	public void createItemImages(HashMap param);
-	public int countItems(HashMap param);
 	public List<ItemEntity> readItems(HashMap param);
 }

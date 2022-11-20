@@ -79,21 +79,16 @@ public class ItemCheckUtil {
 		}
 	}
 	
-	public int checkPageRegex(int MAX_PAGE, int limit, String page) {
+	public int checkPageRegex(String page) {
+		int num = 0;
+		
 		try {
-			int num = Integer.parseInt(page);
-			
-			if(num==0) {
-				return num;
-			}else if(!(num<MAX_PAGE*1.0/limit)) {
-				throw new CustomException(ItemError.PAGE_OUT_OF_RANGE);
-			}else {
-				return num;
-			}
-			
+			 num = Integer.parseInt(page);	
 		}catch(Exception e) {
 			throw new CustomException(ItemError.PAGE_NOT_MATCHED_TO_REGEX);
 		}
+		
+		return num;
 	}
 
 	public int checkLimitRegex(String limit) {

@@ -6,36 +6,28 @@
 		SELECT NEXTVAL(seq_item_id)
 	</select>
 	
-	<select id="countItems" resultType="Integer" parameterType="HashMap">
-		SELECT COUNT(item_id)
-		FROM hashtags
-		<if test="hashtags != null">
-			WHERE REPLACE(hashtag_content,' ', '') IN
-			<foreach collection="hashtags" open="(" close=")" item="hashtag" separator=",">REPLACE(#{hashtag},' ', '')</foreach>
-		</if>
-	</select>
-	
 	<select id="readItems" resultType="ItemEntity" parameterType="HashMap">
-		SELECT i.*, m.item_image_id
-		FROM items i
-		<if test="hashtags != null">
-			WHERE EXISTS(
-				SELECT 1
-				FROM hashtags h
-				WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN 
-				<foreach collection="hashtags" open="(" close=")" item="hashtag" separator=",">
-					REPLACE(#{hashtag},' ', '')
-				</foreach>
-			)
-		</if>
-		LEFT OUTER JOIN (
-			SELECT t.*
-			FROM(
-				SELECT item_image_id, item_id, ROW_NUMBER() OVER(PARTITION BY item_id ORDER BY item_id ASC) lvl
-				FROM item_images
-			) t
-			WHERE t.lvl = 1
-		) m ON i.item_id = m.item_id
+		SELECT *
+		FROM(
+			(SELECT i.*
+			FROM items i
+			<if test="hashtags != null">
+				WHERE EXISTS(
+					SELECT 1
+					FROM hashtags h
+					WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">#{value}</foreach>
+				)
+			</if>
+			) t1
+			LEFT OUTER JOIN (
+				SELECT t.*
+				FROM(
+					SELECT item_image_id, item_id, ROW_NUMBER() OVER(PARTITION BY item_id ORDER BY item_id ASC) lvl
+					FROM item_images
+				) t
+				WHERE t.lvl = 1
+			) t2 USING(item_id)
+		)
 		ORDER BY item_id DESC
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
 	</select>
