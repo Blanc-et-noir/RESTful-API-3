@@ -71,7 +71,7 @@ public class MessageCheckUtil {
 		}
 	}
 	
-	public void checkPageRegex(int MAX_PAGE, int limit, String page) {
+	public int checkPageRegex(String page) {
 		int num = 0;
 
 		try {
@@ -80,13 +80,8 @@ public class MessageCheckUtil {
 			throw new CustomException(MessageError.PAGE_NOT_MATCHED_TO_REGEX);
 		}
 		
-		if(num==0) {
-			return;
-		}else if(!(num<MAX_PAGE*1.0/limit)) {
-			throw new CustomException(MessageError.PAGE_OUT_OF_RANGE);
-		}
+		return num;
 	}
-
 	
 	public int checkLimitRegex(String limit) {
 		int val = 0;

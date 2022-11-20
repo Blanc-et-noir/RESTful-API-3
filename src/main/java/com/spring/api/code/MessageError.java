@@ -9,7 +9,6 @@ public enum MessageError implements Code{
 	MESSAGE_TITLE_EXCEED_MAX_BYTES("MESSAGE_10002","메세지 제목이 1 ~ 120 바이트 크기여야함",HttpStatus.BAD_REQUEST),
 	MESSAGE_CONTENT_EXCEED_MAX_BYTES("MESSAGE_10003","메세지 내용이 1 ~ 600 바이트 크기여야함",HttpStatus.BAD_REQUEST),
 	NOT_FOUND_MESSAGE_TYPE("MESSAGE_10004","메세지 타입 정보 없음",HttpStatus.BAD_REQUEST),
-	PAGE_OUT_OF_RANGE("MESSAGE_10005","메세지 페이지가 범위를 벗어남",HttpStatus.BAD_REQUEST),
 	PAGE_NOT_MATCHED_TO_REGEX("MESSAGE_10006","메세지 페이지가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	LIMIT_OUT_OF_RANGE("MESSAGE_10007","메세지 조회 크기가 범위를 벗어남",HttpStatus.BAD_REQUEST),
 	LIMIT_NOT_MATCHED_TO_REGEX("MESSAGE_10008","메세지 조회 크기가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),

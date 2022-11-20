@@ -103,7 +103,6 @@ public class MessageServiceImpl implements MessageService{
 		String flag = messageCheckUtil.checkFlag(param.get("flag"), message_box);
 		String search = messageCheckUtil.checkSearch(flag,param.get("search"));
 		String order = messageCheckUtil.checkOrderRegex(param.get("order"));
-		String page = param.get("page");
 		
 		messageCheckUtil.checkSearch(flag,search);
 		
@@ -123,12 +122,10 @@ public class MessageServiceImpl implements MessageService{
 		param.put("search", search);
 		param.put("order", order);
 		
-		final int MAX_PAGE = messageMapper.countMessages(param);
-		
 		int limit = messageCheckUtil.checkLimitRegex(param.get("limit"));	
-		messageCheckUtil.checkPageRegex(MAX_PAGE, limit, page);
+		int page = messageCheckUtil.checkPageRegex(param.get("page"));
 		
-		param.put("offset", Integer.parseInt(page)*limit+"");
+		param.put("offset", page*limit+"");
 		
 		List<MessageDTO> messages = new LinkedList<MessageDTO>();
 		
