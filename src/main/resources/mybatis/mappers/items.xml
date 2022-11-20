@@ -11,8 +11,10 @@
 		FROM(
 			(SELECT i.*
 			FROM items i
+			NATURAL JOIN users
+			WHERE user_status = 'N'
 			<if test="hashtags != null">
-				WHERE EXISTS(
+				AND EXISTS(
 					SELECT 1
 					FROM hashtags h
 					WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">#{value}</foreach>
