@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartRequest;
@@ -69,8 +70,24 @@ public class ItemController {
 	}
 	
 	@PostMapping("/api/v1/items/{item_id}/comments")
-	public void createComment(HttpServletRequest request, @PathVariable("item_id") String item_id) {
+	public ResponseEntity<HashMap> createComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @RequestBody HashMap param) {
+		HashMap result = resultUtil.createResultMap("상품 댓글 등록 성공",true);
+		param.put("item_id", item_id);
+		itemService.createComment(request, param);
 		
+		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/api/v1/items/{item_id}/comments/{comment_id}")
+	public ResponseEntity<HashMap> createReplyComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @PathVariable("comment_id") String comment_id, @RequestBody HashMap param) {
+		HashMap result = resultUtil.createResultMap("상품 답글 등록 성공",true);
+		
+		param.put("item_id", item_id);
+		param.put("comment_id", comment_id);
+		
+		itemService.createReplyComment(request, param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/api/v1/items/{item_id}/comments")
@@ -79,8 +96,16 @@ public class ItemController {
 	}
 	
 	@DeleteMapping("/api/v1/items/{item_id}/comments/{comment_id}")
-	public void deleteComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @PathVariable("comment_id") String comment_id) {
+	public ResponseEntity<HashMap> deleteComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @PathVariable("comment_id") String comment_id) {
+		HashMap result = resultUtil.createResultMap("상품 답글 삭제 성공",true);
 		
+		HashMap param = new HashMap();
+		param.put("item_id", item_id);
+		param.put("comment_id", comment_id);
+		
+		itemService.deleteComment(request, param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@PutMapping("/api/v1/items/{item_id}/comments/{comment_id}")

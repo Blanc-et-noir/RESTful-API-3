@@ -6,18 +6,30 @@
 		SELECT NEXTVAL(seq_item_id)
 	</select>
 	
+	<select id="readItemByItemId" resultType="ItemEntity" parameterType="HashMap">
+		SELECT *
+		FROM items NATURAL JOIN users
+		WHERE item_id = ${item_id} AND item_status = 'N' AND user_status = 'N'
+	</select>
+	
+	<select id="readCommentByCommentId" resultType="CommentEntity" parameterType="HashMap">
+		SELECT *
+		FROM comments NATURAL JOIN users
+		WHERE item_id = ${item_id} AND comment_id = ${comment_id} AND user_id = #{user_id} AND comment_status = 'N' AND user_status = 'N'
+	</select>
+	
 	<select id="readItems" resultType="ItemEntity" parameterType="HashMap">
 		SELECT *
 		FROM(
 			(SELECT i.*
 			FROM items i
 			NATURAL JOIN users
-			WHERE user_status = 'N'
+			WHERE item_status = 'N' AND user_status = 'N'
 			<if test="hashtags != null">
 				AND EXISTS(
 					SELECT 1
 					FROM hashtags h
-					WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">#{value}</foreach>
+					WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">REPLACE(#{value},' ', '')</foreach>
 				)
 			</if>
 			) t1
@@ -39,10 +51,28 @@
 		VALUES(${item_id},#{item_name},#{item_description},${item_price},${item_number},NOW(),'N',#{user_id})
 	</insert>
 	
+	<insert id="createHashtags" parameterType="HashMap">
+		INSERT INTO hashtags(hashtag_content, item_id) VALUES
+		<foreach collection="hashtags" separator="," item="value">
+			(#{value}, ${item_id})
+		</foreach>
+	</insert>
+	
 	<insert id="createItemImages" parameterType="HashMap">
 		INSERT INTO item_images VALUES
 		<foreach collection="image_files" separator="," item="image">
 			(NEXTVAL(seq_item_image_id),#{image.item_image_original_name},#{image.item_image_stored_name},#{image.item_image_extension},${image.item_image_size},'N',${item_id})
 		</foreach>
 	</insert>
+	
+	<insert id="createCommentContent" parameterType="HashMap">
+		INSERT INTO comments
+		VALUES(NEXTVAL(seq_comment_id),NULL,#{comment_content},NOW(),'N',${item_id},#{user_id})
+	</insert>
+	
+	<update id="deleteComment" parameterType="HashMap">
+		UPDATE comments
+		SET comment_status = 'Y'
+		WHERE comment_id = ${comment_id} AND user_id = #{user_id} AND comment_status = 'N'
+	</update>
 </mapper>

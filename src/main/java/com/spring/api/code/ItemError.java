@@ -20,7 +20,12 @@ public enum ItemError implements Code{
 	PAGE_NOT_MATCHED_TO_REGEX("ITEM_10006","상품 조회 페이지가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	LIMIT_OUT_OF_RANGE("ITEM_10007","상품 조회 크기가 범위를 벗어남",HttpStatus.BAD_REQUEST),
 	LIMIT_NOT_MATCHED_TO_REGEX("ITEM_10008","상품 조회 크기가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
-	HASHTAG_EXCEED_MAX_BYTES("ITEM_10009","해쉬태그는 1 ~ 120 바이트 크기여야함", HttpStatus.BAD_REQUEST);
+	HASHTAG_EXCEED_MAX_BYTES("ITEM_10009","해쉬태그는 1 ~ 120 바이트 크기여야함", HttpStatus.BAD_REQUEST),
+	NOT_FOUND_ITEM("ITEM_10010","상품 정보 없음", HttpStatus.BAD_REQUEST), 
+	ITEM_ID_NOT_MATCHED_TO_REGEX("ITEM_10011","상품 ID가 형식에 맞지 않음", HttpStatus.BAD_REQUEST), 
+	COMMENT_CONTENT_EXCEED_MAX_BYTES("ITEM_10012","상품 댓글 내용은 1 ~ 600 바이트 크기여야함", HttpStatus.BAD_REQUEST),
+	COMMENT_ID_NOT_MATCHED_TO_REGEX("ITEM_10013","상품 댓글 ID가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	NOT_FOUND_COMMENT("ITEM_10014","상품 댓글 정보 없음", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

@@ -9,20 +9,25 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.api.code.ItemError;
-import com.spring.api.code.MessageError;
+import com.spring.api.entity.CommentEntity;
+import com.spring.api.entity.ItemEntity;
 import com.spring.api.exception.CustomException;
+import com.spring.api.mapper.ItemMapper;
 
 @Component
 public class ItemCheckUtil {
+	private ItemMapper itemMapper;
 	private RegexUtil regexUtil;
 	private HashMap<String,Boolean> extensions;
 	private final int MAX_LIMIT = 50;
 	private final int MIN_LIMIT = 10;
-	private final int HASHTAG_MAX_BYTES = 60;
+	private final int HASHTAG_CONTENT_MAX_BYTES = 60;
+	private final int COMMENT_CONTENT_MAX_BYTES = 600;
 	
 	@Autowired
-	ItemCheckUtil(RegexUtil regexUtil){
+	ItemCheckUtil(ItemMapper itemMapper, RegexUtil regexUtil){
 		this.regexUtil = regexUtil;
+		this.itemMapper = itemMapper;
 		this.extensions = new HashMap<String,Boolean>();
 		
 		extensions.put("image/jpeg", true);
@@ -113,10 +118,52 @@ public class ItemCheckUtil {
 			
 			while(itor.hasNext()) {
 				String hashtag = itor.next();
-				if(!regexUtil.checkBytes(hashtag, HASHTAG_MAX_BYTES)) {
+				if(!regexUtil.checkBytes(hashtag, HASHTAG_CONTENT_MAX_BYTES)) {
 					throw new CustomException(ItemError.HASHTAG_EXCEED_MAX_BYTES);
 				}
 			}
 		}		
+	}
+
+	public ItemEntity isItemExistent(HashMap param) {
+		ItemEntity itemEntity = null;
+		
+		if((itemEntity = itemMapper.readItemByItemId(param)) == null) {
+			throw new CustomException(ItemError.NOT_FOUND_ITEM);
+		}
+		
+		return itemEntity;
+	}
+
+	public void checkItemIdRegex(String item_id) {
+		try {
+			Integer.parseInt(item_id);	
+		}catch(Exception e) {
+			throw new CustomException(ItemError.ITEM_ID_NOT_MATCHED_TO_REGEX);
+		}		
+	}
+
+	public void checkCommentContent(String comment_content) {
+		if(!regexUtil.checkBytes(comment_content, COMMENT_CONTENT_MAX_BYTES)) {
+			throw new CustomException(ItemError.COMMENT_CONTENT_EXCEED_MAX_BYTES);
+		}
+	}
+
+	public void checkCommentIdRegex(String comment_id) {
+		try {
+			Integer.parseInt(comment_id);	
+		}catch(Exception e) {
+			throw new CustomException(ItemError.COMMENT_ID_NOT_MATCHED_TO_REGEX);
+		}
+	}
+
+	public CommentEntity isCommentExistent(HashMap<String, String> param) {
+		CommentEntity commentEntity = null;
+		
+		if((commentEntity = itemMapper.readCommentByCommentId(param)) == null) {
+			throw new CustomException(ItemError.NOT_FOUND_COMMENT);
+		}
+		
+		return commentEntity;
 	}
 }
