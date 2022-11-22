@@ -110,11 +110,19 @@ public class MessageServiceImpl implements MessageService{
 		
 		if(message_box.equalsIgnoreCase("message_receivers")) {
 			param.put("owner_user_id", "message_receiver_user_id");
+			param.put("owner_user_name", "message_receiver_user_name");
 			param.put("owner_message_status", "message_receiver_status");
+			
+			param.put("other_user_id", "message_sender_user_id");
+			param.put("other_user_name", "message_sender_user_name");
 			param.put("other_message_box", "message_senders");
 		}else {
 			param.put("owner_user_id", "message_sender_user_id");
+			param.put("owner_user_name", "message_sender_user_name");
 			param.put("owner_message_status", "message_sender_status");
+			
+			param.put("other_user_id", "message_receiver_user_id");
+			param.put("other_user_name", "message_receiver_user_name");
 			param.put("other_message_box", "message_receivers");
 		}
 		
@@ -129,7 +137,7 @@ public class MessageServiceImpl implements MessageService{
 		
 		List<MessageDTO> messages = new LinkedList<MessageDTO>();
 		
-		for(MessageEntity messageEntity : messageMapper.readBulkMessage(param)) {
+		for(MessageEntity messageEntity : messageMapper.readMessages(param)) {
 			messages.add(new MessageDTO(messageEntity));
 		}
 		

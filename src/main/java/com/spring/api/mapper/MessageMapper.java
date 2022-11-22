@@ -17,7 +17,7 @@ public interface MessageMapper {
 	public HashMap readMessageTypeByMessageTypeId(int message_type_id);
 	public void createMessageSenderInfo(HashMap param);
 	public void createMessageReceiverInfo(HashMap param);
-	public List<MessageEntity> readBulkMessage(HashMap<String, String> param);
+	public List<MessageEntity> readMessages(HashMap<String, String> param);
 	public MessageEntity readMessageByMessageIdAndUserId(HashMap param);
 	public void deleteMessageBySenderId(HashMap<String, String> param);
 	public void deleteMessageByReceiverId(HashMap<String, String> param);

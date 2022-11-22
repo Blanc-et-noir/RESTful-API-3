@@ -27,25 +27,21 @@
 		SELECT NEXTVAL(seq_message_id)
 	</select>
 	
-	<select id="countMessages" resultType="Integer" parameterType="HashMap">
-		SELECT COUNT(*) "max_page"
-		FROM messages NATURAL JOIN (
-			SELECT *
-			FROM ${message_box}
-			WHERE ${owner_user_id} = #{user_id} AND ${owner_message_status} = 'N'
-		) r NATURAL JOIN ${other_message_box}
-		WHERE ${flag} LIKE CONCAT('%',#{search},'%')
-	</select>
-	
-	<select id="readBulkMessage" resultType="MessageEntity" parameterType="HashMap">
+	<select id="readMessages" resultType="MessageEntity" parameterType="HashMap">
 		SELECT *
 		FROM messages 
 		NATURAL JOIN message_types 
 		NATURAL JOIN (
-			SELECT *
-			FROM ${message_box}
-			WHERE ${owner_user_id} = #{user_id} AND ${owner_message_status} = 'N'
-		) r NATURAL JOIN ${other_message_box}
+			SELECT m.message_id, u.user_id ${owner_user_id}, u.user_name ${owner_user_name}
+			FROM ${message_box} m JOIN users u ON m.${owner_user_id} = u.user_id
+			WHERE m.${owner_user_id} = #{user_id} AND m.${owner_message_status} = 'N'
+		) r1
+		NATURAL JOIN (
+			SELECT m.message_id, 
+			CASE WHEN u.user_status = 'Y' THEN NULL ELSE u.user_id END ${other_user_id},
+			CASE WHEN u.user_status = 'Y' THEN '탈퇴한 사용자' ELSE u.user_name END ${other_user_name}
+			FROM ${other_message_box} m JOIN users u ON m.${other_user_id} = u.user_id
+		) r2
 		WHERE ${flag} LIKE CONCAT('%',#{search},'%')
 		ORDER BY message_id ${order}
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY

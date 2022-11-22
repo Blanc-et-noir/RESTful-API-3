@@ -16,6 +16,8 @@ public class MessageEntity {
 	private String message_type_content;
 	private String message_sender_user_id;
 	private String message_receiver_user_id;
+	private String message_sender_user_name;
+	private String message_receiver_user_name;
 	private String message_sender_status;
 	private String message_receiver_status;
 	
