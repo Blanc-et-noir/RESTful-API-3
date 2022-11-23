@@ -7,21 +7,28 @@
 	</select>
 	
 	<select id="readItemByItemId" resultType="ItemEntity" parameterType="HashMap">
-		SELECT *
-		FROM items NATURAL JOIN users
-		WHERE item_id = ${item_id} AND item_status = 'N' AND user_status = 'N'
+		SELECT i.*
+		FROM items i NATURAL JOIN users u LEFT OUTER JOIN(
+			SELECT t.*
+			FROM(
+				SELECT item_image_id, item_id, ROW_NUMBER() OVER(PARTITION BY item_id ORDER BY item_id ASC) lvl
+				FROM item_images
+			) t
+			WHERE t.lvl = 1
+		) m USING(item_id)
+		WHERE i.item_id = ${item_id} AND i.item_status = 'N' AND u.user_status = 'N'
 	</select>
 	
 	<select id="readCommentByCommentId" resultType="CommentEntity" parameterType="HashMap">
 		SELECT *
 		FROM comments NATURAL JOIN users
-		WHERE item_id = ${item_id} AND comment_id = ${comment_id} AND user_id = #{user_id} AND comment_status = 'N' AND user_status = 'N'
+		WHERE item_id = ${item_id} AND comment_id = ${comment_id} AND comment_status = 'N' AND user_status = 'N'
 	</select>
 	
 	<select id="readItems" resultType="ItemEntity" parameterType="HashMap">
 		SELECT *
 		FROM(
-			(SELECT i.*
+			(SELECT *
 			FROM items i
 			NATURAL JOIN users
 			WHERE item_status = 'N' AND user_status = 'N'
@@ -46,6 +53,24 @@
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
 	</select>
 	
+	<select id="readComments" resultType="CommentEntity" parameterType="HashMap">
+		WITH RECURSIVE cte AS(
+			SELECT comment_id, parent_comment_id, comment_id "top_comment_id", comment_content, 1 "comment_depth", CAST(LPAD(comment_id,10,0) AS CHAR(300)) "comment_path",comment_time,comment_status, item_id, user_id
+			FROM comments
+			WHERE item_id = ${item_id} AND parent_comment_id IS NULL
+			UNION ALL
+			SELECT c1.comment_id, c1.parent_comment_id, c2.top_comment_id, c1.comment_content, c2.comment_depth+1 "comment_depth", CONCAT(c2.comment_path, LPAD(c1.comment_id,10,0)) "comment_path",c1.comment_time,c1.comment_status, c1.item_id, c1.user_id
+			FROM comments c1 JOIN cte c2 ON c1.parent_comment_id = c2.comment_id
+		)
+		SELECT comment_id, parent_comment_id, comment_time, comment_depth, item_id,
+			CASE WHEN comment_status = 'Y' THEN '작성자에 의해 삭제된 댓글입니다.' ELSE comment_content END "comment_content",
+			CASE WHEN user_status IS NULL OR user_status = 'Y' THEN NULL ELSE user_id END "user_id",
+			CASE WHEN user_status IS NULL OR user_status = 'Y' THEN '탈퇴한 사용자' ELSE user_name END "user_name"
+		FROM cte LEFT OUTER JOIN users USING(user_id)
+		ORDER BY top_comment_id DESC, comment_path ASC
+		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;
+	</select>
+	
 	<insert id="createItem" parameterType="HashMap">
 		INSERT INTO items
 		VALUES(${item_id},#{item_name},#{item_description},${item_price},${item_number},NOW(),'N',#{user_id})
@@ -68,6 +93,11 @@
 	<insert id="createCommentContent" parameterType="HashMap">
 		INSERT INTO comments
 		VALUES(NEXTVAL(seq_comment_id),NULL,#{comment_content},NOW(),'N',${item_id},#{user_id})
+	</insert>
+	
+	<insert id="createReplyCommentContent" parameterType="HashMap">
+		INSERT INTO comments
+		VALUES(NEXTVAL(seq_comment_id),${comment_id},#{comment_content},NOW(),'N',${item_id},#{user_id})
 	</insert>
 	
 	<update id="deleteComment" parameterType="HashMap">

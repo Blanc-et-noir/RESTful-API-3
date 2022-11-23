@@ -91,8 +91,14 @@ public class ItemController {
 	}
 	
 	@GetMapping("/api/v1/items/{item_id}/comments")
-	public void readComment(HttpServletRequest request, @PathVariable("item_id") String item_id) {
+	public ResponseEntity<HashMap> readComments(HttpServletRequest request, @PathVariable("item_id") String item_id, @RequestParam HashMap param) {
+		HashMap result = resultUtil.createResultMap("상품 댓글 목록 조회 성공",true);
 		
+		param.put("item_id", item_id);
+		
+		result.put("comments", itemService.readComments(request, param));
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/api/v1/items/{item_id}/comments/{comment_id}")

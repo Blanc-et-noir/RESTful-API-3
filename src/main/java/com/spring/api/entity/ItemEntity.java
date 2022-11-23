@@ -15,11 +15,11 @@ import lombok.Setter;
 public class ItemEntity {
 	private int item_id;
 	private String item_name;
-	private String item_description;
 	private int item_price;
 	private int item_number;
 	private Date item_time;
 	private String item_status;
 	private String user_id;
+	private String user_name;
 	private int item_image_id;
 }

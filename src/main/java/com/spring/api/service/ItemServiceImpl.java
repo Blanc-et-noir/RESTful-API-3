@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import com.spring.api.dto.CommentDTO;
 import com.spring.api.dto.ItemDTO;
 import com.spring.api.entity.CommentEntity;
 import com.spring.api.entity.ItemEntity;
@@ -120,6 +121,7 @@ public class ItemServiceImpl implements ItemService{
 		}
 	}
 
+	@Override
 	public List<ItemDTO> readItems(HttpServletRequest request, HashMap param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
@@ -133,6 +135,8 @@ public class ItemServiceImpl implements ItemService{
 		int limit = itemCheckUtil.checkLimitRegex((String)param.get("limit"));
 		int page = itemCheckUtil.checkPageRegex((String)param.get("page"));
 
+		param.put("limit", limit);
+		param.put("page", page);
 		param.put("offset", page*limit+"");
 		
 		List<ItemEntity> list = itemMapper.readItems(param);
@@ -145,6 +149,7 @@ public class ItemServiceImpl implements ItemService{
 		return items;
 	}
 
+	@Override
 	public void createComment(HttpServletRequest request, HashMap<String,String> param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
@@ -160,11 +165,26 @@ public class ItemServiceImpl implements ItemService{
 		itemMapper.createCommentContent(param);
 	}
 
-	public void createReplyComment(HttpServletRequest request, HashMap param) {
-		// TODO Auto-generated method stub
+	@Override
+	public void createReplyComment(HttpServletRequest request, HashMap<String,String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		param.put("user_id", user_id);
 		
+		String item_id = param.get("item_id");
+		String comment_id = param.get("comment_id");
+		String comment_content = param.get("comment_content");
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		itemCheckUtil.checkCommentIdRegex(comment_id);
+		itemCheckUtil.checkCommentContent(comment_content);
+		itemCheckUtil.isItemExistent(param);
+		itemCheckUtil.isCommentExistent(param);
+		
+		itemMapper.createReplyCommentContent(param);
 	}
 
+	@Override
 	public void deleteComment(HttpServletRequest request, HashMap<String,String> param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
@@ -178,8 +198,35 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isItemExistent(param);
 		
 		CommentEntity commentEntity = itemCheckUtil.isCommentExistent(param);
-		
+		itemCheckUtil.isRemovableComment(commentEntity, user_id);
 		itemMapper.deleteComment(param);
 
+	}
+
+	@Override
+	public List<CommentDTO> readComments(HttpServletRequest request, HashMap param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		String item_id = (String)param.get("item_id");
+		
+		int limit = itemCheckUtil.checkLimitRegex((String)param.get("limit"));
+		int page = itemCheckUtil.checkPageRegex((String)param.get("page"));
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		itemCheckUtil.isItemExistent(param);
+
+		param.put("limit", limit);
+		param.put("page", page);
+		param.put("offset", page*limit+"");
+		
+		List<CommentEntity> list = itemMapper.readComments(param);
+		
+		List<CommentDTO> comments = new LinkedList<CommentDTO>();
+		
+		for(CommentEntity commentEntity : list) {
+			comments.add(new CommentDTO(commentEntity));
+		}
+		
+		return comments;
 	}
 }

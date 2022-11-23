@@ -22,7 +22,7 @@ public class ItemCheckUtil {
 	private final int MAX_LIMIT = 50;
 	private final int MIN_LIMIT = 10;
 	private final int HASHTAG_CONTENT_MAX_BYTES = 60;
-	private final int COMMENT_CONTENT_MAX_BYTES = 600;
+	private final int COMMENT_CONTENT_MAX_BYTES = 600;	
 	
 	@Autowired
 	ItemCheckUtil(ItemMapper itemMapper, RegexUtil regexUtil){
@@ -87,10 +87,18 @@ public class ItemCheckUtil {
 	public int checkPageRegex(String page) {
 		int num = 0;
 		
+		if(page==null) {
+			return 0;
+		}
+		
 		try {
-			 num = Integer.parseInt(page);	
+			 num = Integer.parseInt(page);
 		}catch(Exception e) {
 			throw new CustomException(ItemError.PAGE_NOT_MATCHED_TO_REGEX);
+		}
+		
+		if(num<0) {
+			throw new CustomException(ItemError.PAGE_OUT_OF_RANGE);
 		}
 		
 		return num;
@@ -98,6 +106,10 @@ public class ItemCheckUtil {
 
 	public int checkLimitRegex(String limit) {
 		int val = 0;
+		
+		if(limit==null) {
+			return MIN_LIMIT;
+		}
 		
 		try {
 			val = Integer.parseInt(limit);
@@ -165,5 +177,11 @@ public class ItemCheckUtil {
 		}
 		
 		return commentEntity;
+	}
+
+	public void isRemovableComment(CommentEntity commentEntity, String user_id) {
+		if(!user_id.equals(commentEntity.getUser_id())) {
+			throw new CustomException(ItemError.CAN_NOT_DELETE_COMMENT_BY_USER_ID);
+		}		
 	}
 }

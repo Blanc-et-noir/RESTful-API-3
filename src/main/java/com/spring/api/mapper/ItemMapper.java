@@ -19,4 +19,6 @@ public interface ItemMapper {
 	public void createCommentContent(HashMap<String, String> param);
 	public CommentEntity readCommentByCommentId(HashMap<String, String> param);
 	public void deleteComment(HashMap<String, String> param);
+	public List<CommentEntity> readComments(HashMap param);
+	public void createReplyCommentContent(HashMap<String, String> param);
 }
