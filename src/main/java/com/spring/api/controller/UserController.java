@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -104,6 +105,27 @@ public class UserController {
 	public ResponseEntity<HashMap> deleteMyUserInfo(HttpServletRequest request){
 		
 		HashMap result = resultUtil.createResultMap("회원 탈퇴 성공",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("/api/v1/users/{user_id}/questions")
+	public ResponseEntity<HashMap> readQuestion(HttpServletRequest request, @PathVariable("user_id") String user_id){
+		HashMap result = resultUtil.createResultMap("비밀번호 찾기 질문 조회 성공",true);
+		
+		HashMap param = new HashMap();
+		param.put("user_id", user_id);
+		
+		result.put("question", userService.readQuestion(request, param));
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("/api/v1/questions")
+	public ResponseEntity<HashMap> readQuestions(){
+		HashMap result = resultUtil.createResultMap("비밀번호 찾기 질문 목록 조회 성공",true);
+		
+		result.put("questions", userService.readQuestions());
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

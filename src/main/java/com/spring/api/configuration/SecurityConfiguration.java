@@ -58,6 +58,8 @@ public class SecurityConfiguration {
         .antMatchers(HttpMethod.PUT,"/api/v1/tokens").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/tokens").permitAll()
         .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
+        .antMatchers(HttpMethod.GET,"/api/v1/users/*/questions").permitAll()
+        .antMatchers(HttpMethod.GET,"/api/v1/questions").permitAll()
         .anyRequest().authenticated().and()
         
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

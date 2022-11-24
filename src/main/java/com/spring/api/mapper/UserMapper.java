@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.spring.api.dto.QuestionDTO;
 import com.spring.api.entity.BlockingEntity;
 import com.spring.api.entity.FollowingEntity;
 import com.spring.api.entity.QuestionEntity;
@@ -49,4 +50,8 @@ public interface UserMapper {
 	public void updateUserTokensToNull(HashMap param);
 	
 	public void updateUserTokensToNewTokens(HashMap param);
+
+	public QuestionEntity readQuestionByUserId(HashMap<String, String> param);
+
+	public List<QuestionEntity> readQuestions();
 }

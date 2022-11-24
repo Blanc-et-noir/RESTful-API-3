@@ -1,6 +1,7 @@
 package com.spring.api.service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.code.UserError;
+import com.spring.api.dto.QuestionDTO;
 import com.spring.api.encrypt.SHA;
 import com.spring.api.entity.BlockingEntity;
 import com.spring.api.entity.FollowingEntity;
+import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
@@ -25,14 +28,14 @@ import com.spring.api.util.UserCheckUtil;
 public class UserServiceImpl implements UserService{
 	private final UserMapper userMapper;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final UserCheckUtil checkUtil;
+	private final UserCheckUtil userCheckUtil;
     private final RedisUtil redisUtil;
 	
 	@Autowired
 	UserServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, UserCheckUtil checkUtil, RedisUtil redisUtil){
 		this.userMapper = userMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
-		this.checkUtil = checkUtil;
+		this.userCheckUtil = checkUtil;
 		this.redisUtil = redisUtil;
 	}
 	
@@ -46,18 +49,18 @@ public class UserServiceImpl implements UserService{
 		String question_answer = param.get("question_answer");
 		String user_gender = param.get("user_gender");
 		
-		checkUtil.checkUserIdRegex(user_id);
-		checkUtil.checkUserPwRegex(user_pw);
-		checkUtil.checkUserPwRegex(user_pw_check);
-		checkUtil.checkUserPwAndPwCheck(user_pw, user_pw_check);
-		checkUtil.checkUserNameRegex(user_name);
-		checkUtil.checkUserPhoneRegex(user_phone);
-		checkUtil.checkQuestionIdRegex(question_id);
-		checkUtil.checkQuestionAnswerBytes(question_answer);
-		checkUtil.checkUserGender(user_gender);
-		checkUtil.isUserIdDuplicate(userMapper.readUserInfoByUserId(user_id));
-		checkUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(user_phone));
-		checkUtil.isQuestionExistent(Integer.parseInt(question_id));
+		userCheckUtil.checkUserIdRegex(user_id);
+		userCheckUtil.checkUserPwRegex(user_pw);
+		userCheckUtil.checkUserPwRegex(user_pw_check);
+		userCheckUtil.checkUserPwAndPwCheck(user_pw, user_pw_check);
+		userCheckUtil.checkUserNameRegex(user_name);
+		userCheckUtil.checkUserPhoneRegex(user_phone);
+		userCheckUtil.checkQuestionIdRegex(question_id);
+		userCheckUtil.checkQuestionAnswerBytes(question_answer);
+		userCheckUtil.checkUserGender(user_gender);
+		userCheckUtil.isUserIdDuplicate(userMapper.readUserInfoByUserId(user_id));
+		userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(user_phone));
+		userCheckUtil.isQuestionExistent(Integer.parseInt(question_id));
 		
 		String user_salt = SHA.getSalt();
 		param.put("user_pw", SHA.DSHA512(user_pw, user_salt));
@@ -84,38 +87,38 @@ public class UserServiceImpl implements UserService{
 		String new_question_answer = param.get("new_question_answer");
 		String question_answer = param.get("question_answer");
 		
-		UserEntity userEntity = checkUtil.isUserExistent(user_id);
+		UserEntity userEntity = userCheckUtil.isUserExistent(user_id);
 		String user_salt = userEntity.getUser_salt();
 		String user_refreshtoken = userEntity.getUser_refreshtoken();
 		
 		if(new_user_pw!=null&&new_user_pw_check!=null) {
-			checkUtil.checkUserPwRegex(new_user_pw);
-			checkUtil.checkUserPwRegex(new_user_pw_check);
-			checkUtil.checkUserPwAndPwCheck(new_user_pw, new_user_pw_check);
+			userCheckUtil.checkUserPwRegex(new_user_pw);
+			userCheckUtil.checkUserPwRegex(new_user_pw_check);
+			userCheckUtil.checkUserPwAndPwCheck(new_user_pw, new_user_pw_check);
 		}
 		
 		if(new_user_name!=null) {
-			checkUtil.checkUserNameRegex(new_user_name);
+			userCheckUtil.checkUserNameRegex(new_user_name);
 			param.put("user_name", new_user_name);
 		}
 		
 		if(new_user_gender!=null) {
-			checkUtil.checkUserGender(new_user_gender);
+			userCheckUtil.checkUserGender(new_user_gender);
 			param.put("user_gender", new_user_gender);
 		}
 		
 		if(new_user_phone!=null) {
-			checkUtil.checkUserPhoneRegex(new_user_phone);
-			checkUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
+			userCheckUtil.checkUserPhoneRegex(new_user_phone);
+			userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
 			param.put("new_user_phone", new_user_phone);
 		}
 		
 		if(new_user_pw!=null&&new_question_id!=null&&new_question_answer!=null) {
-			checkUtil.checkQuestionIdRegex(new_question_id);
-			checkUtil.checkQuestionAnswerBytes(new_question_answer);
-			checkUtil.checkQuestionAnswerBytes(question_answer);
-			checkUtil.checkUserQuestionAnswerAndOldQuestionAnswer(SHA.DSHA512(question_answer.replaceAll(" ", ""), user_salt), userEntity.getQuestion_answer());
-			checkUtil.isQuestionExistent(Integer.parseInt(new_question_id));
+			userCheckUtil.checkQuestionIdRegex(new_question_id);
+			userCheckUtil.checkQuestionAnswerBytes(new_question_answer);
+			userCheckUtil.checkQuestionAnswerBytes(question_answer);
+			userCheckUtil.checkUserQuestionAnswerAndOldQuestionAnswer(SHA.DSHA512(question_answer.replaceAll(" ", ""), user_salt), userEntity.getQuestion_answer());
+			userCheckUtil.isQuestionExistent(Integer.parseInt(new_question_id));
 			
 			String new_user_salt = SHA.getSalt();
 			param.put("new_question_id", new_question_id);
@@ -146,13 +149,12 @@ public class UserServiceImpl implements UserService{
 		
 		param.put("source_user_id", source_user_id);
 		
-		checkUtil.checkUserIdRegex(target_user_id);
-		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		//checkUtil.isUserExistent(source_user_id);
-		checkUtil.isUserExistent(target_user_id);
-		checkUtil.checkNumberOfFollowingInfo(source_user_id);
-		checkUtil.isNotBlocked(source_user_id, target_user_id);
-		checkUtil.isNotFollowed(source_user_id, target_user_id);
+		userCheckUtil.checkUserIdRegex(target_user_id);
+		userCheckUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
+		userCheckUtil.isUserExistent(target_user_id);
+		userCheckUtil.checkNumberOfFollowingInfo(source_user_id);
+		userCheckUtil.isNotBlocked(source_user_id, target_user_id);
+		userCheckUtil.isNotFollowed(source_user_id, target_user_id);
 
 		userMapper.createFollowingInfo(param);
 		
@@ -167,13 +169,12 @@ public class UserServiceImpl implements UserService{
 		
 		param.put("source_user_id", source_user_id);
 		
-		checkUtil.checkUserIdRegex(target_user_id);
-		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		//checkUtil.isUserExistent(source_user_id);
-		checkUtil.isUserExistent(target_user_id);
-		checkUtil.checkNumberOfBlockingInfo(source_user_id);
-		checkUtil.isNotBlocked(source_user_id, target_user_id);
-		checkUtil.isNotFollowed(source_user_id, target_user_id);
+		userCheckUtil.checkUserIdRegex(target_user_id);
+		userCheckUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
+		userCheckUtil.isUserExistent(target_user_id);
+		userCheckUtil.checkNumberOfBlockingInfo(source_user_id);
+		userCheckUtil.isNotBlocked(source_user_id, target_user_id);
+		userCheckUtil.isNotFollowed(source_user_id, target_user_id);
 
 		userMapper.createBlockingInfo(param);
 		
@@ -187,11 +188,10 @@ public class UserServiceImpl implements UserService{
 		String target_user_id = param.get("target_user_id");
 		
 		param.put("source_user_id", source_user_id);
-		checkUtil.checkUserIdRegex(target_user_id);
-		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		//checkUtil.isUserExistent(source_user_id);
-		checkUtil.isUserRegistered(target_user_id);
-		checkUtil.isFollowed(source_user_id, target_user_id);
+		userCheckUtil.checkUserIdRegex(target_user_id);
+		userCheckUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
+		userCheckUtil.isUserRegistered(target_user_id);
+		userCheckUtil.isFollowed(source_user_id, target_user_id);
 		
 		userMapper.deleteFollowingInfoByBothUserId(param);
 		
@@ -205,11 +205,10 @@ public class UserServiceImpl implements UserService{
 		String target_user_id = param.get("target_user_id");
 		
 		param.put("source_user_id", source_user_id);
-		checkUtil.checkUserIdRegex(target_user_id);
-		checkUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		//checkUtil.isUserExistent(source_user_id);
-		checkUtil.isUserRegistered(target_user_id);
-		checkUtil.isBlocked(source_user_id, target_user_id);
+		userCheckUtil.checkUserIdRegex(target_user_id);
+		userCheckUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
+		userCheckUtil.isUserRegistered(target_user_id);
+		userCheckUtil.isBlocked(source_user_id, target_user_id);
 		
 		userMapper.deleteBlockingInfoByBothUserId(param);
 		
@@ -230,5 +229,28 @@ public class UserServiceImpl implements UserService{
 		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
 		return userMapper.readBlockingInfoBySourceUserId(source_user_id);
+	}
+
+	@Override
+	public QuestionDTO readQuestion(HttpServletRequest request, HashMap<String,String> param) {
+		String user_id = param.get("user_id");
+		
+		userCheckUtil.checkUserIdRegex(user_id);
+		userCheckUtil.isUserExistent(user_id);
+		
+		QuestionEntity questionEntity = userMapper.readQuestionByUserId(param);
+		
+		return new QuestionDTO(questionEntity);
+	}
+
+	@Override
+	public List<QuestionDTO> readQuestions() {
+		List<QuestionDTO> questions = new LinkedList<QuestionDTO>();
+		
+		for(QuestionEntity questionEntity : userMapper.readQuestions()) {
+			questions.add(new QuestionDTO(questionEntity));
+		}
+		
+		return questions;
 	}
 }

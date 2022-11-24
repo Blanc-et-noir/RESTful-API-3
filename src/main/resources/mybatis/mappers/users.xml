@@ -50,6 +50,17 @@
 		WHERE source_user_id = #{source_user_id}
 	</select>
 	
+	<select id="readQuestionByUserId" resultType="QuestionEntity" parameterType="HashMap">
+		SELECT *
+		FROM users NATURAL JOIN questions
+		WHERE user_id = #{user_id}
+	</select>
+	
+	<select id="readQuestions" resultType="QuestionEntity">
+		SELECT *
+		FROM questions
+	</select>
+	
 	<insert id="createUser" parameterType="HashMap">
 		INSERT INTO users(
 			user_id,

@@ -12,7 +12,7 @@ public class QuestionDTO {
 	private String question_content;
 	
 	public QuestionDTO(QuestionEntity questionEntity){		
-		this.question_id = question_id;
-		this.question_content = question_content;
+		this.question_id = questionEntity.getQuestion_id();
+		this.question_content = questionEntity.getQuestion_content();
 	}
 }
