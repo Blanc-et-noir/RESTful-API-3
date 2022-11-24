@@ -198,7 +198,7 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isItemExistent(param);
 		
 		CommentEntity commentEntity = itemCheckUtil.isCommentExistent(param);
-		itemCheckUtil.isRemovableComment(commentEntity, user_id);
+		itemCheckUtil.isEditableComment(commentEntity, user_id);
 		itemMapper.deleteComment(param);
 
 	}
@@ -228,5 +228,26 @@ public class ItemServiceImpl implements ItemService{
 		}
 		
 		return comments;
+	}
+
+	@Override
+	public void updateComment(HttpServletRequest request, HashMap<String,String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		param.put("user_id", user_id);
+		
+		String item_id = param.get("item_id");
+		String comment_id = param.get("comment_id");
+		String comment_content = param.get("comment_content");
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		itemCheckUtil.checkCommentIdRegex(comment_id);
+		itemCheckUtil.checkCommentContent(comment_content);
+		itemCheckUtil.isItemExistent(param);
+		
+		CommentEntity commentEntity = itemCheckUtil.isCommentExistent(param);
+		itemCheckUtil.isEditableComment(commentEntity, user_id);
+		
+		itemMapper.updateComment(param);
 	}
 }

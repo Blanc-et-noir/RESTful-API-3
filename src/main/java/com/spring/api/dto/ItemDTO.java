@@ -12,14 +12,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemDTO {
-	private int item_id;
+	private Integer item_id;
 	private String item_name;
 	private int item_price;
 	private int item_number;
 	private Date item_time;
 	private String user_id;
 	private String user_name;
-	private int item_image_id;
+	private Integer item_image_id;
 	
 	public ItemDTO(ItemEntity itemEntity){
 		this.item_id = itemEntity.getItem_id();

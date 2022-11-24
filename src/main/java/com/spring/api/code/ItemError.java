@@ -27,7 +27,7 @@ public enum ItemError implements Code{
 	COMMENT_ID_NOT_MATCHED_TO_REGEX("ITEM_10013","상품 댓글 ID가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
 	NOT_FOUND_COMMENT("ITEM_10014","상품 댓글 정보 없음", HttpStatus.BAD_REQUEST),
 	PAGE_OUT_OF_RANGE("ITEM_10015","상품 페이지가 범위를 벗어남",HttpStatus.BAD_REQUEST),
-	CAN_NOT_DELETE_COMMENT_BY_USER_ID("ITEM_10016","해당 사용자 정보로 댓글 삭제 불가",HttpStatus.UNAUTHORIZED);
+	CAN_NOT_DELETE_OR_UPDATE_COMMENT_BY_USER_ID("ITEM_10016","해당 사용자 정보로 댓글 삭제 또는 수정 불가",HttpStatus.UNAUTHORIZED);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

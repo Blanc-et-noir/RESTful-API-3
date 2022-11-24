@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionEntity {	
-	private int question_id;
+	private Integer question_id;
 	private String question_content;
 }

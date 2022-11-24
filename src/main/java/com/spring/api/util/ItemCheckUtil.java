@@ -179,9 +179,9 @@ public class ItemCheckUtil {
 		return commentEntity;
 	}
 
-	public void isRemovableComment(CommentEntity commentEntity, String user_id) {
+	public void isEditableComment(CommentEntity commentEntity, String user_id) {
 		if(!user_id.equals(commentEntity.getUser_id())) {
-			throw new CustomException(ItemError.CAN_NOT_DELETE_COMMENT_BY_USER_ID);
+			throw new CustomException(ItemError.CAN_NOT_DELETE_OR_UPDATE_COMMENT_BY_USER_ID);
 		}		
 	}
 }

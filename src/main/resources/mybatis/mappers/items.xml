@@ -105,4 +105,10 @@
 		SET comment_status = 'Y'
 		WHERE comment_id = ${comment_id} AND user_id = #{user_id} AND comment_status = 'N'
 	</update>
+	
+	<update id="updateComment" parameterType="HashMap">
+		UPDATE comments
+		SET comment_content = #{comment_content}
+		WHERE comment_id = ${comment_id} AND comment_status = 'N' AND user_id = #{user_id} AND item_id = ${item_id}
+	</update>
 </mapper>

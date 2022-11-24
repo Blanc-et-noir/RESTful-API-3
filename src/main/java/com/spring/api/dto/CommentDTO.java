@@ -12,16 +12,17 @@ public class CommentDTO {
 	private String user_id;
 	private String user_name;
 	private String comment_time;
-	private int comment_id;
-	private int parent_comment_id;
-	private int item_id;
-	private int comment_depth;
+	private Integer comment_id;
+	private Integer parent_comment_id;
+	private Integer item_id;
+	private Integer comment_depth;
 	
 	private String nvl(Object obj) {
 		return obj!=null?obj.toString():null;
 	}
 	
 	public CommentDTO(CommentEntity commentEntity){
+		this.comment_id = commentEntity.getComment_id();
 		this.comment_content = commentEntity.getComment_content();
 		this.user_id = commentEntity.getUser_id();
 		this.user_name = commentEntity.getUser_name();

@@ -17,7 +17,7 @@ public class UserDTO {
 	private String user_status;
 	private String user_gender;
 	
-	private int question_id;
+	private Integer question_id;
 	private String question_content;
 	
 	public UserDTO(UserEntity userEntity){

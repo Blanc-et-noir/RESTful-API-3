@@ -10,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemImageEntity {
-	private int item_id;
-	private int item_image_id;
+	private Integer item_id;
+	private Integer item_image_id;
 	private String item_image_original_name;
 	private String item_image_stored_name;
 	private String item_image_extension;

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QuestionDTO {	
-	private int question_id;
+	private Integer question_id;
 	private String question_content;
 	
 	public QuestionDTO(QuestionEntity questionEntity){		

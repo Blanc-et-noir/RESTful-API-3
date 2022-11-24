@@ -17,4 +17,5 @@ public interface ItemService {
 	public void deleteComment(HttpServletRequest request, HashMap<String, String> param);
 	public List<CommentDTO> readComments(HttpServletRequest request, HashMap<String,String> param);
 	public void createReplyComment(HttpServletRequest request, HashMap<String, String> param);
+	public void updateComment(HttpServletRequest request, HashMap<String, String> param);
 }

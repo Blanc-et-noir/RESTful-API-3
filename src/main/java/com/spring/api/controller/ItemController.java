@@ -115,8 +115,15 @@ public class ItemController {
 	}
 	
 	@PutMapping("/api/v1/items/{item_id}/comments/{comment_id}")
-	public void updateComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @PathVariable("comment_id") String comment_id) {
+	public ResponseEntity<HashMap> updateComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @PathVariable("comment_id") String comment_id, @RequestBody HashMap param) {
+		HashMap result = resultUtil.createResultMap("상품 댓글 수정 성공",true);
 		
+		param.put("item_id", item_id);
+		param.put("comment_id", comment_id);
+		
+		itemService.updateComment(request, param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/api/v1/wishlists")
