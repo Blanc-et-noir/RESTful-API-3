@@ -1,7 +1,7 @@
 package com.spring.api.entity;
 
-import java.sql.Date;
-import java.util.List;
+
+import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class ItemEntity {
 	private String item_name;
 	private int item_price;
 	private int item_number;
-	private Date item_time;
+	private Timestamp item_time;
 	private String item_status;
 	private String user_id;
 	private String user_name;
