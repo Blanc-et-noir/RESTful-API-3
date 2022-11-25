@@ -2,6 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.spring.api.mapper.ItemMapper">
+	<resultMap type="com.spring.api.dto.ItemWithItemImageDTO" id="ItemWithItemImageDTOMap">
+		<id column="item_id" property="item_id"/>
+		<result column="item_name" property="item_name"/>
+		<result column="item_description" property="item_description"/>
+		<result column="item_price" property="item_price"/>
+		<result column="item_number" property="item_number"/>
+		<result column="item_time" property="item_time"/>
+		<result column="user_id" property="user_id"/>
+		<result column="user_name" property="user_name"/>
+		<collection property="item_images" javaType="java.util.LinkedList" ofType="com.spring.api.dto.ItemImageDTO">
+			<id property="item_image_id" column="item_image_id"/>
+			<result column="item_id" property="item_id"/>
+			<result property="item_image_original_name" column="item_image_original_name"/>
+			<result property="item_image_stored_name" column="item_image_stored_name"/>
+			<result property="item_image_extension" column="item_image_extension"/>
+			<result property="item_image_size" column="item_image_size"/>
+		</collection>
+	</resultMap>
+	
 	<select id="readNewItemId" resultType="Integer">
 		SELECT NEXTVAL(seq_item_id)
 	</select>
@@ -25,31 +44,20 @@
 		WHERE item_id = ${item_id} AND comment_id = ${comment_id} AND comment_status = 'N' AND user_status = 'N'
 	</select>
 	
-	<select id="readItems" resultType="ItemEntity" parameterType="HashMap">
+	<select id="readItems" resultMap="ItemWithItemImageDTOMap" parameterType="HashMap">
 		SELECT *
-		FROM(
-			(SELECT *
-			FROM items i
-			NATURAL JOIN users
-			WHERE item_status = 'N' AND user_status = 'N'
-			<if test="hashtags != null">
-				AND EXISTS(
-					SELECT 1
-					FROM hashtags h
-					WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">REPLACE(#{value},' ', '')</foreach>
-				)
-			</if>
-			) t1
-			LEFT OUTER JOIN (
-				SELECT t.*
-				FROM(
-					SELECT item_image_id, item_id, ROW_NUMBER() OVER(PARTITION BY item_id ORDER BY item_id ASC) lvl
-					FROM item_images
-				) t
-				WHERE t.lvl = 1
-			) t2 USING(item_id)
-		)
-		ORDER BY item_id DESC
+		FROM items i
+		NATURAL JOIN users u
+		LEFT OUTER JOIN (SELECT * FROM item_images) m USING(item_id)
+		WHERE i.item_status = 'N' AND u.user_status = 'N'
+		<if test="hashtags != null">
+			AND EXISTS(
+				SELECT 1
+				FROM hashtags h
+				WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">REPLACE(#{value},' ', '')</foreach>
+			)
+		</if>
+		ORDER BY i.item_id DESC
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
 	</select>
 	

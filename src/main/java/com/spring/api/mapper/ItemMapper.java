@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
 import com.spring.api.entity.ItemEntity;
 
@@ -14,7 +15,7 @@ public interface ItemMapper {
 	public int readNewItemId();
 	public void createItem(HashMap param);
 	public void createItemImages(HashMap param);
-	public List<ItemEntity> readItems(HashMap param);
+	public List<ItemWithItemImageDTO> readItems(HashMap param);
 	public void createHashtags(HashMap param);
 	public void createCommentContent(HashMap<String, String> param);
 	public CommentEntity readCommentByCommentId(HashMap<String, String> param);

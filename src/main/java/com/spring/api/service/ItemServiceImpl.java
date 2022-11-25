@@ -16,9 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
 import com.spring.api.dto.CommentDTO;
-import com.spring.api.dto.ItemDTO;
+import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
-import com.spring.api.entity.ItemEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
 import com.spring.api.util.ItemCheckUtil;
@@ -122,7 +121,7 @@ public class ItemServiceImpl implements ItemService{
 	}
 
 	@Override
-	public List<ItemDTO> readItems(HttpServletRequest request, HashMap param) {
+	public List<ItemWithItemImageDTO> readItems(HttpServletRequest request, HashMap param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
@@ -139,14 +138,7 @@ public class ItemServiceImpl implements ItemService{
 		param.put("page", page);
 		param.put("offset", page*limit+"");
 		
-		List<ItemEntity> list = itemMapper.readItems(param);
-		List<ItemDTO> items = new LinkedList<ItemDTO>();
-		
-		for(ItemEntity itemEntity : list) {
-			items.add(new ItemDTO(itemEntity));
-		}
-		
-		return items;
+		return itemMapper.readItems(param);
 	}
 
 	@Override
