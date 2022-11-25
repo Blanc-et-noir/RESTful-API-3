@@ -143,4 +143,14 @@
 		DELETE FROM blockings
 		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
 	</delete>
+	
+	<update id="updateUserPw" parameterType="HashMap">
+		UPDATE users
+		SET
+			user_pw = #{new_user_pw},
+			question_id = ${new_question_id},
+			question_answer = #{new_question_answer},
+			user_salt = #{new_user_salt}
+		WHERE user_id = #{user_id} AND user_status = 'N'
+	</update>
 </mapper>

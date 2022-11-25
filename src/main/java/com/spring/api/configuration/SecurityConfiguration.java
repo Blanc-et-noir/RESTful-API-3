@@ -59,6 +59,7 @@ public class SecurityConfiguration {
         .antMatchers(HttpMethod.GET,"/api/v1/tokens").permitAll()
         .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/users/*/questions").permitAll()
+        .antMatchers(HttpMethod.PUT,"/api/v1/users/*/passwords").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/questions").permitAll()
         .anyRequest().authenticated().and()
         

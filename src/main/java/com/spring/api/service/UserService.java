@@ -29,4 +29,6 @@ public interface UserService{
 	public QuestionDTO readQuestion(HttpServletRequest request, HashMap<String,String> param);
 
 	public List<QuestionDTO> readQuestions();
+	
+	public void updateUserPw(HttpServletRequest request, HashMap<String, String> param);
 }

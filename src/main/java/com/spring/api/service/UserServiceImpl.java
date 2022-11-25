@@ -253,4 +253,42 @@ public class UserServiceImpl implements UserService{
 		
 		return questions;
 	}
+
+	@Override
+	public void updateUserPw(HttpServletRequest request, HashMap<String,String> param) {
+		String user_id = param.get("user_id");
+		String question_answer = param.get("question_answer");
+		String new_question_id = param.get("new_question_id");
+		String new_question_answer = param.get("new_question_answer");
+		String new_user_pw = param.get("new_user_pw");
+		String new_user_pw_check = param.get("new_user_pw_check");
+		String new_user_salt = SHA.getSalt();
+		
+		param.put("user_id", user_id);
+		param.put("new_user_salt", new_user_salt);
+		
+		userCheckUtil.checkUserIdRegex(user_id);
+		userCheckUtil.checkQuestionIdRegex(new_question_id);
+		userCheckUtil.checkQuestionAnswerBytes(new_question_answer);
+		userCheckUtil.checkUserPwRegex(new_user_pw);
+		userCheckUtil.checkUserPwRegex(new_user_pw_check);
+		userCheckUtil.checkUserPwAndPwCheck(new_user_pw, new_user_pw_check);
+		userCheckUtil.isQuestionExistent(Integer.parseInt(new_question_id));
+		
+		UserEntity userEntity = userCheckUtil.isUserExistent(user_id);
+		userCheckUtil.checkUserQuestionAnswerAndOldQuestionAnswer(SHA.DSHA512(question_answer.replaceAll(" ", ""), userEntity.getUser_salt()), userEntity.getQuestion_answer());
+		
+		param.put("new_user_pw", SHA.DSHA512(new_user_pw.replaceAll(" ", ""), new_user_salt));
+		param.put("new_question_answer", SHA.DSHA512(new_question_answer.replaceAll(" ", ""), new_user_salt));
+		
+		userMapper.updateUserPw(param);
+		userMapper.updateUserPwChangeTime(param);
+		userMapper.updateUserTokensToNull(param);
+		
+		String user_accesstoken = userEntity.getUser_accesstoken();
+		String user_refreshtoken = userEntity.getUser_refreshtoken();
+		
+		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
+		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
+	}
 }

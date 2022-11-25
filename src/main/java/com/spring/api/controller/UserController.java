@@ -129,4 +129,15 @@ public class UserController {
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
+	
+	@PutMapping("/api/v1/users/{user_id}/passwords")
+	public ResponseEntity<HashMap> updateUserPw(HttpServletRequest request, @PathVariable("user_id") String user_id, @RequestBody HashMap param){
+		HashMap result = resultUtil.createResultMap("사용자 비밀번호 변경 성공",true);
+		
+		param.put("user_id", user_id);
+		
+		userService.updateUserPw(request, param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
 }
