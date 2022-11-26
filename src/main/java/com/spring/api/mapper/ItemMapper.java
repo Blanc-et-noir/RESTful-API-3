@@ -8,10 +8,11 @@ import org.apache.ibatis.annotations.Mapper;
 import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
 import com.spring.api.entity.ItemEntity;
+import com.spring.api.entity.ItemImageEntity;
 
 @Mapper
 public interface ItemMapper {
-	public ItemEntity readItemByItemId(HashMap param);
+	public ItemWithItemImageDTO readItemByItemId(HashMap param);
 	public int readNewItemId();
 	public void createItem(HashMap param);
 	public void createItemImages(HashMap param);
@@ -23,4 +24,5 @@ public interface ItemMapper {
 	public List<CommentEntity> readComments(HashMap param);
 	public void createReplyCommentContent(HashMap<String, String> param);
 	public void updateComment(HashMap<String, String> param);
+	public ItemImageEntity readItemImageByItemImageId(HashMap<String, String> param);
 }

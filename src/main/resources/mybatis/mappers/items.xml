@@ -25,16 +25,9 @@
 		SELECT NEXTVAL(seq_item_id)
 	</select>
 	
-	<select id="readItemByItemId" resultType="ItemEntity" parameterType="HashMap">
+	<select id="readItemByItemId" resultMap="ItemWithItemImageDTOMap" parameterType="HashMap">
 		SELECT i.*
-		FROM items i NATURAL JOIN users u LEFT OUTER JOIN(
-			SELECT t.*
-			FROM(
-				SELECT item_image_id, item_id, ROW_NUMBER() OVER(PARTITION BY item_id ORDER BY item_id ASC) lvl
-				FROM item_images
-			) t
-			WHERE t.lvl = 1
-		) m USING(item_id)
+		FROM items i NATURAL JOIN users u LEFT OUTER JOIN item_images m USING(item_id)
 		WHERE i.item_id = ${item_id} AND i.item_status = 'N' AND u.user_status = 'N'
 	</select>
 	
@@ -44,11 +37,17 @@
 		WHERE item_id = ${item_id} AND comment_id = ${comment_id} AND comment_status = 'N' AND user_status = 'N'
 	</select>
 	
+	<select id="readItemImageByItemImageId" resultType="ItemImageEntity" parameterType="HashMap">
+		SELECT *
+		FROM item_images
+		WHERE item_image_id = ${item_image_id} AND item_id = ${item_id};
+	</select>
+	
 	<select id="readItems" resultMap="ItemWithItemImageDTOMap" parameterType="HashMap">
 		SELECT *
 		FROM items i
 		NATURAL JOIN users u
-		LEFT OUTER JOIN (SELECT * FROM item_images) m USING(item_id)
+		LEFT OUTER JOIN (SELECT * FROM item_images WHERE item_image_status = 'N') m USING(item_id)
 		WHERE i.item_status = 'N' AND u.user_status = 'N'
 		<if test="hashtags != null">
 			AND EXISTS(

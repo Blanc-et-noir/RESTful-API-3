@@ -1,11 +1,13 @@
 package com.spring.api.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,14 +61,20 @@ public class ItemController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@GetMapping("/api/v1/items{item_id}/images")
-	public void readItemImages(HttpServletRequest request) {
+	@GetMapping("/api/v1/items/{item_id}/images/{item_image_id}")
+	public ResponseEntity readItemImage(HttpServletRequest request, HttpServletResponse response, @PathVariable("item_id") String item_id, @PathVariable("item_image_id") String item_image_id) throws IOException {
+		HashMap result = resultUtil.createResultMap("상품 이미지 조회 성공",true);
 		
-	}
-	
-	@GetMapping("/api/v1/items{item_id}/images/{item_image_id}")
-	public void readItemImage(HttpServletRequest request, HttpServletResponse response, @PathVariable("item_id") String item_id, @PathVariable("item_image_id") String item_image_id) {
+		HashMap param = new HashMap();
+		param.put("item_id", item_id);
+		param.put("item_image_id", item_image_id);
 		
+		HttpHeaders header = new HttpHeaders();
+		
+		header.add("Content-Disposition", "attachment; filename=");
+		header.add("Cache-Control", "no-cache");
+		
+		return itemService.readItemImage(request,response, param);
 	}
 	
 	@PostMapping("/api/v1/items/{item_id}/comments")

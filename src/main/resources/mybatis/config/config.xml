@@ -3,6 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<typeAliases>
+		<typeAlias type="com.spring.api.entity.ItemImageEntity" alias="ItemImageEntity"/>
 		<typeAlias type="com.spring.api.dto.ItemWithItemImageDTO" alias="ItemWithItemImageDTO"/>
 		<typeAlias type="java.util.HashMap" alias="HashMap"/>
 		<typeAlias type="java.util.List" alias="List"/>

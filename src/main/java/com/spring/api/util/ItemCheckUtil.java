@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.api.code.ItemError;
+import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
-import com.spring.api.entity.ItemEntity;
+import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.mapper.ItemMapper;
 
@@ -137,14 +138,14 @@ public class ItemCheckUtil {
 		}		
 	}
 
-	public ItemEntity isItemExistent(HashMap param) {
-		ItemEntity itemEntity = null;
+	public ItemWithItemImageDTO isItemExistent(HashMap param) {
+		ItemWithItemImageDTO itemWithItemImageDTO = null;
 		
-		if((itemEntity = itemMapper.readItemByItemId(param)) == null) {
+		if((itemWithItemImageDTO = itemMapper.readItemByItemId(param)) == null) {
 			throw new CustomException(ItemError.NOT_FOUND_ITEM);
 		}
 		
-		return itemEntity;
+		return itemWithItemImageDTO;
 	}
 
 	public void checkItemIdRegex(String item_id) {
@@ -183,5 +184,23 @@ public class ItemCheckUtil {
 		if(!user_id.equals(commentEntity.getUser_id())) {
 			throw new CustomException(ItemError.CAN_NOT_DELETE_OR_UPDATE_COMMENT_BY_USER_ID);
 		}		
+	}
+
+	public void checkItemImageIdRegex(String item_image_id) {
+		try {
+			Integer.parseInt(item_image_id);	
+		}catch(Exception e) {
+			throw new CustomException(ItemError.ITEM_IMAGE_ID_NOT_MATCHED_TO_REGEX);
+		}	
+	}
+
+	public ItemImageEntity isItemImageExistent(HashMap<String, String> param) {
+		ItemImageEntity itemImageEntity = null;
+		
+		if((itemImageEntity = itemMapper.readItemImageByItemImageId(param)) == null) {
+			throw new CustomException(ItemError.NOT_FOUND_ITEM_IMAGE);
+		}
+		
+		return itemImageEntity;
 	}
 }

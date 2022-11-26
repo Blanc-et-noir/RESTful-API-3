@@ -1,6 +1,7 @@
 package com.spring.api.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,8 +9,13 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +24,7 @@ import org.springframework.web.multipart.MultipartRequest;
 import com.spring.api.dto.CommentDTO;
 import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
+import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
 import com.spring.api.util.ItemCheckUtil;
@@ -241,5 +248,29 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableComment(commentEntity, user_id);
 		
 		itemMapper.updateComment(param);
+	}
+
+	public ResponseEntity<Object> readItemImage(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws IOException {
+		String item_id = param.get("item_id");
+		String item_image_id = param.get("item_image_id");
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		itemCheckUtil.checkItemImageIdRegex(item_image_id);
+		itemCheckUtil.isItemExistent(param);
+		ItemImageEntity itemImageEntity = itemCheckUtil.isItemImageExistent(param);
+		
+		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_id+SEP+"images"+SEP+itemImageEntity.getItem_image_stored_name()+"."+itemImageEntity.getItem_image_extension());
+	
+		if(file.exists()) {
+			HttpHeaders header = new HttpHeaders();
+			header.add("Content-Disposition", "attachment; filename="+itemImageEntity.getItem_image_original_name()+"."+itemImageEntity.getItem_image_extension());
+			header.add("Cache-Control", "no-cache");
+			header.add("Content-Type", "application/octet-stream");
+			
+			return new ResponseEntity<Object>(FileUtils.readFileToByteArray(file),header,HttpStatus.OK);
+		}else {
+			System.out.println("없음");
+			return null;
+		}
 	}
 }
