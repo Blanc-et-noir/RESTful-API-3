@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.api.code.ItemError;
 import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
+import com.spring.api.entity.ItemEntity;
 import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.mapper.ItemMapper;
@@ -202,5 +203,11 @@ public class ItemCheckUtil {
 		}
 		
 		return itemImageEntity;
+	}
+
+	public void isEditableItem(ItemWithItemImageDTO itemWithItemImageDTO, String user_id) {
+		if(!user_id.equals(itemWithItemImageDTO.getUser_id())) {
+			throw new CustomException(ItemError.CAN_NOT_DELETE_OR_UPDATE_ITEM_BY_USER_ID);
+		}	
 	}
 }

@@ -118,4 +118,10 @@
 		SET comment_content = #{comment_content}
 		WHERE comment_id = ${comment_id} AND comment_status = 'N' AND user_id = #{user_id} AND item_id = ${item_id}
 	</update>
+	
+	<update id="deleteItem" parameterType="HashMap">
+		UPDATE items
+		SET item_status = 'Y'
+		WHERE item_id = ${item_id} AND user_id = #{user_id} AND item_status = 'N'
+	</update>
 </mapper>

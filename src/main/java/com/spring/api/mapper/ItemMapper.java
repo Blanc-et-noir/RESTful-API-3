@@ -25,4 +25,5 @@ public interface ItemMapper {
 	public void createReplyCommentContent(HashMap<String, String> param);
 	public void updateComment(HashMap<String, String> param);
 	public ItemImageEntity readItemImageByItemImageId(HashMap<String, String> param);
+	public void deleteItem(HashMap<String, String> param);
 }

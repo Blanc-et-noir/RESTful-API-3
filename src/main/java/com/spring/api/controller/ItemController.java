@@ -49,8 +49,15 @@ public class ItemController {
 	}
 	
 	@DeleteMapping("/api/v1/items/{item_id}")
-	public void deleteItem(HttpServletRequest request, @RequestParam HashMap param, @PathVariable("item_id") String item_id) {
+	public ResponseEntity<HashMap> deleteItem(HttpServletRequest request, @PathVariable("item_id") String item_id) {
+		HashMap result = resultUtil.createResultMap("상품 삭제 성공",true);
 		
+		HashMap param = new HashMap();
+		param.put("item_id", item_id);
+		
+		itemService.deleteItem(request, param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@GetMapping("/api/v1/items")

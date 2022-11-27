@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartRequest;
 import com.spring.api.dto.CommentDTO;
 import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
+import com.spring.api.entity.ItemEntity;
 import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
@@ -250,6 +251,7 @@ public class ItemServiceImpl implements ItemService{
 		itemMapper.updateComment(param);
 	}
 
+	@Override
 	public ResponseEntity<Object> readItemImage(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws IOException {
 		String item_id = param.get("item_id");
 		String item_image_id = param.get("item_image_id");
@@ -272,5 +274,20 @@ public class ItemServiceImpl implements ItemService{
 			System.out.println("없음");
 			return null;
 		}
+	}
+
+	@Override
+	public void deleteItem(HttpServletRequest request, HashMap<String,String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		param.put("user_id", user_id);
+		
+		String item_id = param.get("item_id");
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		ItemWithItemImageDTO itemWithItemImageDTO = itemCheckUtil.isItemExistent(param);
+		itemCheckUtil.isEditableItem(itemWithItemImageDTO, user_id);
+		
+		itemMapper.deleteItem(param);
 	}
 }
