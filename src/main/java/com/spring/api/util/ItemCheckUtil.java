@@ -21,10 +21,6 @@ public class ItemCheckUtil {
 	private ItemMapper itemMapper;
 	private RegexUtil regexUtil;
 	private HashMap<String,Boolean> extensions;
-	private final int MAX_LIMIT = 50;
-	private final int MIN_LIMIT = 10;
-	private final int HASHTAG_CONTENT_MAX_BYTES = 60;
-	private final int COMMENT_CONTENT_MAX_BYTES = 600;	
 	
 	@Autowired
 	ItemCheckUtil(ItemMapper itemMapper, RegexUtil regexUtil){
@@ -110,7 +106,7 @@ public class ItemCheckUtil {
 		int val = 0;
 		
 		if(limit==null) {
-			return MIN_LIMIT;
+			return regexUtil.getMIN_LIMIT();
 		}
 		
 		try {
@@ -119,7 +115,7 @@ public class ItemCheckUtil {
 			throw new CustomException(ItemError.LIMIT_NOT_MATCHED_TO_REGEX);
 		}
 		
-		if(!(val>=MIN_LIMIT&&val<=MAX_LIMIT)) {
+		if(!(val>=regexUtil.getMIN_LIMIT()&&val<=regexUtil.getMAX_LIMIT())) {
 			throw new CustomException(ItemError.LIMIT_OUT_OF_RANGE);
 		}
 		
@@ -132,8 +128,10 @@ public class ItemCheckUtil {
 			
 			while(itor.hasNext()) {
 				String hashtag = itor.next();
-				if(!regexUtil.checkBytes(hashtag, HASHTAG_CONTENT_MAX_BYTES)) {
+				if(!regexUtil.checkBytes(hashtag, regexUtil.getHASHTAG_CONTENT_MAX_BYTES())) {
 					throw new CustomException(ItemError.HASHTAG_EXCEED_MAX_BYTES);
+				}else if(!regexUtil.checkRegex(hashtag, regexUtil.getHASHTAG_REGEX())) {
+					throw new CustomException(ItemError.HASHTAG_NOT_MATCHED_TO_REGEX);
 				}
 			}
 		}		
@@ -158,7 +156,7 @@ public class ItemCheckUtil {
 	}
 
 	public void checkCommentContent(String comment_content) {
-		if(!regexUtil.checkBytes(comment_content, COMMENT_CONTENT_MAX_BYTES)) {
+		if(!regexUtil.checkBytes(comment_content, regexUtil.getCOMMENT_CONTENT_MAX_BYTES())) {
 			throw new CustomException(ItemError.COMMENT_CONTENT_EXCEED_MAX_BYTES);
 		}
 	}

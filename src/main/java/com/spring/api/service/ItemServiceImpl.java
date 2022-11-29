@@ -271,7 +271,6 @@ public class ItemServiceImpl implements ItemService{
 			
 			return new ResponseEntity<Object>(FileUtils.readFileToByteArray(file),header,HttpStatus.OK);
 		}else {
-			System.out.println("없음");
 			return null;
 		}
 	}

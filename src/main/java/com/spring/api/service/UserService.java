@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.spring.api.dto.QuestionDTO;
+import com.spring.api.dto.UserDTO;
 import com.spring.api.entity.BlockingEntity;
 import com.spring.api.entity.FollowingEntity;
 
@@ -31,4 +32,8 @@ public interface UserService{
 	public List<QuestionDTO> readQuestions();
 	
 	public void updateUserPw(HttpServletRequest request, HashMap<String, String> param);
+
+	public UserDTO readMyUserInfo(HttpServletRequest request);
+
+	public void deleteMyUserInfo(HttpServletRequest request);
 }

@@ -10,13 +10,13 @@
 
 	<select id="readUserInfoByUserId" resultType="UserEntity" parameterType="String">
 		SELECT *
-		FROM users
+		FROM users NATURAL JOIN questions
 		WHERE user_id = #{user_id}
 	</select>
 	
 	<select id="readUserInfoByUserPhone" resultType="UserEntity" parameterType="String">
 		SELECT *
-		FROM users
+		FROM users NATURAL JOIN questions
 		WHERE user_phone = #{user_phone}
 	</select>
 	
@@ -131,6 +131,12 @@
 	<update id="updateUserTokensToNewTokens" parameterType="HashMap">
 		UPDATE users
 		SET user_accesstoken = #{user_accesstoken}, user_refreshtoken = #{user_refreshtoken}
+		WHERE user_id = #{user_id} AND user_status = 'N'
+	</update>
+	
+	<update id="deleteUser" parameterType="HashMap">
+		UPDATE users
+		SET user_status = 'Y', user_accesstoken = NULL, user_refreshtoken = NULL
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 	

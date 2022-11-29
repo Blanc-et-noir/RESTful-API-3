@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.code.UserError;
 import com.spring.api.dto.QuestionDTO;
+import com.spring.api.dto.UserDTO;
 import com.spring.api.encrypt.SHA;
 import com.spring.api.entity.BlockingEntity;
 import com.spring.api.entity.FollowingEntity;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService{
 		this.redisUtil = redisUtil;
 	}
 	
+	@Override
 	public void createUser(HashMap<String,String> param) throws CustomException {
 		String user_id = param.get("user_id");
 		String user_pw = param.get("user_pw");
@@ -287,6 +289,38 @@ public class UserServiceImpl implements UserService{
 		
 		String user_accesstoken = userEntity.getUser_accesstoken();
 		String user_refreshtoken = userEntity.getUser_refreshtoken();
+		
+		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
+		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
+	}
+
+	@Override
+	public UserDTO readMyUserInfo(HttpServletRequest request) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		HashMap param = new HashMap();
+		param.put("user_id", user_id);
+		
+		UserEntity userEntity = userMapper.readUserInfoByUserId(user_id);
+		
+		return new UserDTO(userEntity);
+	}
+
+	@Override
+	public void deleteMyUserInfo(HttpServletRequest request) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		
+		HashMap param = new HashMap();
+		param.put("user_id", user_id);
+		
+		UserEntity userEntity = userCheckUtil.isUserExistent(user_id);
+		
+		user_accesstoken = userEntity.getUser_accesstoken();
+		String user_refreshtoken = userEntity.getUser_refreshtoken();
+		
+		userMapper.deleteUser(param);
 		
 		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
 		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));

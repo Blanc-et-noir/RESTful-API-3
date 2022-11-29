@@ -47,6 +47,15 @@ public class UserController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
+	@GetMapping("/api/v1/users/me")
+	public ResponseEntity<HashMap> updateMyUserInfo(HttpServletRequest request){		
+		HashMap result = resultUtil.createResultMap("회원 정보 조회 성공",true);
+		
+		result.put("user", userService.readMyUserInfo(request));
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
 	@PostMapping("/api/v1/users/me/followings")
 	public ResponseEntity<HashMap> createFollowingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.createFollowingInfo(request,param);
@@ -105,6 +114,8 @@ public class UserController {
 	public ResponseEntity<HashMap> deleteMyUserInfo(HttpServletRequest request){
 		
 		HashMap result = resultUtil.createResultMap("회원 탈퇴 성공",true);
+		
+		userService.deleteMyUserInfo(request);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

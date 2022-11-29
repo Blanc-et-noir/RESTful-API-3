@@ -30,7 +30,8 @@ public enum ItemError implements Code{
 	CAN_NOT_DELETE_OR_UPDATE_COMMENT_BY_USER_ID("ITEM_10016","해당 사용자 정보로 댓글 삭제 또는 수정 불가",HttpStatus.UNAUTHORIZED),
 	ITEM_IMAGE_ID_NOT_MATCHED_TO_REGEX("ITEM_10017","상품 이미지 ID가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	NOT_FOUND_ITEM_IMAGE("ITEM_10018","상품 이미지 정보 없음",HttpStatus.BAD_REQUEST), 
-	CAN_NOT_DELETE_OR_UPDATE_ITEM_BY_USER_ID("ITEM_10019","해당 사용자 정보로 상품 삭제 또는 수정 불가",HttpStatus.UNAUTHORIZED);
+	CAN_NOT_DELETE_OR_UPDATE_ITEM_BY_USER_ID("ITEM_10019","해당 사용자 정보로 상품 삭제 또는 수정 불가",HttpStatus.UNAUTHORIZED),
+	HASHTAG_NOT_MATCHED_TO_REGEX("ITEM_10020","해시태그 값이 형식에 맞지 않음", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

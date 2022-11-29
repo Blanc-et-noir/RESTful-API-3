@@ -56,4 +56,6 @@ public interface UserMapper {
 	public List<QuestionEntity> readQuestions();
 
 	public void updateUserPw(HashMap<String, String> param);
+
+	public void deleteUser(HashMap param);
 }
