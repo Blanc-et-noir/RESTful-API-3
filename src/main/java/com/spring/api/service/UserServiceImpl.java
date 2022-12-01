@@ -321,6 +321,7 @@ public class UserServiceImpl implements UserService{
 		String user_refreshtoken = userEntity.getUser_refreshtoken();
 		
 		userMapper.deleteUser(param);
+		userMapper.updateUserWithdrawTime(param);
 		
 		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
 		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));

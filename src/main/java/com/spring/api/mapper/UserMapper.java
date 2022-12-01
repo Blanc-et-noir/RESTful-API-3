@@ -58,4 +58,6 @@ public interface UserMapper {
 	public void updateUserPw(HashMap<String, String> param);
 
 	public void deleteUser(HashMap param);
+
+	public void updateUserWithdrawTime(HashMap param);
 }

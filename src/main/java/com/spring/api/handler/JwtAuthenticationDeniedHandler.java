@@ -12,7 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.spring.api.exception.CustomException;
+import com.spring.api.code.AuthError;
 import com.spring.api.util.TimeUtil;
 
 @Component
@@ -26,15 +26,13 @@ public class JwtAuthenticationDeniedHandler implements AccessDeniedHandler{
 	
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-    	CustomException customException = (CustomException) request.getAttribute("customException");
-        
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(customException.getHttpStatus().value());
+        response.setStatus(401);
         
     	JSONObject result = new JSONObject();
     	result.put("flag", false);
-    	result.put("code", customException.getCode());
-    	result.put("message", customException.getMessage());
+    	result.put("code", AuthError.NOT_AUTHORIZED.getCode());
+    	result.put("message", AuthError.NOT_AUTHORIZED.getMessage());
     	result.put("timestamp", timeUtil.getTimestamp());
     	
         response.getWriter().print(result);

@@ -25,20 +25,16 @@ import com.spring.api.util.RedisUtil;
 public class SecurityConfiguration {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler;
-	private final RedisUtil redisUtil;
-	private final JwtTokenProvider jwtTokenProvider;
+
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	
 	@Autowired
 	SecurityConfiguration(
-			RedisUtil redisUtil, 
-			JwtTokenProvider jwtTokenProvider, 
-			JwtAuthenticationFilter jwtAuthenticationFilter, 
-			JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
-			JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler){
-		
-		this.redisUtil = redisUtil;
-		this.jwtTokenProvider = jwtTokenProvider;
+		JwtAuthenticationFilter jwtAuthenticationFilter, 
+		JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
+		JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler
+	){
+
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 		this.jwtAuthenticationDeniedHandler = jwtAuthenticationDeniedHandler;	
@@ -61,6 +57,8 @@ public class SecurityConfiguration {
         .antMatchers(HttpMethod.GET,"/api/v1/users/*/questions").permitAll()
         .antMatchers(HttpMethod.PUT,"/api/v1/users/*/passwords").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/questions").permitAll()
+        .antMatchers(HttpMethod.GET,"/api/v1/items/*/images/*").permitAll()
+        .antMatchers(HttpMethod.GET,"/api/v1/batches/*").hasRole("ADMIN")
         .anyRequest().authenticated().and()
         
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

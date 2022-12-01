@@ -140,6 +140,12 @@
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</update>
 	
+	<update id="updateUserWithdrawTime" parameterType="HashMap">
+		UPDATE user_times
+		SET user_withdraw_time = NOW()
+		WHERE user_id = #{user_id}
+	</update>
+	
 	<delete id="deleteFollowingInfoByBothUserId" parameterType="HashMap">
 		DELETE FROM followings
 		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}

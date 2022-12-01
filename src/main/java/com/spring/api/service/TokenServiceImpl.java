@@ -52,7 +52,7 @@ public class TokenServiceImpl implements TokenService{
 		if(!userEntity.getUser_pw().equals(SHA.DSHA512(user_pw, userEntity.getUser_salt()))) {
 			throw new CustomException(UserError.NOT_FOUND_USER);
 		}
-		
+
 		Authentication authentication = new UserAuthentication(userEntity.getUser_id(), null, Arrays.asList(new SimpleGrantedAuthority(userEntity.getUser_role())));
 		
 		String user_accesstoken = jwtTokenProvider.createToken(authentication,true);
@@ -64,6 +64,7 @@ public class TokenServiceImpl implements TokenService{
 		param.put("user_accesstoken", user_accesstoken);
 		param.put("user_refreshtoken", user_refreshtoken);
 		param.put("user_id", user_id);
+		
 		userMapper.updateUserLoginTime(param);
 		userMapper.updateUserTokensToNewTokens(param);
 		

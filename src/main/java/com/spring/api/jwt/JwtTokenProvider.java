@@ -1,9 +1,11 @@
 package com.spring.api.jwt;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -34,7 +36,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = null;
         String token_type = null;
-        
+
         if(isAccessToken) {
         	expiryDate = new Date(now.getTime() + ACCESSTOKEN_EXPIRATION_TIME);
         	token_type = "user_accesstoken";
@@ -42,12 +44,15 @@ public class JwtTokenProvider {
         	expiryDate = new Date(now.getTime() + REFRESHTOKEN_EXPIRATION_TIME);
         	token_type = "user_refreshtoken";
         }
-        
+
+        String user_role = authentication.getAuthorities().iterator().next().getAuthority();
+
         return Jwts.builder()
                 .setSubject((String) authentication.getPrincipal())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .claim("token_type", token_type)
+                .claim("user_role", user_role)
                 .signWith(SignatureAlgorithm.HS512, PRIVATE_KEY)
                 .compact();
     }
@@ -71,6 +76,21 @@ public class JwtTokenProvider {
     	        return claims.getSubject();
     	}catch(ExpiredJwtException  e) {
     		return (String) e.getClaims().getSubject();
+    	}catch(Exception e) {
+    		return "INVALID";
+    	}
+    }
+    
+    public String getUserRoleFromJWT(String token) {
+    	try {
+    		Claims claims = Jwts.parser()
+    	            .setSigningKey(PRIVATE_KEY)
+    	            .parseClaimsJws(token)
+    	            .getBody();
+
+    	        return (String) claims.get("user_role");
+    	}catch(ExpiredJwtException  e) {
+    		return (String) e.getClaims().get("user_role");
     	}catch(Exception e) {
     		return "INVALID";
     	}
