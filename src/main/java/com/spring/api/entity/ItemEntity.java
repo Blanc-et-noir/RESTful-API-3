@@ -21,5 +21,4 @@ public class ItemEntity {
 	private String item_status;
 	private String user_id;
 	private String user_name;
-	private Integer item_image_id;
 }

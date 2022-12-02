@@ -140,7 +140,8 @@ public class TokenServiceImpl implements TokenService{
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_token);
 
 		HashMap tokenInfo = new HashMap();
-		tokenInfo.put("token_owner", jwtTokenProvider.getUserIdFromJWT(user_token));
+		tokenInfo.put("user_id", jwtTokenProvider.getUserIdFromJWT(user_token));
+		tokenInfo.put("user_role", jwtTokenProvider.getUserRoleFromJWT(user_token));
 		tokenInfo.put("token_type", jwtTokenProvider.getTokenType(user_token));
 		tokenInfo.put("token_remaining_time_of_seconds", jwtTokenProvider.getRemainingTime(user_token)/1000);
 		

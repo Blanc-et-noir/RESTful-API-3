@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import com.spring.api.entity.UserEntity;
+import com.spring.api.rowMapper.ItemEntityRowMapper;
 import com.spring.api.rowMapper.UserEntityRowMapper;
 
 @Configuration
@@ -54,6 +55,7 @@ public class BatchConfiguration {
 		return this.jobBuilderFactory
 				.get("deleteJob")
 				.start(deleteUserStep())
+				.next(deleteItemStep())
 				.build();
 	}
 	
@@ -69,6 +71,17 @@ public class BatchConfiguration {
 	}
 	
 	@Bean
+	@JobScope
+	public Step deleteItemStep() {
+		return this.stepBuilderFactory
+				.get("deleteItemStep")
+				.<UserEntity, UserEntity>chunk(10)
+				.reader(itemEntityReader(this.dataSource))
+				.writer(itemEntityWriter(this.dataSource))
+				.build();
+	}
+	
+	@Bean
 	@StepScope
 	public JdbcPagingItemReader<UserEntity> userEntityReader(DataSource dataSource){
 		try {
@@ -77,7 +90,7 @@ public class BatchConfiguration {
 			factoryBean.setDataSource(dataSource);
 			factoryBean.setSelectClause("SELECT *");
 			factoryBean.setFromClause("FROM users NATURAL JOIN questions NATURAL JOIN user_times");
-			factoryBean.setWhereClause("WHERE user_status = 'Y' AND TIMESTAMPDIFF(DAY, user_withdraw_time, NOW()) >= 30");
+			factoryBean.setWhereClause("WHERE user_status = 'Y' AND TIMESTAMPDIFF(DAY, user_withdraw_time, NOW()) >= 0");
 			factoryBean.setSortKey("user_id");
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
@@ -106,6 +119,48 @@ public class BatchConfiguration {
 		return itemWriterBuilder
 			.dataSource(dataSource)
 			.sql("DELETE FROM users WHERE user_id = :user_id")
+			.beanMapped()
+			.build();
+	}
+	
+	@Bean
+	@StepScope
+	public JdbcPagingItemReader<UserEntity> itemEntityReader(DataSource dataSource){
+		try {
+			SqlPagingQueryProviderFactoryBean factoryBean = new SqlPagingQueryProviderFactoryBean();
+			
+			factoryBean.setDataSource(dataSource);
+			factoryBean.setSelectClause("SELECT *");
+			factoryBean.setFromClause("FROM items");
+			factoryBean.setWhereClause("WHERE user_id IS NULL OR item_status = 'Y'");
+			factoryBean.setSortKey("item_id");
+			
+			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
+			
+			JdbcPagingItemReaderBuilder itemReaderBuilder = new JdbcPagingItemReaderBuilder();
+			
+			itemReaderBuilder.name("itemReaderBuilder");
+			itemReaderBuilder.dataSource(dataSource);
+			itemReaderBuilder.queryProvider(pagingQueryProvider);
+			itemReaderBuilder.pageSize(10);
+			itemReaderBuilder.parameterValues(new HashMap());
+			itemReaderBuilder.rowMapper(new ItemEntityRowMapper());
+			
+			return itemReaderBuilder.build(); 
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@Bean
+	@StepScope
+	public JdbcBatchItemWriter<UserEntity> itemEntityWriter(DataSource dataSource){
+		JdbcBatchItemWriterBuilder itemWriterBuilder = new JdbcBatchItemWriterBuilder();
+		
+		return itemWriterBuilder
+			.dataSource(dataSource)
+			.sql("DELETE FROM items WHERE item_id = :item_id")
 			.beanMapped()
 			.build();
 	}
