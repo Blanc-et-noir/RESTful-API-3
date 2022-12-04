@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartRequest;
 import com.spring.api.dto.CommentDTO;
 import com.spring.api.dto.ItemWithItemImageDTO;
 import com.spring.api.entity.CommentEntity;
-import com.spring.api.entity.ItemEntity;
 import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
@@ -37,7 +36,7 @@ public class ItemServiceImpl implements ItemService{
 	private ItemCheckUtil itemCheckUtil;
 	private ItemMapper itemMapper;
 	private final String SEP = File.separator;
-	private final String BASE_DIRECTORY_OF_IMAGE_FILES = "C:"+SEP+"georaesangeo"+SEP+"items"+SEP;
+	private final String BASE_DIRECTORY_OF_IMAGE_FILES = "C:"+SEP+"georaesangeo"+SEP+"items"+SEP+"images"+SEP;
 	
 	@Autowired
 	ItemServiceImpl(JwtTokenProvider jwtTokenProvider,ItemMapper itemMapper, ItemCheckUtil itemCheckUtil){
@@ -114,7 +113,7 @@ public class ItemServiceImpl implements ItemService{
 			for(String item_image_name : mappingTable.keySet()) {
 				MultipartFile multipartFile = mappingTable.get(item_image_name);
 				try {
-					File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_id+SEP+"images"+SEP+item_image_name);
+					File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_image_name);
 
 					if(!file.exists()) {
 						file.mkdirs();
@@ -261,7 +260,7 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isItemExistent(param);
 		ItemImageEntity itemImageEntity = itemCheckUtil.isItemImageExistent(param);
 		
-		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_id+SEP+"images"+SEP+itemImageEntity.getItem_image_stored_name()+"."+itemImageEntity.getItem_image_extension());
+		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+itemImageEntity.getItem_image_stored_name()+"."+itemImageEntity.getItem_image_extension());
 	
 		if(file.exists()) {
 			HttpHeaders header = new HttpHeaders();

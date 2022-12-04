@@ -16,5 +16,5 @@ public class ItemImageEntity {
 	private String item_image_stored_name;
 	private String item_image_extension;
 	private int item_image_size;
-	private String item_status;
+	private String item_image_status;
 }

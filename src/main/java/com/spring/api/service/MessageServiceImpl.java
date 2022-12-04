@@ -75,7 +75,7 @@ public class MessageServiceImpl implements MessageService{
 		param.put("user_id", user_id);
 		
 		messageCheckUtil.checkMessageIdRegex(message_id);
-		MessageEntity messageEntity = messageCheckUtil.isMessageExistent(param);
+		messageCheckUtil.isMessageExistent(param);
 		
 		messageMapper.deleteMessageBySenderId(param);
 		messageMapper.deleteMessageByReceiverId(param);

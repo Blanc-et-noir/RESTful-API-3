@@ -34,7 +34,6 @@ public class SecurityConfiguration {
 		JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
 		JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler
 	){
-
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 		this.jwtAuthenticationDeniedHandler = jwtAuthenticationDeniedHandler;	
