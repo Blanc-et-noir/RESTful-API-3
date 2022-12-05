@@ -1,14 +1,14 @@
 package com.spring.api.util;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.spring.api.code.MessageError;
-import com.spring.api.code.UserError;
 import com.spring.api.entity.MessageEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
@@ -27,47 +27,43 @@ public class MessageCheckUtil {
     
 	private final int FOLLOWING_LIMIT = 5;
 	private final int BLOCKING_LIMIT = 5;
-	private final int MESSAGE_RECEIVER_USER_ID_LIMIT = 10;
+
 	private final int SEARCH_LIMIT_BYTES = 120;
 	private final int MAX_LIMIT = 50;
 	private final int MIN_LIMIT = 10;
+	private final long BATCH_FREQUENCY;
+	private final long MESSAGE_FREQUENCY;
 	
 	@Autowired
-	MessageCheckUtil(UserMapper userMapper,MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, RedisTemplate redisTemplate, RegexUtil regexUtil){
+	MessageCheckUtil(
+		UserMapper userMapper,
+		MessageMapper messageMapper,
+		JwtTokenProvider jwtTokenProvider,
+		RedisTemplate redisTemplate,
+		RegexUtil regexUtil,
+		@Value("${frequency.batch}") long BATCH_FREQUENCY,
+		@Value("${frequency.message}") long MESSAGE_FREQUENCY
+	){
 		this.userMapper = userMapper;
 		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.redisTemplate = redisTemplate;
 		this.regexUtil = regexUtil;
+		this.BATCH_FREQUENCY = BATCH_FREQUENCY;
+		this.MESSAGE_FREQUENCY = MESSAGE_FREQUENCY;
 	}
 	
 	public void isMessageTypeExistent(int message_type_id) {
 		if(messageMapper.readMessageTypeByMessageTypeId(message_type_id)==null) {
 			throw new CustomException(MessageError.NOT_FOUND_MESSAGE_TYPE);
 		}
-	}
-	
-	
-	public void areUsersExistent(List<String> message_receiver_user_ids) {
-		if(messageMapper.readUsersByUserIds(message_receiver_user_ids).size()<message_receiver_user_ids.size()) {
-			throw new CustomException(UserError.NOT_FOUND_USER);
-		}
-	}
-	
+	}	
 	
 	public void checkMessageTypeIdRegex(String message_type_id) {
 		try {
 			Integer.parseInt(message_type_id);
 		}catch(Exception e) {
 			throw new CustomException(MessageError.MESSAGE_TYPE_ID_NOT_MATCHED_TO_REGEX);
-		}
-	}
-	
-	public void checkUserIdsRegex(List<String> user_ids) {
-		for(String user_id : user_ids) {
-			if(!regexUtil.checkRegex(user_id, regexUtil.getUSER_ID_REGEX())) {
-				throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
-			}
 		}
 	}
 	
@@ -98,13 +94,6 @@ public class MessageCheckUtil {
 		
 		return val;
 	}
-	
-	public void areTheNumberOfUserIdsProper(List<String> message_receiver_user_ids) {
-		if(!(!message_receiver_user_ids.isEmpty()&&message_receiver_user_ids.size()>=1&&message_receiver_user_ids.size()<=MESSAGE_RECEIVER_USER_ID_LIMIT)) {
-			throw new CustomException(MessageError.THE_NUMBER_OF_USER_IDS_ARE_NOT_PROPER);
-		}
-	}
-	
 	
 	public void checkMessageTitleBytes(String message_title) {
 		if(!regexUtil.checkBytes(message_title, regexUtil.getMESSAGE_TITLE_MAX_BYTES())) {
@@ -185,6 +174,14 @@ public class MessageCheckUtil {
 			throw new CustomException(MessageError.NOT_FOUND_MESSAGE);
 		}else {
 			return messageEntity;
+		}
+	}
+
+	public void checkUserMessageTime(Timestamp userMessageTime) {
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		
+		if(userMessageTime != null && (now.getTime()-userMessageTime.getTime())/1000 <= MESSAGE_FREQUENCY) {
+			throw new CustomException(MessageError.TOO_FREQUENT_TO_SEND_MESSAGE);
 		}
 	}
 }

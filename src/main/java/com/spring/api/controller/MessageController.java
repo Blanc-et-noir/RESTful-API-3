@@ -30,8 +30,8 @@ public class MessageController {
 	}
 	
 	@PostMapping("/api/v1/messages")
-	public ResponseEntity<HashMap> createBulkMessage(HttpServletRequest request, @RequestBody HashMap<String,Object> param){
-		messageService.createBulkMessage(request,param);
+	public ResponseEntity<HashMap> createMessage(HttpServletRequest request, @RequestBody HashMap param){
+		messageService.createMessage(request,param);
 		
 		HashMap result = resultUtil.createResultMap("메세지 전송 성공",true);
 		

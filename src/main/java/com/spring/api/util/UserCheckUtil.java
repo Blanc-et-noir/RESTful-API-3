@@ -121,7 +121,6 @@ public class UserCheckUtil {
 			throw new CustomException(UserError.QUESTION_ID_NOT_MATCHED_TO_REGEX);
 		}
 	}
-
 	
 	public void checkQuestionAnswerBytes(String question_answer) {
 		if(!regexUtil.checkBytes(question_answer, regexUtil.getQUESTION_ANSWER_MAX_BYTES())) {
@@ -129,7 +128,6 @@ public class UserCheckUtil {
 		}
 	}
 
-	
 	public UserEntity isUserExistent(String user_id) {		
 		UserEntity userEntity = userMapper.readUserInfoByNotWithdrawedUserId(user_id);
 		
@@ -159,8 +157,6 @@ public class UserCheckUtil {
 			throw new CustomException(UserError.NOT_FOUND_QUESTION);
 		}
 	}
-	
-
 	
 	public void isSourceUserIdAndTargetUserIdNotSame(String source_user_id, String target_user_id) {
 		if(source_user_id.equals(target_user_id)) {

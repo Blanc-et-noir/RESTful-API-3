@@ -21,5 +21,7 @@ public class MessageEntity {
 	private String message_sender_status;
 	private String message_receiver_status;
 	
+	private Timestamp message_sender_delete_time;
+	private Timestamp message_receiver_delete_time;
 	private Timestamp message_time;
 }

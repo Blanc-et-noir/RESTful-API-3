@@ -14,57 +14,61 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.spring.api.dto.DetailedMessageDTO;
 import com.spring.api.dto.MessageDTO;
 import com.spring.api.entity.MessageEntity;
+import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.MessageMapper;
 import com.spring.api.util.MessageCheckUtil;
+import com.spring.api.util.UserCheckUtil;
 
 @Service("messageService")
 @Transactional
 public class MessageServiceImpl implements MessageService{
 	private final MessageMapper messageMapper;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final UserCheckUtil userCheckUtil;
 	private final MessageCheckUtil messageCheckUtil;
 	
 	@Autowired
-	MessageServiceImpl(MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, MessageCheckUtil MessageCheckUtil){
+	MessageServiceImpl(MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, UserCheckUtil userCheckUtil, MessageCheckUtil MessageCheckUtil){
 		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
+		this.userCheckUtil = userCheckUtil;
 		this.messageCheckUtil = MessageCheckUtil;
 	}
 	
 	@Override
-	public void createBulkMessage(HttpServletRequest request, @RequestBody HashMap<String,Object> param) {
+	public void createMessage(HttpServletRequest request, @RequestBody HashMap<String,String> param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String message_sender_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		param.put("message_sender_user_id", message_sender_user_id);
 		
-		String message_type_id = (String) param.get("message_type_id");
-		String message_title = (String) param.get("message_title");
-		String message_content = (String) param.get("message_content");
+		String message_type_id = param.get("message_type_id");
+		String message_title = param.get("message_title");
+		String message_content = param.get("message_content");
+		String message_receiver_user_id = param.get("message_receiver_user_id");
 		
 		messageCheckUtil.checkMessageTypeIdRegex(message_type_id);
 		messageCheckUtil.checkMessageTitleBytes(message_title);
 		messageCheckUtil.checkMessageContentBytes(message_content);
-		
-		List<String> message_receiver_user_ids = (List<String>) param.get("message_receiver_user_ids");
-		
-		messageCheckUtil.areTheNumberOfUserIdsProper(message_receiver_user_ids);
-		messageCheckUtil.checkUserIdsRegex(message_receiver_user_ids);
-		messageCheckUtil.areUsersExistent(message_receiver_user_ids);
+		userCheckUtil.checkUserIdRegex(message_receiver_user_id);
+		userCheckUtil.isUserExistent(message_receiver_user_id);
 		messageCheckUtil.isMessageTypeExistent(Integer.parseInt(message_type_id));
+		messageCheckUtil.checkUserMessageTime(messageMapper.readUserMessageTime(param));		
 		
-		int message_id = messageMapper.readNewMessageId();
-		param.put("message_id", message_id);
-		param.put("message_receiver_user_ids", message_receiver_user_ids);
-		
-		message_receiver_user_ids = messageMapper.readUsersByNotBlockedUserIds(param);
-		param.put("message_receiver_user_ids", message_receiver_user_ids);
-
-		if(message_receiver_user_ids.size()!=0) {
-			messageMapper.createBulkMessage(param);
-			messageMapper.createMessageSenderInfo(param);
-			messageMapper.createMessageReceiverInfo(param);
+		try {
+			userCheckUtil.isNotBlocked(message_receiver_user_id, message_sender_user_id);
+			
+			param.put("message_id", messageMapper.readNewMessageId()+"");
+			
+			messageMapper.createMessage(param);
+			messageMapper.createMessageSender(param);
+			messageMapper.createMessageReceiver(param);
+			messageMapper.updateUserMessageTime(param);
+		}catch(CustomException e) {
+			
 		}
+
+		return;
 	}
 
 	@Override

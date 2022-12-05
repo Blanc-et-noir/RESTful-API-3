@@ -2,25 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.spring.api.mapper.MessageMapper">
-	<select id="readUsersByUserIds" resultType="UserEntity" parameterType="List">
-		SELECT *
-		FROM users
-		WHERE user_id IN <foreach collection="message_receiver_user_ids" separator="," open="(" close=")" item="message_receiver_user_id">#{message_receiver_user_id}</foreach> AND user_status = 'N'
-	</select>
-
 	<select id="readMessageTypeByMessageTypeId" resultType="HashMap" parameterType="Integer">
 		SELECT *
 		FROM message_types
 		WHERE message_type_id = #{message_type_id}
-	</select>
-
-	<select id="readUsersByNotBlockedUserIds" resultType="String" parameterType="HashMap">
-		SELECT user_id
-		FROM users
-		WHERE
-			user_status = 'N' AND
-			user_id IN <foreach collection="message_receiver_user_ids" separator="," open="(" close=")" item="message_receiver_user_id">#{message_receiver_user_id}</foreach> AND
-			user_id NOT IN (SELECT source_user_id FROM blockings WHERE target_user_id = #{message_sender_user_id})
 	</select>
 
 	<select id="readNewMessageId" resultType="Integer" parameterType="HashMap">
@@ -53,28 +38,39 @@
 		WHERE message_id = ${message_id} AND (message_sender_status='N' AND message_sender_user_id = #{user_id} OR message_receiver_status='N' AND message_receiver_user_id = #{user_id})
 	</select>
 
-	<insert id="createBulkMessage" parameterType="HashMap">
+	<select id="readUserMessageTime" resultType="java.sql.Timestamp" parameterType="HashMap">
+		SELECT user_message_time
+		FROM user_times
+		WHERE user_id = #{message_sender_user_id}
+	</select>
+
+	<insert id="createMessage" parameterType="HashMap">
 		INSERT INTO messages VALUES(${message_id},${message_type_id},#{message_title},#{message_content}, NOW())
 	</insert>
 	
-	<insert id="createMessageSenderInfo" parameterType="HashMap">
+	<insert id="createMessageSender" parameterType="HashMap">
 		INSERT INTO message_senders(message_id, message_sender_user_id) VALUES(${message_id},#{message_sender_user_id})
 	</insert>
 	
-	<insert id="createMessageReceiverInfo" parameterType="HashMap">
-		INSERT INTO message_receivers(message_id, message_receiver_user_id) VALUES
-		<foreach collection="message_receiver_user_ids" item="message_receiver_user_id" separator=",">(${message_id},#{message_receiver_user_id})</foreach>
+	<insert id="createMessageReceiver" parameterType="HashMap">
+		INSERT INTO message_receivers(message_id, message_receiver_user_id) VALUES(${message_id},#{message_receiver_user_id})
 	</insert>
 	
 	<update id="deleteMessageBySenderId" parameterType="HashMap">
 		UPDATE message_senders
-		SET message_sender_status = 'Y'
+		SET message_sender_status = 'Y', message_sender_delete_time = NOW()
 		WHERE message_id = ${message_id} AND message_sender_user_id = #{user_id} AND message_sender_status = 'N'
 	</update>
 	
 	<update id="deleteMessageByReceiverId" parameterType="HashMap">
 		UPDATE message_receivers
-		SET message_receiver_status = 'Y'
+		SET message_receiver_status = 'Y', message_receiver_delete_time = NOW()
 		WHERE message_id = ${message_id} AND message_receiver_user_id = #{user_id} AND message_receiver_status = 'N'
+	</update>
+	
+	<update id="updateUserMessageTime" parameterType="HashMap">
+		UPDATE user_times
+		SET user_message_time = NOW()
+		WHERE user_id = #{message_sender_user_id}
 	</update>
 </mapper>
