@@ -61,6 +61,12 @@
 		FROM questions
 	</select>
 	
+	<select id="readUserItemTime" resultType="java.sql.Timestamp" parameterType="HashMap">
+		SELECT user_item_time
+		FROM user_times
+		WHERE user_id = #{user_id}
+	</select>
+	
 	<insert id="createUser" parameterType="HashMap">
 		INSERT INTO users(
 			user_id,
@@ -164,5 +170,11 @@
 			question_answer = #{new_question_answer},
 			user_salt = #{new_user_salt}
 		WHERE user_id = #{user_id} AND user_status = 'N'
+	</update>
+	
+	<update id="updateUserItemTime" parameterType="HashMap">
+		UPDATE user_times
+		SET user_item_time = NOW()
+		WHERE user_id = #{user_id}
 	</update>
 </mapper>

@@ -15,8 +15,6 @@ public class MessageDTO {
 	private String message_type_content;
 	private String message_sender_user_id;
 	private String message_receiver_user_id;
-	private String message_sender_user_name;
-	private String message_receiver_user_name;
 	
 	private String message_time;
 	
@@ -31,7 +29,5 @@ public class MessageDTO {
 		this.message_sender_user_id = messageEntity.getMessage_sender_user_id();
 		this.message_receiver_user_id = messageEntity.getMessage_receiver_user_id();
 		this.message_time = nvl(messageEntity.getMessage_time());
-		this.message_receiver_user_name = messageEntity.getMessage_receiver_user_name();
-		this.message_sender_user_name = messageEntity.getMessage_sender_user_name();
 	}
 }

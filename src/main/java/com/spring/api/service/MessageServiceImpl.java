@@ -110,18 +110,22 @@ public class MessageServiceImpl implements MessageService{
 			param.put("owner_user_id", "message_receiver_user_id");
 			param.put("owner_user_name", "message_receiver_user_name");
 			param.put("owner_message_status", "message_receiver_status");
+			param.put("owner_message_delete_time", "message_receiver_delete_time");
 			
 			param.put("other_user_id", "message_sender_user_id");
 			param.put("other_user_name", "message_sender_user_name");
 			param.put("other_message_box", "message_senders");
+			param.put("other_message_delete_time", "message_sender_delete_time");
 		}else {
 			param.put("owner_user_id", "message_sender_user_id");
 			param.put("owner_user_name", "message_sender_user_name");
 			param.put("owner_message_status", "message_sender_status");
+			param.put("owner_message_delete_time", "message_sender_delete_time");
 			
 			param.put("other_user_id", "message_receiver_user_id");
 			param.put("other_user_name", "message_receiver_user_name");
 			param.put("other_message_box", "message_receivers");
+			param.put("other_message_delete_time", "message_receiver_delete_time");
 		}
 		
 		param.put("flag", flag);
