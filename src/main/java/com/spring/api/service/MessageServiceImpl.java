@@ -55,18 +55,12 @@ public class MessageServiceImpl implements MessageService{
 		messageCheckUtil.isMessageTypeExistent(Integer.parseInt(message_type_id));
 		messageCheckUtil.checkUserMessageTime(messageMapper.readUserMessageTime(param));		
 		
-		try {
-			userCheckUtil.isNotBlocked(message_receiver_user_id, message_sender_user_id);
-			
-			param.put("message_id", messageMapper.readNewMessageId()+"");
-			
-			messageMapper.createMessage(param);
-			messageMapper.createMessageSender(param);
-			messageMapper.createMessageReceiver(param);
-			messageMapper.updateUserMessageTime(param);
-		}catch(CustomException e) {
-			
-		}
+		param.put("message_id", messageMapper.readNewMessageId()+"");
+		
+		messageMapper.createMessage(param);
+		messageMapper.createMessageSender(param);
+		messageMapper.createMessageReceiver(param);
+		messageMapper.updateUserMessageTime(param);
 
 		return;
 	}

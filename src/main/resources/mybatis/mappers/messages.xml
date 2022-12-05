@@ -14,7 +14,7 @@
 	
 	<select id="readMessages" resultType="MessageEntity" parameterType="HashMap">
 		SELECT *
-		FROM messages 
+		FROM messages m
 		NATURAL JOIN message_types 
 		NATURAL JOIN (
 			SELECT m.message_id, u.user_id ${owner_user_id}, u.user_name ${owner_user_name}
@@ -27,7 +27,11 @@
 			CASE WHEN u.user_status = 'Y' THEN '탈퇴한 사용자' ELSE u.user_name END ${other_user_name}
 			FROM ${other_message_box} m JOIN users u ON m.${other_user_id} = u.user_id
 		) r2
-		WHERE ${flag} LIKE CONCAT('%',#{search},'%')
+		WHERE ${flag} LIKE CONCAT('%',#{search},'%') AND NOT EXISTS(
+			SELECT 1
+			FROM blockings b
+			WHERE b.source_user_id = #{user_id} AND b.target_user_id = r2.${other_user_id}
+		)
 		ORDER BY message_id ${order}
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
 	</select>
