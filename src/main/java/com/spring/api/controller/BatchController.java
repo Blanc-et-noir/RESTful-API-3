@@ -29,7 +29,7 @@ public class BatchController{
 		this.deleteJob = deleteJob;
 	}
 	
-	@GetMapping("/api/v1/batches/deleteJob")
+	@GetMapping("/api/v1/batches")
 	public ResponseEntity<HashMap> deleteJob() throws Exception{		
 		JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
 		jobParametersBuilder.addDate("now", new Date());

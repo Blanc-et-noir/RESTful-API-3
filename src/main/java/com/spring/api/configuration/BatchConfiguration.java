@@ -23,30 +23,45 @@ import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilde
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import com.spring.api.entity.ItemEntity;
 import com.spring.api.entity.ItemImageEntity;
+import com.spring.api.entity.MessageEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.rowMapper.ItemEntityRowMapper;
 import com.spring.api.rowMapper.ItemImageEntityRowMapper;
+import com.spring.api.rowMapper.MessageEntityRowMapper;
 import com.spring.api.rowMapper.UserEntityRowMapper;
 
 @Configuration
 public class BatchConfiguration {
-	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
-	@Autowired
 	private StepBuilderFactory stepBuilderFactory;
-	@Autowired
 	private DataSource dataSource;
-	@Autowired
 	private JobRepository jobRepository;
 	
 	private final String SEP = File.separator;
 	private final String BASE_DIRECTORY_OF_IMAGE_FILES = "C:"+SEP+"georaesangeo"+SEP+"items"+SEP+"images"+SEP;
+	private final long BATCH_FREQUENCY;
+	
+	@Autowired
+	BatchConfiguration(
+		JobBuilderFactory jobBuilderFactory,
+		StepBuilderFactory stepBuilderFactory,
+		DataSource dataSource,
+		JobRepository jobRepository,
+		@Value("${frequency.batch}") long BATCH_FREQUENCY
+	){
+		this.jobBuilderFactory = jobBuilderFactory;
+		this.stepBuilderFactory = stepBuilderFactory;
+		this.dataSource = dataSource;
+		this.jobRepository = jobRepository;
+		this.BATCH_FREQUENCY = BATCH_FREQUENCY;
+	}
 	
 	@Bean("asyncJobLauncher")
 	public JobLauncher asyncJobLauncher() throws Exception {
@@ -64,7 +79,7 @@ public class BatchConfiguration {
 		return this.jobBuilderFactory
 				.get("deleteJob")
 				.start(deleteUserStep())
-				//메세지 id 조회 및 삭제 스텝
+				.next(deleteMessageStep())
 				.next(deleteItemStep())
 				.next(deleteItemImageStep())
 				.build();
@@ -96,12 +111,70 @@ public class BatchConfiguration {
 	@JobScope
 	public Step deleteItemImageStep() {
 		return this.stepBuilderFactory
-				.get("deleteItemStep")
+				.get("deleteItemImageStep")
 				.<ItemImageEntity, ItemImageEntity>chunk(10)
 				.reader(itemImageEntityReader(this.dataSource))
 				.processor(new ItemImageEntityProcessor())
 				.writer(itemImageEntityWriter(this.dataSource))
 				.build();
+	}
+	
+	@Bean
+	@JobScope
+	public Step deleteMessageStep() {
+		return this.stepBuilderFactory
+				.get("deleteMessageStep")
+				.<MessageEntity, MessageEntity>chunk(10)
+				.reader(messageEntityReader(this.dataSource))
+				.writer(messageEntityWriter(this.dataSource))
+				.build();
+	}
+	
+	@Bean
+	@StepScope
+	public JdbcPagingItemReader<MessageEntity> messageEntityReader(DataSource dataSource){
+		try {
+			SqlPagingQueryProviderFactoryBean factoryBean = new SqlPagingQueryProviderFactoryBean();
+			
+			factoryBean.setDataSource(dataSource);
+			factoryBean.setSelectClause("SELECT *");
+			factoryBean.setFromClause("FROM messages m");
+			factoryBean.setWhereClause(
+				"WHERE "+
+				"NOT EXISTS(SELECT 1 FROM message_receivers r WHERE m.message_id = r.message_id AND (r.message_receiver_status = 'N' OR (r.message_receiver_status = 'Y' AND TIMESTAMPDIFF(SECOND,r.message_receiver_delete_time, NOW()) <= "+BATCH_FREQUENCY+")))"+
+				" AND "+
+				"NOT EXISTS(SELECT 1 FROM message_senders s WHERE m.message_id = s.message_id AND (s.message_sender_status = 'N' OR (s.message_sender_status = 'Y' AND TIMESTAMPDIFF(SECOND,s.message_sender_delete_time,NOW()) <= "+BATCH_FREQUENCY+")))"
+			);
+			factoryBean.setSortKey("message_id");
+			
+			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
+			
+			JdbcPagingItemReaderBuilder messageReaderBuilder = new JdbcPagingItemReaderBuilder();
+			
+			messageReaderBuilder.name("messageReaderBuilder");
+			messageReaderBuilder.dataSource(dataSource);
+			messageReaderBuilder.queryProvider(pagingQueryProvider);
+			messageReaderBuilder.pageSize(10);
+			messageReaderBuilder.parameterValues(new HashMap());
+			messageReaderBuilder.rowMapper(new MessageEntityRowMapper());
+			
+			return messageReaderBuilder.build(); 
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@Bean
+	@StepScope
+	public JdbcBatchItemWriter<MessageEntity> messageEntityWriter(DataSource dataSource){
+		JdbcBatchItemWriterBuilder messageWriterBuilder = new JdbcBatchItemWriterBuilder();
+		
+		return messageWriterBuilder
+			.dataSource(dataSource)
+			.sql("DELETE FROM messages WHERE message_id = :message_id")
+			.beanMapped()
+			.build();
 	}
 	
 	@Bean
@@ -113,7 +186,7 @@ public class BatchConfiguration {
 			factoryBean.setDataSource(dataSource);
 			factoryBean.setSelectClause("SELECT *");
 			factoryBean.setFromClause("FROM users NATURAL JOIN questions NATURAL JOIN user_times");
-			factoryBean.setWhereClause("WHERE user_status = 'Y' AND TIMESTAMPDIFF(DAY, user_withdraw_time, NOW()) >= 0");
+			factoryBean.setWhereClause("WHERE user_status = 'Y' AND TIMESTAMPDIFF(DAY, user_withdraw_time, NOW()) >= "+BATCH_FREQUENCY);
 			factoryBean.setSortKey("user_id");
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
@@ -230,7 +303,7 @@ public class BatchConfiguration {
 			.build();
 	}
 	
-	class ItemImageEntityProcessor implements ItemProcessor<ItemImageEntity,ItemImageEntity>{
+	private class ItemImageEntityProcessor implements ItemProcessor<ItemImageEntity,ItemImageEntity>{
 
 		@Override
 		public ItemImageEntity process(ItemImageEntity itemImageEntity) throws Exception {

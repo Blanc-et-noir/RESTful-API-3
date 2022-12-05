@@ -22,7 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
 import com.spring.api.dto.CommentDTO;
-import com.spring.api.dto.ItemWithItemImageDTO;
+import com.spring.api.dto.ItemWithItemImagesDTO;
+import com.spring.api.dto.ItemWithItemThumbnailImageDTO;
 import com.spring.api.entity.CommentEntity;
 import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
@@ -128,7 +129,7 @@ public class ItemServiceImpl implements ItemService{
 	}
 
 	@Override
-	public List<ItemWithItemImageDTO> readItems(HttpServletRequest request, HashMap param) {
+	public List<ItemWithItemThumbnailImageDTO> readItems(HttpServletRequest request, HashMap param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
@@ -283,9 +284,19 @@ public class ItemServiceImpl implements ItemService{
 		String item_id = param.get("item_id");
 		
 		itemCheckUtil.checkItemIdRegex(item_id);
-		ItemWithItemImageDTO itemWithItemImageDTO = itemCheckUtil.isItemExistent(param);
+		ItemWithItemImagesDTO itemWithItemImageDTO = itemCheckUtil.isItemExistent(param);
 		itemCheckUtil.isEditableItem(itemWithItemImageDTO, user_id);
 		
 		itemMapper.deleteItem(param);
+	}
+
+	@Override
+	public ItemWithItemImagesDTO readItem(HttpServletRequest request, HashMap<String,String> param) {
+		String item_id = param.get("item_id");
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
+		
+		return itemWithItemImagesDTO;		
 	}
 }

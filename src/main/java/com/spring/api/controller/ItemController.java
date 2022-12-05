@@ -43,9 +43,16 @@ public class ItemController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/api/v1/items/{item_id}")
-	public void updateItem(MultipartRequest multipartRequest, HttpServletRequest request, @PathVariable("item_id") String item_id) {
+	@GetMapping("/api/v1/items/{item_id}")
+	public ResponseEntity<HashMap> updateItem(HttpServletRequest request, @PathVariable("item_id") String item_id) {
+		HashMap result = resultUtil.createResultMap("상품 상세 조회 성공",true);
 		
+		HashMap param = new HashMap();
+		param.put("item_id", item_id);
+		
+		result.put("item", itemService.readItem(request, param));
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/api/v1/items/{item_id}")
