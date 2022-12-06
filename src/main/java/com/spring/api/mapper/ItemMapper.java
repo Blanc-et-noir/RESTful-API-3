@@ -29,4 +29,5 @@ public interface ItemMapper {
 	public void deleteItem(HashMap<String, String> param);
 	public Timestamp readUserItemTime(HashMap<String, String> param);
 	public void updateUserItemTime(HashMap<String, String> param);
+	public void sellItem(HashMap<String, String> param);
 }

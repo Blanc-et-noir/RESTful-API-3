@@ -32,7 +32,8 @@ public enum ItemError implements Code{
 	NOT_FOUND_ITEM_IMAGE("ITEM_10018","상품 이미지 정보 없음",HttpStatus.BAD_REQUEST), 
 	CAN_NOT_DELETE_OR_UPDATE_ITEM_BY_USER_ID("ITEM_10019","해당 사용자 정보로 상품 삭제 또는 수정 불가",HttpStatus.UNAUTHORIZED),
 	HASHTAG_NOT_MATCHED_TO_REGEX("ITEM_10020","해시태그 값이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
-	TOO_FREQUENT_TO_CREATE_ITEM("ITEM_10021","너무 잦은 상품 등록 요청", HttpStatus.BAD_REQUEST);
+	TOO_FREQUENT_TO_CREATE_ITEM("ITEM_10021","너무 잦은 상품 등록 요청", HttpStatus.BAD_REQUEST),
+	ALREADY_SOLD_ITEM("ITEM_10022","이미 판매된 상품", HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

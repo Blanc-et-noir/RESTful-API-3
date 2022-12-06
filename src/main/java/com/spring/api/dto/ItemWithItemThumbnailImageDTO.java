@@ -11,6 +11,7 @@ public class ItemWithItemThumbnailImageDTO {
 	private int item_price;
 	private int item_number;
 	private String item_time;
+	private String item_status;
 	private String user_id;
 	private Integer item_thumbnail_image_id;
 }

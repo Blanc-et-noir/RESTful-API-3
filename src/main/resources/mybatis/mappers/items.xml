@@ -8,6 +8,7 @@
 		<result column="item_description" property="item_description"/>
 		<result column="item_price" property="item_price"/>
 		<result column="item_number" property="item_number"/>
+		<result column="item_status" property="item_status"/>
 		<result column="item_time" property="item_time"/>
 		<result column="user_id" property="user_id"/>
 		<collection property="item_images" javaType="java.util.LinkedList" ofType="com.spring.api.dto.ItemImageDTO">
@@ -141,5 +142,11 @@
 		UPDATE user_times
 		SET user_item_time = NOW()
 		WHERE user_id = #{user_id}
+	</update>
+	
+	<update id="sellItem" parameterType="HashMap">
+		UPDATE items
+		SET item_status = 'S'
+		WHERE item_id = ${item_id} AND item_status = 'N'
 	</update>
 </mapper>

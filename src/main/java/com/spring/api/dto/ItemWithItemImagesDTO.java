@@ -14,6 +14,7 @@ public class ItemWithItemImagesDTO {
 	private int item_number;
 	private String item_time;
 	private String item_description;
+	private String item_status;
 	private String user_id;
 	private List<ItemImageDTO> item_images;
 }

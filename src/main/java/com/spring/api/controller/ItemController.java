@@ -36,11 +36,30 @@ public class ItemController {
 	
 	@PostMapping("/api/v1/items")
 	public ResponseEntity<HashMap> createItem(MultipartRequest multipartRequest, HttpServletRequest request) {
-		
 		HashMap result = resultUtil.createResultMap("상품 등록 성공",true);
+		
 		itemService.createItem(multipartRequest, request);
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/api/v1/items/{item_id}")
+	public ResponseEntity<HashMap> sellItem(HttpServletRequest request, @PathVariable("item_id") String item_id) {
+		HashMap result = resultUtil.createResultMap("상품 판매 처리 성공",true);
+		
+		HashMap param = new HashMap();
+		param.put("item_id", item_id);
+		
+		itemService.sellItem(request, param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@PutMapping("/api/v1/items/{item_id}")
+	public ResponseEntity<HashMap> updateItem(MultipartRequest multipartRequest, HttpServletRequest request, @PathVariable("item_id") String item_id) {
+		HashMap result = resultUtil.createResultMap("상품 수정 성공",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@GetMapping("/api/v1/items/{item_id}")
@@ -83,10 +102,10 @@ public class ItemController {
 		param.put("item_id", item_id);
 		param.put("item_image_id", item_image_id);
 		
-		HttpHeaders header = new HttpHeaders();
+		//HttpHeaders header = new HttpHeaders();
 		
-		header.add("Content-Disposition", "attachment; filename=");
-		header.add("Cache-Control", "no-cache");
+		//header.add("Content-Disposition", "attachment; filename=");
+		//header.add("Cache-Control", "no-cache");
 		
 		return itemService.readItemImage(request,response, param);
 	}
@@ -145,21 +164,6 @@ public class ItemController {
 		
 		itemService.updateComment(request, param);
 		
-		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
-	}
-	
-	@PostMapping("/api/v1/wishlists")
-	public void createWishlist(HttpServletRequest request) {
-		
-	}
-	
-	@GetMapping("/api/v1/wishlists/me")
-	public void readWishlists(HttpServletRequest request) {
-		
-	}
-	
-	@DeleteMapping("/api/v1/wishlists/{wishlist_id}")
-	public void deleteWishlist(HttpServletRequest request,  @PathVariable("wishlist_id") String wishlist_id) {
-		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 }

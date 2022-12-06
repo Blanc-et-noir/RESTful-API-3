@@ -25,4 +25,5 @@ public interface ItemService {
 	public ResponseEntity<Object> readItemImage(HttpServletRequest request, HttpServletResponse response,HashMap<String, String> param) throws IOException;
 	public void deleteItem(HttpServletRequest request, HashMap<String, String> param);
 	public ItemWithItemImagesDTO readItem(HttpServletRequest request, HashMap<String, String> param);
+	public void sellItem(HttpServletRequest request, HashMap<String, String> param);
 }

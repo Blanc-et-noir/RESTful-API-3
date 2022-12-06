@@ -25,6 +25,7 @@ import com.spring.api.dto.CommentDTO;
 import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.dto.ItemWithItemThumbnailImageDTO;
 import com.spring.api.entity.CommentEntity;
+import com.spring.api.entity.ItemEntity;
 import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
@@ -301,5 +302,21 @@ public class ItemServiceImpl implements ItemService{
 		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
 		
 		return itemWithItemImagesDTO;		
+	}
+
+	@Override
+	public void sellItem(HttpServletRequest request, HashMap<String,String> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		param.put("user_id", user_id);
+		
+		String item_id = param.get("item_id");
+		
+		itemCheckUtil.checkItemIdRegex(item_id);
+		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
+		itemCheckUtil.isNotSold(itemWithItemImagesDTO);
+		itemCheckUtil.isEditableItem(itemWithItemImagesDTO, user_id);
+		
+		itemMapper.sellItem(param);
 	}
 }

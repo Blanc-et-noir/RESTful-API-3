@@ -224,4 +224,10 @@ public class ItemCheckUtil {
 			throw new CustomException(ItemError.TOO_FREQUENT_TO_CREATE_ITEM);
 		}
 	}
+
+	public void isNotSold(ItemWithItemImagesDTO itemWithItemImagesDTO) {
+		if(itemWithItemImagesDTO.getItem_status().equals("S")) {
+			throw new CustomException(ItemError.ALREADY_SOLD_ITEM);
+		}
+	}
 }
