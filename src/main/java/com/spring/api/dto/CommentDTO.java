@@ -10,7 +10,6 @@ import lombok.Setter;
 public class CommentDTO {
 	private String comment_content;
 	private String user_id;
-	private String user_name;
 	private String comment_time;
 	private Integer comment_id;
 	private Integer parent_comment_id;
@@ -25,7 +24,6 @@ public class CommentDTO {
 		this.comment_id = commentEntity.getComment_id();
 		this.comment_content = commentEntity.getComment_content();
 		this.user_id = commentEntity.getUser_id();
-		this.user_name = commentEntity.getUser_name();
 		this.comment_time = nvl(commentEntity.getComment_time());
 		this.parent_comment_id = commentEntity.getParent_comment_id();
 		this.item_id = commentEntity.getItem_id();

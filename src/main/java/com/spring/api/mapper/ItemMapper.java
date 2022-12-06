@@ -1,5 +1,6 @@
 package com.spring.api.mapper;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface ItemMapper {
 	public void updateComment(HashMap<String, String> param);
 	public ItemImageEntity readItemImageByItemImageId(HashMap<String, String> param);
 	public void deleteItem(HashMap<String, String> param);
+	public Timestamp readUserItemTime(HashMap<String, String> param);
+	public void updateUserItemTime(HashMap<String, String> param);
 }

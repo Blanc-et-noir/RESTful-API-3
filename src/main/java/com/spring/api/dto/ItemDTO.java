@@ -14,7 +14,6 @@ public class ItemDTO {
 	private int item_number;
 	private String item_time;
 	private String user_id;
-	private String user_name;
 	
 	private String nvl(Object obj) {
 		return obj!=null?obj.toString():null;
@@ -27,6 +26,5 @@ public class ItemDTO {
 		this.item_number = itemEntity.getItem_number();
 		this.item_time = nvl(itemEntity.getItem_time());
 		this.user_id = itemEntity.getUser_id();
-		this.user_name = itemEntity.getUser_name();
 	}
 }

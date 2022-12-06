@@ -1,14 +1,17 @@
 package com.spring.api.util;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.api.code.ItemError;
+import com.spring.api.code.MessageError;
 import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.entity.CommentEntity;
 import com.spring.api.entity.ItemImageEntity;
@@ -20,12 +23,18 @@ public class ItemCheckUtil {
 	private ItemMapper itemMapper;
 	private RegexUtil regexUtil;
 	private HashMap<String,Boolean> extensions;
+	private final long ITEM_FREQUENCY;
 	
 	@Autowired
-	ItemCheckUtil(ItemMapper itemMapper, RegexUtil regexUtil){
+	ItemCheckUtil(
+		ItemMapper itemMapper, 
+		RegexUtil regexUtil,
+		@Value("${frequency.item}") long ITEM_FREQUENCY
+	){
 		this.regexUtil = regexUtil;
 		this.itemMapper = itemMapper;
 		this.extensions = new HashMap<String,Boolean>();
+		this.ITEM_FREQUENCY = ITEM_FREQUENCY;
 		
 		extensions.put("image/jpeg", true);
 		extensions.put("image/gif", true);
@@ -206,5 +215,13 @@ public class ItemCheckUtil {
 		if(!user_id.equals(itemWithItemImagesDTO.getUser_id())) {
 			throw new CustomException(ItemError.CAN_NOT_DELETE_OR_UPDATE_ITEM_BY_USER_ID);
 		}	
+	}
+	
+	public void checkUserItemTime(Timestamp userItemTime) {
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		
+		if(userItemTime != null && (now.getTime()-userItemTime.getTime())/1000 <= ITEM_FREQUENCY) {
+			throw new CustomException(ItemError.TOO_FREQUENT_TO_CREATE_ITEM);
+		}
 	}
 }

@@ -10,7 +10,6 @@
 		<result column="item_number" property="item_number"/>
 		<result column="item_time" property="item_time"/>
 		<result column="user_id" property="user_id"/>
-		<result column="user_name" property="user_name"/>
 		<collection property="item_images" javaType="java.util.LinkedList" ofType="com.spring.api.dto.ItemImageDTO">
 			<id column="item_image_id" property="item_image_id"/>
 			<result column="item_id" property="item_id"/>
@@ -28,7 +27,7 @@
 	<select id="readItemByItemId" resultMap="ItemWithItemImagesDTOMap" parameterType="HashMap">
 		SELECT *
 		FROM items i NATURAL JOIN users u LEFT OUTER JOIN item_images m USING(item_id)
-		WHERE i.item_id = ${item_id} AND i.item_status = 'N' AND u.user_status = 'N'
+		WHERE i.item_id = ${item_id} AND i.item_status != 'Y' AND u.user_status = 'N'
 	</select>
 	
 	<select id="readCommentByCommentId" resultType="CommentEntity" parameterType="HashMap">
@@ -56,7 +55,7 @@
 			) t
 			WHERE t.lvl = 1
 		) m USING(item_id)
-		WHERE i.item_status = 'N' AND u.user_status = 'N'
+		WHERE i.item_status != 'Y' AND u.user_status = 'N'
 		<if test="hashtags != null">
 			AND EXISTS(
 				SELECT 1
@@ -79,16 +78,21 @@
 		)
 		SELECT comment_id, parent_comment_id, comment_time, comment_depth, item_id,
 			CASE WHEN comment_status = 'Y' THEN '작성자에 의해 삭제된 댓글입니다.' ELSE comment_content END "comment_content",
-			CASE WHEN user_status IS NULL OR user_status = 'Y' THEN NULL ELSE user_id END "user_id",
-			CASE WHEN user_status IS NULL OR user_status = 'Y' THEN '탈퇴한 사용자' ELSE user_name END "user_name"
+			CASE WHEN user_id IS NULL OR user_status = 'Y' THEN '탈퇴한 사용자' ELSE user_id END "user_id"
 		FROM cte LEFT OUTER JOIN users USING(user_id)
 		ORDER BY top_comment_id DESC, comment_path ASC
 		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;
 	</select>
 	
+	<select id="readUserItemTime" resultType="java.sql.Timestamp" parameterType="HashMap">
+		SELECT user_item_time
+		FROM user_times
+		WHERE user_id = #{user_id}
+	</select>
+	
 	<insert id="createItem" parameterType="HashMap">
 		INSERT INTO items
-		VALUES(${item_id},#{item_name},#{item_description},${item_price},${item_number},NOW(),'N',#{user_id})
+		VALUES(${item_id},#{item_name},#{item_description},${item_price},${item_number},'N',NOW(),NULL,#{user_id})
 	</insert>
 	
 	<insert id="createHashtags" parameterType="HashMap">
@@ -129,7 +133,13 @@
 	
 	<update id="deleteItem" parameterType="HashMap">
 		UPDATE items
-		SET item_status = 'Y'
-		WHERE item_id = ${item_id} AND user_id = #{user_id} AND item_status = 'N'
+		SET item_status = 'Y', item_delete_time = NOW()
+		WHERE item_id = ${item_id} AND user_id = #{user_id} AND item_status != 'Y'
+	</update>
+	
+	<update id="updateUserItemTime" parameterType="HashMap">
+		UPDATE user_times
+		SET user_item_time = NOW()
+		WHERE user_id = #{user_id}
 	</update>
 </mapper>

@@ -141,9 +141,9 @@ public class BatchConfiguration {
 			factoryBean.setFromClause("FROM messages m");
 			factoryBean.setWhereClause(
 				"WHERE "+
-				"NOT EXISTS(SELECT 1 FROM message_receivers r WHERE m.message_id = r.message_id AND (r.message_receiver_status = 'N' OR (r.message_receiver_status = 'Y' AND TIMESTAMPDIFF(SECOND,r.message_receiver_delete_time, NOW()) <= "+BATCH_FREQUENCY+")))"+
+				"NOT EXISTS(SELECT 1 FROM message_receivers r WHERE m.message_id = r.message_id AND (r.message_receiver_status = 'N' OR (r.message_receiver_status = 'Y' AND TIMESTAMPDIFF(SECOND,r.message_receiver_delete_time, NOW()) < "+BATCH_FREQUENCY+")))"+
 				" AND "+
-				"NOT EXISTS(SELECT 1 FROM message_senders s WHERE m.message_id = s.message_id AND (s.message_sender_status = 'N' OR (s.message_sender_status = 'Y' AND TIMESTAMPDIFF(SECOND,s.message_sender_delete_time,NOW()) <= "+BATCH_FREQUENCY+")))"
+				"NOT EXISTS(SELECT 1 FROM message_senders s WHERE m.message_id = s.message_id AND (s.message_sender_status = 'N' OR (s.message_sender_status = 'Y' AND TIMESTAMPDIFF(SECOND,s.message_sender_delete_time,NOW()) < "+BATCH_FREQUENCY+")))"
 			);
 			factoryBean.setSortKey("message_id");
 			
@@ -228,7 +228,7 @@ public class BatchConfiguration {
 			factoryBean.setDataSource(dataSource);
 			factoryBean.setSelectClause("SELECT *");
 			factoryBean.setFromClause("FROM items");
-			factoryBean.setWhereClause("WHERE user_id IS NULL OR item_status = 'Y'");
+			factoryBean.setWhereClause("WHERE user_id IS NULL OR item_status = 'Y' AND TIMESTAMPDIFF(SECOND,item_delete_time,NOW()) >= "+BATCH_FREQUENCY);
 			factoryBean.setSortKey("item_id");
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();

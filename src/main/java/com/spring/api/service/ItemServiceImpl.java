@@ -68,7 +68,7 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.checkItemNumber(item_number);
 		itemCheckUtil.checkItemImages(item_images);
 		itemCheckUtil.checkHashtagsRegex(hashtags);
-		
+
 		int item_id = itemMapper.readNewItemId();
 		
 		HashMap param = new HashMap();
@@ -80,7 +80,10 @@ public class ItemServiceImpl implements ItemService{
 		param.put("user_id", user_id);
 		param.put("hashtags", hashtags);
 		
+		itemCheckUtil.checkUserItemTime(itemMapper.readUserItemTime(param));
+		
 		itemMapper.createItem(param);
+		itemMapper.updateUserItemTime(param);
 		
 		if(hashtags!=null&&hashtags.size()>0) {
 			itemMapper.createHashtags(param);

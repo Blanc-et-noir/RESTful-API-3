@@ -15,6 +15,5 @@ public class ItemWithItemImagesDTO {
 	private String item_time;
 	private String item_description;
 	private String user_id;
-	private String user_name;
 	private List<ItemImageDTO> item_images;
 }

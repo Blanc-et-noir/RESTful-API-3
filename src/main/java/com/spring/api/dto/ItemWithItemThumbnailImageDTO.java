@@ -12,6 +12,5 @@ public class ItemWithItemThumbnailImageDTO {
 	private int item_number;
 	private String item_time;
 	private String user_id;
-	private String user_name;
 	private Integer item_thumbnail_image_id;
 }
