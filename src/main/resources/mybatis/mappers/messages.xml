@@ -23,7 +23,7 @@
 			r1.${owner_message_delete_time},
 			r2.${other_message_delete_time}
 		FROM messages m
-		NATURAL JOIN message_types 
+		NATURAL JOIN message_types
 		LEFT OUTER JOIN (
 			SELECT m.message_id, u.user_id ${owner_user_id}, u.user_status, m.${owner_message_delete_time}, m.${owner_message_status}
 			FROM ${message_box} m JOIN users u ON m.${owner_user_id} = u.user_id
@@ -60,13 +60,10 @@
 			r1.message_sender_delete_time,
 			r2.message_receiver_delete_time,
 			message_time
-		FROM messages NATURAL JOIN message_types LEFT OUTER JOIN (
-			SELECT *
-			FROM message_senders m JOIN users u ON(m.message_sender_user_id = u.user_id)) r1
-		USING(message_id) LEFT OUTER JOIN (
-			SELECT *
-			FROM message_receivers m JOIN users u ON(m.message_receiver_user_id = u.user_id)) r2
-		USING(message_id)
+		FROM messages
+			NATURAL JOIN message_types
+			LEFT OUTER JOIN (SELECT * FROM message_senders m JOIN users u ON(m.message_sender_user_id = u.user_id)) r1 USING(message_id)
+			LEFT OUTER JOIN (SELECT * FROM message_receivers m JOIN users u ON(m.message_receiver_user_id = u.user_id)) r2 USING(message_id)
 		WHERE message_id = ${message_id} AND (message_sender_status='N' AND message_sender_user_id = #{user_id} OR message_receiver_status='N' AND message_receiver_user_id = #{user_id})
 	</select>
 

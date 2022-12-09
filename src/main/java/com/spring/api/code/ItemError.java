@@ -4,11 +4,11 @@ import org.springframework.http.HttpStatus;
 
 public enum ItemError implements Code{
 	
-	NOT_FOUND_USER("ITEM_10000","사용자 정보 없음", HttpStatus.BAD_REQUEST),
-	USER_ID_NOT_MATCHED_TO_REGEX("ITEM_10001","사용자 ID가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
-	USER_PW_NOT_MATCHED_TO_REGEX("ITEM_10002","사용자 PW가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
-	USER_NAME_NOT_MATCHED_TO_REGEX("ITEM_10003","사용자 이름이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
-	USER_PHONE_NOT_MATCHED_TO_REGEX("ITEM_10004","사용자 전화번호가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	//NOT_FOUND_USER("ITEM_10000","사용자 정보 없음", HttpStatus.BAD_REQUEST),
+	//USER_ID_NOT_MATCHED_TO_REGEX("ITEM_10001","사용자 ID가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	//USER_PW_NOT_MATCHED_TO_REGEX("ITEM_10002","사용자 PW가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	//USER_NAME_NOT_MATCHED_TO_REGEX("ITEM_10003","사용자 이름이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	//USER_PHONE_NOT_MATCHED_TO_REGEX("ITEM_10004","사용자 전화번호가 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
 	
 	
 	ITEM_PRICE_NOT_MATCHED_TO_REGEX("ITEM_10002","상품 가격이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
@@ -31,9 +31,11 @@ public enum ItemError implements Code{
 	ITEM_IMAGE_ID_NOT_MATCHED_TO_REGEX("ITEM_10017","상품 이미지 ID가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	NOT_FOUND_ITEM_IMAGE("ITEM_10018","상품 이미지 정보 없음",HttpStatus.BAD_REQUEST), 
 	CAN_NOT_DELETE_OR_UPDATE_ITEM_BY_USER_ID("ITEM_10019","해당 사용자 정보로 상품 삭제 또는 수정 불가",HttpStatus.UNAUTHORIZED),
-	HASHTAG_NOT_MATCHED_TO_REGEX("ITEM_10020","해시태그 값이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
+	HASHTAG_CONTENT_NOT_MATCHED_TO_REGEX("ITEM_10020","해시태그 값이 형식에 맞지 않음", HttpStatus.BAD_REQUEST),
 	TOO_FREQUENT_TO_CREATE_ITEM("ITEM_10021","너무 잦은 상품 등록 요청", HttpStatus.BAD_REQUEST),
-	ALREADY_SOLD_ITEM("ITEM_10022","이미 판매된 상품", HttpStatus.BAD_REQUEST);
+	ALREADY_SOLD_ITEM("ITEM_10022","이미 판매된 상품", HttpStatus.BAD_REQUEST),
+	NOT_FOUND_HASHTAG("ITEM_10023","해쉬태그 정보 없음",HttpStatus.BAD_REQUEST),
+	HASHTAG_ID_NOT_MATCHED_TO_REGEX("ITEM_10024","해쉬태그 ID가 형식에 맞지 않음",HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

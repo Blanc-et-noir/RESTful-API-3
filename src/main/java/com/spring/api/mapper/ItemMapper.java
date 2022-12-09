@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.dto.ItemWithItemThumbnailImageDTO;
 import com.spring.api.entity.CommentEntity;
+import com.spring.api.entity.HashtagEntity;
 import com.spring.api.entity.ItemImageEntity;
 
 @Mapper
@@ -30,4 +31,7 @@ public interface ItemMapper {
 	public Timestamp readUserItemTime(HashMap<String, String> param);
 	public void updateUserItemTime(HashMap<String, String> param);
 	public void sellItem(HashMap<String, String> param);
+	public void deleteHashtags(HashMap<String, Object> param);
+	public void deleteItemImages(HashMap<String, Object> param);
+	public void updateItem(HashMap<String, Object> param);
 }

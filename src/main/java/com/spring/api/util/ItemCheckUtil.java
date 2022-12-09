@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.api.code.ItemError;
-import com.spring.api.code.MessageError;
+import com.spring.api.dto.HashtagDTO;
+import com.spring.api.dto.ItemImageDTO;
 import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.entity.CommentEntity;
 import com.spring.api.entity.ItemImageEntity;
@@ -41,39 +42,51 @@ public class ItemCheckUtil {
 		extensions.put("image/png", true);
 	}
 	
-	public void checkItemName(String item_name) {
-		if(!regexUtil.checkBytes(item_name, regexUtil.getITEM_NAME_MAX_BYTES())) {
+	public void checkItemName(String item_name, boolean isNullable) {
+		if(isNullable) {
+			return;
+		}else if(!regexUtil.checkBytes(item_name, regexUtil.getITEM_NAME_MAX_BYTES())) {
 			throw new CustomException(ItemError.ITEM_NAME_EXCEED_MAX_BYTES);
 		}
 	}
 
-	public void checkItemDescription(String item_description) {
-		if(!regexUtil.checkBytes(item_description, regexUtil.getITEM_DESCRIPTION_MAX_BYTES())) {
+	public void checkItemDescription(String item_description, boolean isNullable) {
+		if(isNullable) {
+			return;
+		}else if(!regexUtil.checkBytes(item_description, regexUtil.getITEM_DESCRIPTION_MAX_BYTES())) {
 			throw new CustomException(ItemError.ITEM_DESCRIPTION_EXCEED_MAX_BYTES);
 		}
 	}
 
-	public void checkItemPrice(String item_price) {
-		try {
-			int num = Integer.parseInt(item_price);
-			
-			if(num<1||num>100000000) {
-				throw new CustomException(ItemError.ITEM_PRICE_OUT_OF_RANGE);
+	public void checkItemPrice(String item_price, boolean isNullable) {
+		if(isNullable) {
+			return;
+		}else {
+			try {
+				int num = Integer.parseInt(item_price);
+				
+				if(num<1||num>100000000) {
+					throw new CustomException(ItemError.ITEM_PRICE_OUT_OF_RANGE);
+				}
+			}catch(Exception e) {
+				throw new CustomException(ItemError.ITEM_PRICE_NOT_MATCHED_TO_REGEX);
 			}
-		}catch(Exception e) {
-			throw new CustomException(ItemError.ITEM_PRICE_NOT_MATCHED_TO_REGEX);
-		}		
+		}
 	}
 
-	public void checkItemNumber(String item_number) {
-		try {
-			int num = Integer.parseInt(item_number);
-			
-			if(num<1||num>100000000) {
-				throw new CustomException(ItemError.ITEM_NUMBER_OUT_OF_RANGE);
+	public void checkItemNumber(String item_number, boolean isNullable) {
+		if(isNullable) {
+			return;
+		}else {
+			try {
+				int num = Integer.parseInt(item_number);
+				
+				if(num<1||num>100000000) {
+					throw new CustomException(ItemError.ITEM_NUMBER_OUT_OF_RANGE);
+				}
+			}catch(Exception e) {
+				throw new CustomException(ItemError.ITEM_NUMBER_NOT_MATCHED_TO_REGEX);
 			}
-		}catch(Exception e) {
-			throw new CustomException(ItemError.ITEM_NUMBER_NOT_MATCHED_TO_REGEX);
 		}	
 	}
 
@@ -130,16 +143,13 @@ public class ItemCheckUtil {
 		return val;
 	}
 
-	public void checkHashtagsRegex(List<String> hashtags) {
-		if(hashtags != null) {
-			Iterator<String> itor = hashtags.iterator();
-			
-			while(itor.hasNext()) {
-				String hashtag = itor.next();
-				if(!regexUtil.checkBytes(hashtag, regexUtil.getHASHTAG_CONTENT_MAX_BYTES())) {
+	public void checkHashtagContentsRegex(List<String> hashtag_contents) {
+		if(hashtag_contents != null) {			
+			for(String hashtag_content : hashtag_contents) {
+				if(!regexUtil.checkBytes(hashtag_content, regexUtil.getHASHTAG_CONTENT_MAX_BYTES())) {
 					throw new CustomException(ItemError.HASHTAG_EXCEED_MAX_BYTES);
-				}else if(!regexUtil.checkRegex(hashtag, regexUtil.getHASHTAG_REGEX())) {
-					throw new CustomException(ItemError.HASHTAG_NOT_MATCHED_TO_REGEX);
+				}else if(!regexUtil.checkRegex(hashtag_content, regexUtil.getHASHTAG_CONTENT_REGEX())) {
+					throw new CustomException(ItemError.HASHTAG_CONTENT_NOT_MATCHED_TO_REGEX);
 				}
 			}
 		}		
@@ -201,14 +211,21 @@ public class ItemCheckUtil {
 		}	
 	}
 
-	public ItemImageEntity isItemImageExistent(HashMap<String, String> param) {
-		ItemImageEntity itemImageEntity = null;
+	public ItemImageDTO isItemImageExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, String item_id) {
+		ItemImageDTO itemImageDTO = null;
 		
-		if((itemImageEntity = itemMapper.readItemImageByItemImageId(param)) == null) {
-			throw new CustomException(ItemError.NOT_FOUND_ITEM_IMAGE);
+		for(ItemImageDTO itemImage: itemWithItemImagesDTO.getItem_images()) {
+			if(itemImage.getItem_id() == Integer.parseInt(item_id)) {
+				itemImageDTO = itemImage;
+				break;
+			}
 		}
 		
-		return itemImageEntity;
+		if(itemImageDTO != null) {
+			return itemImageDTO;
+		}else {
+			throw new CustomException(ItemError.NOT_FOUND_ITEM_IMAGE);
+		}
 	}
 
 	public void isEditableItem(ItemWithItemImagesDTO itemWithItemImagesDTO, String user_id) {
@@ -228,6 +245,58 @@ public class ItemCheckUtil {
 	public void isNotSold(ItemWithItemImagesDTO itemWithItemImagesDTO) {
 		if(itemWithItemImagesDTO.getItem_status().equals("S")) {
 			throw new CustomException(ItemError.ALREADY_SOLD_ITEM);
+		}
+	}
+
+	public void areHashtagsExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, List<String> hashtag_ids) {
+		HashMap hm = new HashMap();
+
+		for(HashtagDTO hashtag : itemWithItemImagesDTO.getHashtags()) {
+			hm.put(hashtag.getHashtag_id()+"",true);
+		}
+		
+		for(String hashtag_id : hashtag_ids) {
+			if(!hm.containsKey(hashtag_id)) {
+				throw new CustomException(ItemError.NOT_FOUND_HASHTAG);
+			}
+		}
+	}
+
+	public void areItemImagesExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, List<String> item_image_ids) {
+		HashMap hm = new HashMap();
+
+		for(ItemImageDTO itemImage : itemWithItemImagesDTO.getItem_images()) {
+			hm.put(itemImage.getItem_image_id()+"",true);
+		}
+		
+		for(String item_image_id : item_image_ids) {
+			if(!hm.containsKey(item_image_id)) {
+				throw new CustomException(ItemError.NOT_FOUND_ITEM_IMAGE);
+			}
+		}
+	}
+
+	public void checkHashtagIdsRegex(List<String> hashtag_ids) {
+		if(hashtag_ids!=null) {
+			for(String hashtag_id : hashtag_ids) {
+				try {
+					int val = Integer.parseInt(hashtag_id);
+				}catch(Exception e) {
+					throw new CustomException(ItemError.HASHTAG_ID_NOT_MATCHED_TO_REGEX);
+				}
+			}
+		}
+	}
+
+	public void checkItemImageIdsRegex(List<String> item_image_ids) {
+		if(item_image_ids!=null) {
+			for(String item_image_id : item_image_ids) {
+				try {
+					int val = Integer.parseInt(item_image_id);
+				}catch(Exception e) {
+					throw new CustomException(ItemError.ITEM_IMAGE_ID_NOT_MATCHED_TO_REGEX);
+				}
+			}
 		}
 	}
 }

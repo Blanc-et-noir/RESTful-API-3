@@ -13,11 +13,16 @@
 		<result column="user_id" property="user_id"/>
 		<collection property="item_images" javaType="java.util.LinkedList" ofType="com.spring.api.dto.ItemImageDTO">
 			<id column="item_image_id" property="item_image_id"/>
-			<result column="item_id" property="item_id"/>
+			<!-- <result column="item_id" property="item_id"/> -->
 			<result column="item_image_original_name" property="item_image_original_name"/>
 			<result column="item_image_stored_name" property="item_image_stored_name"/>
 			<result column="item_image_extension" property="item_image_extension"/>
 			<result column="item_image_size" property="item_image_size"/>
+		</collection>
+		<collection property="hashtags" javaType="java.util.LinkedList" ofType="com.spring.api.dto.HashtagDTO">
+			<id column="hashtag_id" property="hashtag_id"/>
+			<!--<result column="item_id" property="item_id"/> -->
+			<result column="hashtag_content" property="hashtag_content"/>
 		</collection>
 	</resultMap>
 
@@ -27,8 +32,11 @@
 	
 	<select id="readItemByItemId" resultMap="ItemWithItemImagesDTOMap" parameterType="HashMap">
 		SELECT *
-		FROM items i NATURAL JOIN users u LEFT OUTER JOIN item_images m USING(item_id)
-		WHERE i.item_id = ${item_id} AND i.item_status != 'Y' AND u.user_status = 'N'
+		FROM items i
+			NATURAL JOIN users u
+			LEFT OUTER JOIN hashtags h USING(item_id)
+			LEFT OUTER JOIN item_images m USING(item_id)
+		WHERE i.item_id = ${item_id} AND i.item_status != 'Y' AND u.user_status = 'N' AND m.item_image_status = 'N'
 	</select>
 	
 	<select id="readCommentByCommentId" resultType="CommentEntity" parameterType="HashMap">
@@ -57,11 +65,11 @@
 			WHERE t.lvl = 1
 		) m USING(item_id)
 		WHERE i.item_status != 'Y' AND u.user_status = 'N'
-		<if test="hashtags != null">
+		<if test="hashtag_contents != null">
 			AND EXISTS(
 				SELECT 1
 				FROM hashtags h
-				WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtags" open="(" close=")" item="value" separator=",">REPLACE(#{value},' ', '')</foreach>
+				WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtag_contents" open="(" close=")" item="value" separator=",">REPLACE(#{value},' ', '')</foreach>
 			)
 		</if>
 		ORDER BY i.item_id DESC
@@ -98,7 +106,7 @@
 	
 	<insert id="createHashtags" parameterType="HashMap">
 		INSERT INTO hashtags(hashtag_content, item_id) VALUES
-		<foreach collection="hashtags" separator="," item="value">
+		<foreach collection="hashtag_contents" separator="," item="value">
 			(#{value}, ${item_id})
 		</foreach>
 	</insert>
@@ -149,4 +157,30 @@
 		SET item_status = 'S'
 		WHERE item_id = ${item_id} AND item_status = 'N'
 	</update>
+	
+	<update id="deleteItemImages" parameterType="HashMap">
+		UPDATE item_images
+		SET item_image_status = 'Y'
+		WHERE item_id = ${item_id} AND item_image_id IN(
+			<foreach collection="item_image_ids" item="value" separator=",">
+				${value}
+			</foreach>
+		)
+	</update>
+	
+	<update id="updateItem" parameterType="HashMap">
+		UPDATE items
+		<set>
+			<if test="item_name != null">item_name = #{item_name},</if>
+			<if test="item_description != null">item_description = #{item_description},</if>
+			<if test="item_price != null">item_price = ${item_price},</if>
+			<if test="item_number != null">item_number = ${item_number},</if>
+		</set>
+		WHERE user_id = #{user_id} AND item_id = ${item_id} AND item_status = 'N'
+	</update>
+	
+	<delete id="deleteHashtags" parameterType="HashMap">
+		DELETE FROM hashtags
+		WHERE item_id = ${item_id} AND hashtag_id IN(<foreach collection="hashtag_ids" item="value" separator=",">${value}</foreach>)
+	</delete>
 </mapper>

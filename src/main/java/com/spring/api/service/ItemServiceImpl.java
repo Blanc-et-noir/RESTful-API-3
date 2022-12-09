@@ -22,11 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
 import com.spring.api.dto.CommentDTO;
+import com.spring.api.dto.ItemImageDTO;
 import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.dto.ItemWithItemThumbnailImageDTO;
 import com.spring.api.entity.CommentEntity;
-import com.spring.api.entity.ItemEntity;
-import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
 import com.spring.api.util.ItemCheckUtil;
@@ -56,19 +55,19 @@ public class ItemServiceImpl implements ItemService{
 		String item_price = request.getParameter("item_price");
 		String item_number = request.getParameter("item_number");
 		
-		List<MultipartFile> item_images = multipartRequest.getFiles("item_images");
-		List<String> hashtags = null;
+		List<MultipartFile> item_images = multipartRequest.getFiles("item_image");
+		List<String> hashtag_contents = null;
 		
-		if(request.getParameterValues("hashtags")!=null) {
-			hashtags = Arrays.asList(request.getParameterValues("hashtags"));
+		if(request.getParameterValues("hashtag_content")!=null) {
+			hashtag_contents = Arrays.asList(request.getParameterValues("hashtag_content"));
 		}
 		
-		itemCheckUtil.checkItemName(item_name);
-		itemCheckUtil.checkItemDescription(item_description);
-		itemCheckUtil.checkItemPrice(item_price);
-		itemCheckUtil.checkItemNumber(item_number);
+		itemCheckUtil.checkItemName(item_name,false);
+		itemCheckUtil.checkItemDescription(item_description,false);
+		itemCheckUtil.checkItemPrice(item_price,false);
+		itemCheckUtil.checkItemNumber(item_number,false);
 		itemCheckUtil.checkItemImages(item_images);
-		itemCheckUtil.checkHashtagsRegex(hashtags);
+		itemCheckUtil.checkHashtagContentsRegex(hashtag_contents);
 
 		int item_id = itemMapper.readNewItemId();
 		
@@ -79,57 +78,18 @@ public class ItemServiceImpl implements ItemService{
 		param.put("item_price", item_price);
 		param.put("item_number", item_number);
 		param.put("user_id", user_id);
-		param.put("hashtags", hashtags);
+		param.put("hashtag_contents", hashtag_contents);
 		
 		itemCheckUtil.checkUserItemTime(itemMapper.readUserItemTime(param));
 		
 		itemMapper.createItem(param);
 		itemMapper.updateUserItemTime(param);
 		
-		if(hashtags!=null&&hashtags.size()>0) {
+		if(hashtag_contents!=null&&hashtag_contents.size()>0) {
 			itemMapper.createHashtags(param);
 		}
 		
-		if(item_images!=null&&item_images.size()>0) {
-			List<HashMap> image_files = new LinkedList<HashMap>();
-			
-			HashMap<String, MultipartFile> mappingTable = new HashMap<String,MultipartFile>();
-			
-			for(MultipartFile multipartFile : item_images) {
-				HashMap image = new HashMap();
-				String originalFilename = multipartFile.getOriginalFilename();
-				String item_image_extension = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
-				String item_image_original_name = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-				String item_image_stored_name = UUID.randomUUID().toString();
-				
-				image.put("item_image_original_name", item_image_original_name);
-				image.put("item_image_stored_name", item_image_stored_name);
-				image.put("item_image_extension", item_image_extension);
-				image.put("item_image_size", multipartFile.getSize());
-				image_files.add(image);
-				
-				mappingTable.put(item_image_stored_name+"."+item_image_extension, multipartFile);
-			}
-			
-			param.put("image_files", image_files);
-			
-			itemMapper.createItemImages(param);
-			
-			for(String item_image_name : mappingTable.keySet()) {
-				MultipartFile multipartFile = mappingTable.get(item_image_name);
-				try {
-					File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_image_name);
-
-					if(!file.exists()) {
-						file.mkdirs();
-					}
-
-					multipartFile.transferTo(file);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		registerFile(item_images, param);
 	}
 
 	@Override
@@ -137,10 +97,10 @@ public class ItemServiceImpl implements ItemService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		if(request.getParameterValues("hashtags")!=null) {
-			List<String> hashtags = Arrays.asList(request.getParameterValues("hashtags"));
-			itemCheckUtil.checkHashtagsRegex(hashtags);
-			param.put("hashtags", hashtags);
+		if(request.getParameterValues("hashtag_content")!=null) {
+			List<String> hashtag_contents = Arrays.asList(request.getParameterValues("hashtag_content"));
+			itemCheckUtil.checkHashtagContentsRegex(hashtag_contents);
+			param.put("hashtag_contents", hashtag_contents);
 		}
 		
 		int limit = itemCheckUtil.checkLimitRegex((String)param.get("limit"));
@@ -262,14 +222,14 @@ public class ItemServiceImpl implements ItemService{
 		
 		itemCheckUtil.checkItemIdRegex(item_id);
 		itemCheckUtil.checkItemImageIdRegex(item_image_id);
-		itemCheckUtil.isItemExistent(param);
-		ItemImageEntity itemImageEntity = itemCheckUtil.isItemImageExistent(param);
+		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
+		ItemImageDTO itemImageDTO = itemCheckUtil.isItemImageExistent(itemWithItemImagesDTO, item_id);
 		
-		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+itemImageEntity.getItem_image_stored_name()+"."+itemImageEntity.getItem_image_extension());
+		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+itemImageDTO.getItem_image_stored_name()+"."+itemImageDTO.getItem_image_extension());
 	
 		if(file.exists()) {
 			HttpHeaders header = new HttpHeaders();
-			header.add("Content-Disposition", "attachment; filename="+itemImageEntity.getItem_image_original_name()+"."+itemImageEntity.getItem_image_extension());
+			header.add("Content-Disposition", "attachment; filename="+itemImageDTO.getItem_image_original_name()+"."+itemImageDTO.getItem_image_extension());
 			header.add("Cache-Control", "no-cache");
 			header.add("Content-Type", "application/octet-stream");
 			
@@ -318,5 +278,123 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableItem(itemWithItemImagesDTO, user_id);
 		
 		itemMapper.sellItem(param);
+	}
+
+	@Override
+	public void updateItem(MultipartRequest multipartRequest, HttpServletRequest request, HashMap<String, Object> param) {
+		String user_accesstoken = request.getHeader("user_accesstoken");
+		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+
+		String item_name = request.getParameter("item_name");
+		String item_description = request.getParameter("item_description");
+		String item_price = request.getParameter("item_price");
+		String item_number = request.getParameter("item_number");
+		String item_id = (String) param.get("item_id");
+		
+		param.put("item_id", item_id);
+		param.put("item_name", item_name);
+		param.put("item_description", item_description);
+		param.put("item_price", item_price);
+		param.put("item_number", item_number);
+		param.put("user_id", user_id);
+		
+		List<MultipartFile> item_images = multipartRequest.getFiles("item_image");
+		List<String> hashtag_contents = null;
+		List<String> hashtag_ids = null;
+		List<String> item_image_ids = null;
+		
+		if(request.getParameterValues("hashtag_id")!=null) {
+			hashtag_ids = Arrays.asList(request.getParameterValues("hashtag_id"));
+			param.put("hashtag_ids", hashtag_ids);
+		}
+		
+		if(request.getParameterValues("item_image_id")!=null) {
+			item_image_ids = Arrays.asList(request.getParameterValues("item_image_id"));
+			param.put("item_image_ids", item_image_ids);
+		}
+		
+		if(request.getParameterValues("hashtag_content")!=null) {
+			hashtag_contents = Arrays.asList(request.getParameterValues("hashtag_content"));
+			param.put("hashtag_contents", hashtag_contents);
+		}
+		
+		itemCheckUtil.checkItemName(item_name,true);
+		itemCheckUtil.checkItemDescription(item_description,true);
+		itemCheckUtil.checkItemPrice(item_price,true);
+		itemCheckUtil.checkItemNumber(item_number,true);
+		itemCheckUtil.checkItemIdRegex(item_id);
+		itemCheckUtil.checkHashtagIdsRegex(hashtag_ids);
+		itemCheckUtil.checkItemImageIdsRegex(item_image_ids);
+		
+		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
+		itemCheckUtil.isNotSold(itemWithItemImagesDTO);
+		itemCheckUtil.isEditableItem(itemWithItemImagesDTO, user_id);
+		
+		itemCheckUtil.areHashtagsExistent(itemWithItemImagesDTO, hashtag_ids);
+		itemCheckUtil.areItemImagesExistent(itemWithItemImagesDTO, item_image_ids);
+		
+		//해시태그 삭제
+		if(hashtag_ids!=null&&hashtag_ids.size()>0) {
+			itemMapper.deleteHashtags(param);
+		}
+		
+		//이미지 삭제
+		if(item_image_ids!=null&&item_image_ids.size()>0) {
+			itemMapper.deleteItemImages(param);
+		}
+		
+		//아이템 수정
+		if(!(item_name == null&&item_description==null&&item_price==null&&item_number==null)) {
+			itemMapper.updateItem(param);
+		}
+		
+		//해시태그 추가
+		itemMapper.createHashtags(param);
+		
+		//이미지 추가 및 등록
+		registerFile(item_images, param);
+	}
+	
+	private void registerFile(List<MultipartFile> item_images, HashMap param) {
+		if(item_images!=null&&item_images.size()>0) {
+			List<HashMap> image_files = new LinkedList<HashMap>();
+			
+			HashMap<String, MultipartFile> mappingTable = new HashMap<String,MultipartFile>();
+			
+			for(MultipartFile multipartFile : item_images) {
+				HashMap image = new HashMap();
+				String originalFilename = multipartFile.getOriginalFilename();
+				String item_image_extension = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
+				String item_image_original_name = originalFilename.substring(0,originalFilename.lastIndexOf("."));
+				String item_image_stored_name = UUID.randomUUID().toString();
+				
+				image.put("item_image_original_name", item_image_original_name);
+				image.put("item_image_stored_name", item_image_stored_name);
+				image.put("item_image_extension", item_image_extension);
+				image.put("item_image_size", multipartFile.getSize());
+				image_files.add(image);
+				
+				mappingTable.put(item_image_stored_name+"."+item_image_extension, multipartFile);
+			}
+			
+			param.put("image_files", image_files);
+			
+			itemMapper.createItemImages(param);
+			
+			for(String item_image_name : mappingTable.keySet()) {
+				MultipartFile multipartFile = mappingTable.get(item_image_name);
+				try {
+					File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_image_name);
+
+					if(!file.exists()) {
+						file.mkdirs();
+					}
+
+					multipartFile.transferTo(file);
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }

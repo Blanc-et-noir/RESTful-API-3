@@ -59,6 +59,11 @@ public class ItemController {
 	public ResponseEntity<HashMap> updateItem(MultipartRequest multipartRequest, HttpServletRequest request, @PathVariable("item_id") String item_id) {
 		HashMap result = resultUtil.createResultMap("상품 수정 성공",true);
 		
+		HashMap param = new HashMap();
+		param.put("item_id", item_id);
+		
+		itemService.updateItem(multipartRequest, request, param);
+		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	

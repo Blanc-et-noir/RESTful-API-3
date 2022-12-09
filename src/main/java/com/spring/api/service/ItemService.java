@@ -26,4 +26,5 @@ public interface ItemService {
 	public void deleteItem(HttpServletRequest request, HashMap<String, String> param);
 	public ItemWithItemImagesDTO readItem(HttpServletRequest request, HashMap<String, String> param);
 	public void sellItem(HttpServletRequest request, HashMap<String, String> param);
+	public void updateItem(MultipartRequest multipartRequest, HttpServletRequest request, HashMap<String, Object> param);
 }
