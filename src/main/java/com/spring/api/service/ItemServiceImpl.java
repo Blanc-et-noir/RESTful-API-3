@@ -329,7 +329,6 @@ public class ItemServiceImpl implements ItemService{
 		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
 		itemCheckUtil.isNotSold(itemWithItemImagesDTO);
 		itemCheckUtil.isEditableItem(itemWithItemImagesDTO, user_id);
-		
 		itemCheckUtil.areHashtagsExistent(itemWithItemImagesDTO, hashtag_ids);
 		itemCheckUtil.areItemImagesExistent(itemWithItemImagesDTO, item_image_ids);
 		
@@ -349,7 +348,9 @@ public class ItemServiceImpl implements ItemService{
 		}
 		
 		//해시태그 추가
-		itemMapper.createHashtags(param);
+		if(hashtag_contents!=null&&hashtag_contents.size()>0) {
+			itemMapper.createHashtags(param);
+		}
 		
 		//이미지 추가 및 등록
 		registerFile(item_images, param);

@@ -251,13 +251,17 @@ public class ItemCheckUtil {
 	public void areHashtagsExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, List<String> hashtag_ids) {
 		HashMap hm = new HashMap();
 
-		for(HashtagDTO hashtag : itemWithItemImagesDTO.getHashtags()) {
-			hm.put(hashtag.getHashtag_id()+"",true);
+		if(itemWithItemImagesDTO.getHashtags()!=null) {
+			for(HashtagDTO hashtag : itemWithItemImagesDTO.getHashtags()) {
+				hm.put(hashtag.getHashtag_id()+"",true);
+			}
 		}
 		
-		for(String hashtag_id : hashtag_ids) {
-			if(!hm.containsKey(hashtag_id)) {
-				throw new CustomException(ItemError.NOT_FOUND_HASHTAG);
+		if(hashtag_ids!=null) {
+			for(String hashtag_id : hashtag_ids) {
+				if(!hm.containsKey(hashtag_id)) {
+					throw new CustomException(ItemError.NOT_FOUND_HASHTAG);
+				}
 			}
 		}
 	}
@@ -265,13 +269,17 @@ public class ItemCheckUtil {
 	public void areItemImagesExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, List<String> item_image_ids) {
 		HashMap hm = new HashMap();
 
-		for(ItemImageDTO itemImage : itemWithItemImagesDTO.getItem_images()) {
-			hm.put(itemImage.getItem_image_id()+"",true);
+		if(itemWithItemImagesDTO.getItem_images()!=null) {
+			for(ItemImageDTO itemImage : itemWithItemImagesDTO.getItem_images()) {
+				hm.put(itemImage.getItem_image_id()+"",true);
+			}	
 		}
 		
-		for(String item_image_id : item_image_ids) {
-			if(!hm.containsKey(item_image_id)) {
-				throw new CustomException(ItemError.NOT_FOUND_ITEM_IMAGE);
+		if(item_image_ids!=null) {
+			for(String item_image_id : item_image_ids) {
+				if(!hm.containsKey(item_image_id)) {
+					throw new CustomException(ItemError.NOT_FOUND_ITEM_IMAGE);
+				}
 			}
 		}
 	}
