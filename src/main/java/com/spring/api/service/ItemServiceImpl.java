@@ -1,21 +1,21 @@
 package com.spring.api.service;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +29,8 @@ import com.spring.api.entity.CommentEntity;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.ItemMapper;
 import com.spring.api.util.ItemCheckUtil;
+
+import net.coobird.thumbnailator.Thumbnails;
 
 @Service("itemService")
 @Transactional
@@ -90,6 +92,8 @@ public class ItemServiceImpl implements ItemService{
 		}
 		
 		registerFile(item_images, param);
+		
+		return;
 	}
 
 	@Override
@@ -127,6 +131,8 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isItemExistent(param);
 
 		itemMapper.createCommentContent(param);
+		
+		return;
 	}
 
 	@Override
@@ -146,6 +152,8 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isCommentExistent(param);
 		
 		itemMapper.createReplyCommentContent(param);
+		
+		return;
 	}
 
 	@Override
@@ -165,6 +173,7 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableComment(commentEntity, user_id);
 		itemMapper.deleteComment(param);
 
+		return;
 	}
 
 	@Override
@@ -213,30 +222,41 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableComment(commentEntity, user_id);
 		
 		itemMapper.updateComment(param);
+		
+		return;
 	}
 
 	@Override
-	public ResponseEntity<Object> readItemImage(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws IOException {
+	public void readItemImage(HttpServletRequest request, HttpServletResponse response, HashMap<String,String> param) throws IOException {
 		String item_id = param.get("item_id");
 		String item_image_id = param.get("item_image_id");
+		String item_image_type = param.get("item_image_type");
 		
 		itemCheckUtil.checkItemIdRegex(item_id);
 		itemCheckUtil.checkItemImageIdRegex(item_image_id);
+		itemCheckUtil.checkItemImageType(item_image_type);
+		
 		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
-		ItemImageDTO itemImageDTO = itemCheckUtil.isItemImageExistent(itemWithItemImagesDTO, item_id);
+		ItemImageDTO itemImageDTO = itemCheckUtil.isItemImageExistent(itemWithItemImagesDTO, item_image_id);
 		
 		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+itemImageDTO.getItem_image_stored_name()+"."+itemImageDTO.getItem_image_extension());
-	
-		if(file.exists()) {
-			HttpHeaders header = new HttpHeaders();
-			header.add("Content-Disposition", "attachment; filename="+itemImageDTO.getItem_image_original_name()+"."+itemImageDTO.getItem_image_extension());
-			header.add("Cache-Control", "no-cache");
-			header.add("Content-Type", "application/octet-stream");
-			
-			return new ResponseEntity<Object>(FileUtils.readFileToByteArray(file),header,HttpStatus.OK);
+		BufferedImage imageFile = null;
+		
+		if(item_image_type==null||item_image_type.equals("original")) {
+			imageFile = ImageIO.read(file);
 		}else {
-			return null;
+			imageFile = Thumbnails.of(file).size(100, 100).asBufferedImage();
 		}
+		
+		response.setHeader("Cache-Control", "no-cache");
+		
+		OutputStream out = response.getOutputStream();
+		
+		ImageIO.write(imageFile, itemImageDTO.getItem_image_extension(), out);
+		
+		out.close();
+		
+		return;
 	}
 
 	@Override
@@ -252,6 +272,8 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableItem(itemWithItemImageDTO, user_id);
 		
 		itemMapper.deleteItem(param);
+		
+		return;
 	}
 
 	@Override
@@ -278,6 +300,8 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableItem(itemWithItemImagesDTO, user_id);
 		
 		itemMapper.sellItem(param);
+		
+		return;
 	}
 
 	@Override
@@ -331,29 +355,26 @@ public class ItemServiceImpl implements ItemService{
 		itemCheckUtil.isEditableItem(itemWithItemImagesDTO, user_id);
 		itemCheckUtil.areHashtagsExistent(itemWithItemImagesDTO, hashtag_ids);
 		itemCheckUtil.areItemImagesExistent(itemWithItemImagesDTO, item_image_ids);
-		
-		//해시태그 삭제
+
 		if(hashtag_ids!=null&&hashtag_ids.size()>0) {
 			itemMapper.deleteHashtags(param);
 		}
-		
-		//이미지 삭제
+
 		if(item_image_ids!=null&&item_image_ids.size()>0) {
 			itemMapper.deleteItemImages(param);
 		}
-		
-		//아이템 수정
+
 		if(!(item_name == null&&item_description==null&&item_price==null&&item_number==null)) {
 			itemMapper.updateItem(param);
 		}
-		
-		//해시태그 추가
+
 		if(hashtag_contents!=null&&hashtag_contents.size()>0) {
 			itemMapper.createHashtags(param);
 		}
-		
-		//이미지 추가 및 등록
+
 		registerFile(item_images, param);
+		
+		return;
 	}
 	
 	private void registerFile(List<MultipartFile> item_images, HashMap param) {
@@ -397,5 +418,7 @@ public class ItemServiceImpl implements ItemService{
 				}
 			}
 		}
+		
+		return;
 	}
 }

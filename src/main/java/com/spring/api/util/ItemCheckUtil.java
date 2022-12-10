@@ -211,11 +211,11 @@ public class ItemCheckUtil {
 		}	
 	}
 
-	public ItemImageDTO isItemImageExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, String item_id) {
+	public ItemImageDTO isItemImageExistent(ItemWithItemImagesDTO itemWithItemImagesDTO, String item_image_id) {
 		ItemImageDTO itemImageDTO = null;
 		
 		for(ItemImageDTO itemImage: itemWithItemImagesDTO.getItem_images()) {
-			if(itemImage.getItem_id() == Integer.parseInt(item_id)) {
+			if(itemImage.getItem_image_id() == Integer.parseInt(item_image_id)) {
 				itemImageDTO = itemImage;
 				break;
 			}
@@ -305,6 +305,14 @@ public class ItemCheckUtil {
 					throw new CustomException(ItemError.ITEM_IMAGE_ID_NOT_MATCHED_TO_REGEX);
 				}
 			}
+		}
+	}
+
+	public void checkItemImageType(String item_image_type) {
+		if(item_image_type==null) {
+			return;
+		}else if(!item_image_type.equals("original")&&!item_image_type.equals("thumbnail")) {
+			throw new CustomException(ItemError.ITEM_IMAGE_TYPE_NOT_MATHCHED_TO_REGEX);
 		}
 	}
 }

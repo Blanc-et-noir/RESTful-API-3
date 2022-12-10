@@ -100,21 +100,17 @@ public class ItemController {
 	}
 	
 	@GetMapping("/api/v1/items/{item_id}/images/{item_image_id}")
-	public ResponseEntity readItemImage(HttpServletRequest request, HttpServletResponse response, @PathVariable("item_id") String item_id, @PathVariable("item_image_id") String item_image_id) throws IOException {
+	public ResponseEntity<HashMap> readItemImage(HttpServletRequest request, HttpServletResponse response, @PathVariable("item_id") String item_id, @PathVariable("item_image_id") String item_image_id, @RequestParam HashMap param) throws IOException {
 		HashMap result = resultUtil.createResultMap("상품 이미지 조회 성공",true);
 		
-		HashMap param = new HashMap();
 		param.put("item_id", item_id);
 		param.put("item_image_id", item_image_id);
 		
-		//HttpHeaders header = new HttpHeaders();
+		itemService.readItemImage(request,response, param);
 		
-		//header.add("Content-Disposition", "attachment; filename=");
-		//header.add("Cache-Control", "no-cache");
-		
-		return itemService.readItemImage(request,response, param);
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK); 
 	}
-	
+	 
 	@PostMapping("/api/v1/items/{item_id}/comments")
 	public ResponseEntity<HashMap> createComment(HttpServletRequest request, @PathVariable("item_id") String item_id, @RequestBody HashMap param) {
 		HashMap result = resultUtil.createResultMap("상품 댓글 등록 성공",true);
