@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.api.code.ItemError;
+import com.spring.api.code.UserError;
 import com.spring.api.dto.HashtagDTO;
 import com.spring.api.dto.ItemImageDTO;
 import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.entity.CommentEntity;
-import com.spring.api.entity.ItemImageEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.mapper.ItemMapper;
 
@@ -314,5 +314,24 @@ public class ItemCheckUtil {
 		}else if(!item_image_type.equals("original")&&!item_image_type.equals("thumbnail")) {
 			throw new CustomException(ItemError.ITEM_IMAGE_TYPE_NOT_MATHCHED_TO_REGEX);
 		}
+	}
+
+	public void checkFlagRegex(String flag) {
+		if(flag == null) {
+			return;
+		}else if(flag != null && !(flag.equals("user_id")||flag.equals("item_name"))) {
+			throw new CustomException(ItemError.FLAG_NOT_MATCHED_TO_REGEX);
+		}
+	}
+
+	public String checkSearchRegex(String flag, String search) {
+		if(flag == null) {
+			return null;
+		}else if(flag.equals("user_id") && !regexUtil.checkRegex(search, regexUtil.getUSER_ID_REGEX())) {
+			throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
+		}else if(flag.equals("item_name") && !regexUtil.checkBytes(search, regexUtil.getITEM_NAME_MAX_BYTES())) {
+			throw new CustomException(ItemError.ITEM_NAME_EXCEED_MAX_BYTES);
+		}
+		return search.replaceAll(" ", "");
 	}
 }

@@ -36,7 +36,8 @@ public enum ItemError implements Code{
 	ALREADY_SOLD_ITEM("ITEM_10022","이미 판매된 상품", HttpStatus.BAD_REQUEST),
 	NOT_FOUND_HASHTAG("ITEM_10023","해쉬태그 정보 없음",HttpStatus.BAD_REQUEST),
 	HASHTAG_ID_NOT_MATCHED_TO_REGEX("ITEM_10024","해쉬태그 ID가 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
-	ITEM_IMAGE_TYPE_NOT_MATHCHED_TO_REGEX("ITEM_10025","상품 이미지 타입이 형식에 맞지 않음",HttpStatus.BAD_REQUEST);
+	ITEM_IMAGE_TYPE_NOT_MATHCHED_TO_REGEX("ITEM_10025","상품 이미지 타입이 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
+	FLAG_NOT_MATCHED_TO_REGEX("ITEM_10026","상품 조회 기준이 형식에 맞지 않음",HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

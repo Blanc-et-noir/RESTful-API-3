@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -100,12 +99,17 @@ public class ItemServiceImpl implements ItemService{
 	public List<ItemWithItemThumbnailImageDTO> readItems(HttpServletRequest request, HashMap param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
+		String flag = (String) param.get("flag");
+		String search = (String) param.get("search");
 		
 		if(request.getParameterValues("hashtag_content")!=null) {
 			List<String> hashtag_contents = Arrays.asList(request.getParameterValues("hashtag_content"));
 			itemCheckUtil.checkHashtagContentsRegex(hashtag_contents);
 			param.put("hashtag_contents", hashtag_contents);
 		}
+		
+		itemCheckUtil.checkFlagRegex(flag);
+		param.put("search",itemCheckUtil.checkSearchRegex(flag, search));
 		
 		int limit = itemCheckUtil.checkLimitRegex((String)param.get("limit"));
 		int page = itemCheckUtil.checkPageRegex((String)param.get("page"));

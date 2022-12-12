@@ -64,7 +64,7 @@
 			) t
 			WHERE t.lvl = 1
 		) m USING(item_id)
-		WHERE i.item_status != 'Y' AND u.user_status = 'N'
+		WHERE i.item_status != 'Y' AND u.user_status = 'N' <if test="flag != null">AND REPLACE(${flag},' ','') LIKE CONCAT('%',#{search},'%')</if>
 		<if test="hashtag_contents != null">
 			AND EXISTS(
 				SELECT 1
