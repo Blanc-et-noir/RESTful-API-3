@@ -116,10 +116,6 @@ public class ItemCheckUtil {
 			throw new CustomException(ItemError.PAGE_NOT_MATCHED_TO_REGEX);
 		}
 		
-		if(num<0) {
-			throw new CustomException(ItemError.PAGE_OUT_OF_RANGE);
-		}
-		
 		return num;
 	}
 
