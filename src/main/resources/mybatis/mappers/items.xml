@@ -35,7 +35,7 @@
 		FROM items i
 			NATURAL JOIN users u
 			LEFT OUTER JOIN hashtags h USING(item_id)
-			LEFT OUTER JOIN item_images m USING(item_id)
+			LEFT OUTER JOIN item_images m ON(i.item_id = m.item_id AND m.item_image_status ='N')
 		WHERE i.item_id = ${item_id} AND i.item_status != 'Y' AND u.user_status = 'N'
 	</select>
 	
