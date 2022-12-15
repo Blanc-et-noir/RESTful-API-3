@@ -16,24 +16,25 @@ import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.spring.api.filter.JwtAuthenticationFilter;
+import com.spring.api.filter.RequestWrappingFilter;
 import com.spring.api.handler.JwtAuthenticationDeniedHandler;
 import com.spring.api.handler.JwtAuthenticationEntryPoint;
-import com.spring.api.jwt.JwtTokenProvider;
-import com.spring.api.util.RedisUtil;
 
 @Configuration
 public class SecurityConfiguration {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler;
-
+	private final RequestWrappingFilter requestWrappingFilter;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	
 	@Autowired
 	SecurityConfiguration(
+		RequestWrappingFilter requestWrappingFilter,
 		JwtAuthenticationFilter jwtAuthenticationFilter, 
 		JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
 		JwtAuthenticationDeniedHandler jwtAuthenticationDeniedHandler
 	){
+		this.requestWrappingFilter = requestWrappingFilter;
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 		this.jwtAuthenticationDeniedHandler = jwtAuthenticationDeniedHandler;	
@@ -57,11 +58,11 @@ public class SecurityConfiguration {
         .antMatchers(HttpMethod.PUT,"/api/v1/users/*/passwords").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/questions").permitAll()
         .antMatchers(HttpMethod.GET,"/api/v1/items/*/images/*").permitAll()
-        .antMatchers(HttpMethod.GET,"/api/v1/batches").hasRole("ADMIN")
+        .antMatchers("/api/v1/batches/**").hasRole("ADMIN")
         .anyRequest().authenticated().and()
-        
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(requestWrappingFilter, JwtAuthenticationFilter.class)
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
         .accessDeniedHandler(jwtAuthenticationDeniedHandler);
         
