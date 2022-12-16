@@ -1,28 +1,23 @@
 package com.spring.api.handler;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.spring.api.exception.CustomException;
-import com.spring.api.util.TimeUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-	private final TimeUtil timeUtil;
-	
-	@Autowired
-	JwtAuthenticationEntryPoint(TimeUtil timeUtil){
-		this.timeUtil = timeUtil;
-	}
-	
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException {
     	CustomException customException = (CustomException) request.getAttribute("customException");
@@ -34,7 +29,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     	result.put("flag", false);
     	result.put("code", customException.getCode());
     	result.put("message", customException.getMessage());
-    	result.put("timestamp", timeUtil.getTimestamp());
+    	result.put("timestamp", new Timestamp(System.currentTimeMillis()).toString());
+    	
+    	log.error("");
+    	log.error("[ ERROR ] : flag : {}",false);
+    	log.error("[ ERROR ] : code : {}",customException.getCode());
+    	log.error("[ ERROR ] : message : {}",customException.getMessage());
     	
         response.getWriter().print(result);
     }

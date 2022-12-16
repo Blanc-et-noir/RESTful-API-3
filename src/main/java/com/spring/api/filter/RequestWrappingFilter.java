@@ -24,28 +24,24 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class RequestWrappingFilter extends OncePerRequestFilter{
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {        
 		ContentCachingRequestWrapper readableRequest = new ContentCachingRequestWrapper(request);
-        
+		
         Timestamp requestedTime = new Timestamp(System.currentTimeMillis());
-
+        
         filterChain.doFilter(readableRequest, response);
 
         Timestamp responsedTime = new Timestamp(System.currentTimeMillis());
         
-        try {
-        	log.info("");
-			log.info("[ INFO ] : URI : {}",readableRequest.getRequestURI());
-			log.info("[ INFO ] : Method : {}",readableRequest.getMethod());
-			log.info("[ INFO ] : Content Type : {}",readableRequest.getContentType());
-			log.info("[ INFO ] : Requested Time : {}",requestedTime);
-			log.info("[ INFO ] : Responsed Time : {}",responsedTime);
-			log.info("[ INFO ] : Elapsed Time : {}ms",responsedTime.getTime()-requestedTime.getTime());
-			log.info("[ INFO ] : Parameters : {}",getParameters(readableRequest));
-			log.info("[ INFO ] : Http Status : {}",response.getStatus());
-		}catch(Exception e) {
-			log.error("[ ERROR ]: "+e);
-		}
+    	log.info("");
+		log.info("[ INFO ] : URI : {}",readableRequest.getRequestURI());
+		log.info("[ INFO ] : Method : {}",readableRequest.getMethod());
+		log.info("[ INFO ] : Content Type : {}",readableRequest.getContentType());
+		log.info("[ INFO ] : Requested Time : {}",requestedTime);
+		log.info("[ INFO ] : Responsed Time : {}",responsedTime);
+		log.info("[ INFO ] : Elapsed Time : {}ms",responsedTime.getTime()-requestedTime.getTime());
+		log.info("[ INFO ] : Parameters : {}",getParameters(readableRequest));
+		log.info("[ INFO ] : Http Status : {}",response.getStatus());
 	}
 	
 	private String getParameters(ContentCachingRequestWrapper readableRequest) {
@@ -65,7 +61,7 @@ public class RequestWrappingFilter extends OncePerRequestFilter{
 	}
 	
 	private String readRequestParameters(ContentCachingRequestWrapper readableRequest) throws IOException {
-		HashMap result = new HashMap();
+		HashMap<String,String> result = new HashMap<String,String>();
 		
 		Enumeration<String> enumeration = readableRequest.getParameterNames();
 		
