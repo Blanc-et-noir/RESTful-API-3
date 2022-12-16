@@ -1,5 +1,7 @@
 package com.spring.api.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -22,10 +24,21 @@ public class RegexUtil {
 	private final int MESSAGE_CONTENT_MAX_BYTES = 600;
 	private final int ITEM_NAME_MAX_BYTES = 120;
 	private final int ITEM_DESCRIPTION_MAX_BYTES = 3000;
-	private final int MAX_LIMIT = 50;
-	private final int MIN_LIMIT = 10;
 	private final int HASHTAG_CONTENT_MAX_BYTES = 60;
 	private final int COMMENT_CONTENT_MAX_BYTES = 600;	
+	private final int SEARCH_MAX_BYTES = 120;
+	
+	private final int MAX_LIMIT;
+	private final int MIN_LIMIT;
+	
+	@Autowired
+	RegexUtil(
+		@Value("${min.limit}") int MIN_LIMIT,
+		@Value("${max.limit}") int MAX_LIMIT
+	){
+		this.MIN_LIMIT = MIN_LIMIT;
+		this.MAX_LIMIT = MAX_LIMIT;
+	}
 	
 	public boolean checkBytes(String str, final int maxLength) {
 		if(!StringUtils.hasText(str)) {

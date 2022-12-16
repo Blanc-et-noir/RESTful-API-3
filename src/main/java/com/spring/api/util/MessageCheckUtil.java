@@ -5,51 +5,29 @@ import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.spring.api.code.MessageError;
 import com.spring.api.entity.MessageEntity;
 import com.spring.api.exception.CustomException;
-import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.MessageMapper;
-import com.spring.api.mapper.UserMapper;
 
 import io.jsonwebtoken.lang.Strings;
 
 @Component
 public class MessageCheckUtil {
-	private JwtTokenProvider jwtTokenProvider;
-	private UserMapper userMapper;
 	private MessageMapper messageMapper;
-    private RedisTemplate<String, String> redisTemplate;
     private RegexUtil regexUtil;
-    
-	private final int FOLLOWING_LIMIT = 5;
-	private final int BLOCKING_LIMIT = 5;
-
-	private final int SEARCH_LIMIT_BYTES = 120;
-	private final int MAX_LIMIT = 50;
-	private final int MIN_LIMIT = 10;
-	private final long BATCH_FREQUENCY;
 	private final long MESSAGE_FREQUENCY;
 	
 	@Autowired
 	MessageCheckUtil(
-		UserMapper userMapper,
 		MessageMapper messageMapper,
-		JwtTokenProvider jwtTokenProvider,
-		RedisTemplate redisTemplate,
 		RegexUtil regexUtil,
-		@Value("${frequency.batch}") long BATCH_FREQUENCY,
-		@Value("${frequency.message}") long MESSAGE_FREQUENCY
+		@Value("${message.frequency}") long MESSAGE_FREQUENCY
 	){
-		this.userMapper = userMapper;
 		this.messageMapper = messageMapper;
-		this.jwtTokenProvider = jwtTokenProvider;
-		this.redisTemplate = redisTemplate;
 		this.regexUtil = regexUtil;
-		this.BATCH_FREQUENCY = BATCH_FREQUENCY;
 		this.MESSAGE_FREQUENCY = MESSAGE_FREQUENCY;
 	}
 	
@@ -69,18 +47,26 @@ public class MessageCheckUtil {
 	
 	public int checkPageRegex(String page) {
 		int num = 0;
-
+		
+		if(page==null) {
+			return 0;
+		}
+		
 		try {
-			num = Integer.parseInt(page);
+			 num = Integer.parseInt(page);
 		}catch(Exception e) {
 			throw new CustomException(MessageError.PAGE_NOT_MATCHED_TO_REGEX);
 		}
 		
 		return num;
 	}
-	
+
 	public int checkLimitRegex(String limit) {
 		int val = 0;
+		
+		if(limit==null) {System.out.println(regexUtil.getMIN_LIMIT()+" "+regexUtil.getMAX_LIMIT());
+			return regexUtil.getMIN_LIMIT();
+		}
 		
 		try {
 			val = Integer.parseInt(limit);
@@ -88,7 +74,7 @@ public class MessageCheckUtil {
 			throw new CustomException(MessageError.LIMIT_NOT_MATCHED_TO_REGEX);
 		}
 		
-		if(!(val>=MIN_LIMIT&&val<=MAX_LIMIT)) {
+		if(!(val>=regexUtil.getMIN_LIMIT()&&val<=regexUtil.getMAX_LIMIT())) {
 			throw new CustomException(MessageError.LIMIT_OUT_OF_RANGE);
 		}
 		
@@ -137,7 +123,7 @@ public class MessageCheckUtil {
 		if(flag.equalsIgnoreCase("message_title")||flag.equalsIgnoreCase("message_content")) {
 			if(search == null || !Strings.hasText(search)) {
 				return "";
-			}else if(!regexUtil.checkBytes(search, SEARCH_LIMIT_BYTES)) {
+			}else if(!regexUtil.checkBytes(search, regexUtil.getSEARCH_MAX_BYTES())) {
 				throw new CustomException(MessageError.SEARCH_EXCEED_MAX_BYTES);
 			}
 			return search;

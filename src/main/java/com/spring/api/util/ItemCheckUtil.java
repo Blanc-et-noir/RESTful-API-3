@@ -30,7 +30,7 @@ public class ItemCheckUtil {
 	ItemCheckUtil(
 		ItemMapper itemMapper, 
 		RegexUtil regexUtil,
-		@Value("${frequency.item}") long ITEM_FREQUENCY
+		@Value("${item.frequency}") long ITEM_FREQUENCY
 	){
 		this.regexUtil = regexUtil;
 		this.itemMapper = itemMapper;
