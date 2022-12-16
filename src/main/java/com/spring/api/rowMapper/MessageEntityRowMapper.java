@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.spring.api.entity.MessageEntity;
-import com.spring.api.entity.UserEntity;
 
 public class MessageEntityRowMapper implements RowMapper<MessageEntity>{
 

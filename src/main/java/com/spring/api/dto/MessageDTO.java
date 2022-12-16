@@ -1,5 +1,7 @@
 package com.spring.api.dto;
 
+import java.sql.Timestamp;
+
 import com.spring.api.entity.MessageEntity;
 
 import lombok.Getter;
@@ -9,17 +11,14 @@ import lombok.Setter;
 @Setter
 public class MessageDTO {
 	private Integer message_id;
-	
 	private String message_title;
-	
 	private String message_type_content;
 	private String message_sender_user_id;
 	private String message_receiver_user_id;
-	
 	private String message_time;
 	
-	private String nvl(Object obj) {
-		return obj!=null?obj.toString():null;
+	private String nvl(Timestamp timestamp) {
+		return timestamp!=null?timestamp.toString():null;
 	}
 	
 	public MessageDTO(MessageEntity messageEntity){

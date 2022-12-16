@@ -1,5 +1,7 @@
 package com.spring.api.dto;
 
+import java.sql.Timestamp;
+
 import com.spring.api.entity.FollowingEntity;
 
 import lombok.Getter;
@@ -12,11 +14,11 @@ public class FollowingDTO {
 	private String target_user_id;
 	private String following_time;
 	
-	private String nvl(Object obj) {
-		return obj!=null?obj.toString():null;
+	private String nvl(Timestamp timestamp) {
+		return timestamp!=null?timestamp.toString():null;
 	}
 	
-	FollowingDTO(FollowingEntity followingEntity){
+	public FollowingDTO(FollowingEntity followingEntity){
 		this.source_user_id = followingEntity.getSource_user_id();
 		this.target_user_id = followingEntity.getTarget_user_id();
 		this.following_time = nvl(followingEntity.getFollowing_time());

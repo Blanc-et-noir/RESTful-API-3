@@ -16,7 +16,7 @@ public class BlockingDTO {
 		return obj!=null?obj.toString():null;
 	}
 	
-	BlockingDTO(BlockingEntity blockingEntity){
+	public BlockingDTO(BlockingEntity blockingEntity){
 		this.source_user_id = blockingEntity.getSource_user_id();
 		this.target_user_id = blockingEntity.getTarget_user_id();
 		this.blocking_time = nvl(blockingEntity.getBlocking_time());

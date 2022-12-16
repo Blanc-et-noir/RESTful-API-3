@@ -134,8 +134,10 @@ public class MessageServiceImpl implements MessageService{
 		
 		int limit = messageCheckUtil.checkLimitRegex(param.get("limit"));	
 		int page = messageCheckUtil.checkPageRegex(param.get("page"));
-		
-		param.put("offset", page*limit+"");
+
+		param.put("offset", (page*limit)+"");
+		param.put("limit", limit+"");
+		param.put("page", page+"");
 		
 		List<MessageDTO> messages = new LinkedList<MessageDTO>();
 		
