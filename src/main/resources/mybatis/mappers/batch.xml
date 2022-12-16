@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.api.mapper.BatchMapper">
+	<resultMap type="com.spring.api.dto.JobExecutionDTO" id="JobExecutionDTOMap">
+		<id column="job_execution_id" property="job_execution_id"/>
+		<result column="status" property="status"/>
+		<result column="exit_code" property="exit_code"/>
+		<result column="create_time" property="create_time"/>
+		<result column="start_time" property="start_time"/>
+		<result column="end_time" property="end_time"/>
+		<association property="job_instance" javaType="com.spring.api.dto.JobInstanceDTO">
+			<id column="job_instance_id" property="job_instance_id"/>
+			<result column="job_name" property="job_name"/>
+			<result column="job_key" property="job_key"/>
+		</association>
+		<collection property="step_executions" javaType="java.util.LinkedList" ofType="com.spring.api.dto.StepExecutionDTO">
+			<id column="step_execution_id" property="step_execution_id"/>
+			<result column="step_name" property="step_name"/>
+			<result column="status" property="status"/>
+			<result column="exit_code" property="exit_code"/>
+			<result column="start_time" property="start_time"/>
+			<result column="end_time" property="end_time"/>
+			<result column="step_name" property="step_name"/>
+		</collection>
+	</resultMap>
+	
+	<select id="readBatch" resultMap="JobExecutionDTOMap" parameterType="HashMap">
+		SELECT *
+		FROM batch_job_execution
+			JOIN batch_job_instance USING(job_instance_id)
+			JOIN batch_step_execution USING(job_execution_id)
+		WHERE job_execution_id = ${job_execution_id}
+	</select>
+
+	<select id="readBatches" resultMap="JobExecutionDTOMap" parameterType="HashMap">
+		SELECT *
+		FROM batch_job_execution
+		ORDER BY job_execution_id DESC
+		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
+	</select>
+</mapper>
