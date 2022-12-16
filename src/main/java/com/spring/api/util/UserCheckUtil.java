@@ -1,43 +1,45 @@
 package com.spring.api.util;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.spring.api.code.AuthError;
-import com.spring.api.code.MessageError;
 import com.spring.api.code.UserError;
-import com.spring.api.entity.MessageEntity;
 import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
-import com.spring.api.mapper.MessageMapper;
 import com.spring.api.mapper.UserMapper;
 
 @Component
 public class UserCheckUtil {
-	private JwtTokenProvider jwtTokenProvider;
-	private UserMapper userMapper;
-	private MessageMapper messageMapper;
-    private RedisTemplate<String, String> redisTemplate;
-    private RegexUtil regexUtil;
-    
-	private final int FOLLOWING_LIMIT = 5;
-	private final int BLOCKING_LIMIT = 5;
-	private final int MESSAGE_RECEIVER_USER_ID_LIMIT = 10;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final UserMapper userMapper;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RegexUtil regexUtil;
+	private final int FOLLOWING_LIMIT;
+	private final int BLOCKING_LIMIT;
 	
 	@Autowired
-	UserCheckUtil(UserMapper userMapper,MessageMapper messageMapper, JwtTokenProvider jwtTokenProvider, RedisTemplate redisTemplate, RegexUtil regexUtil){
+	UserCheckUtil(
+		UserMapper userMapper,
+		JwtTokenProvider jwtTokenProvider,
+		RedisTemplate redisTemplate,
+		RegexUtil regexUtil,
+		@Value("${following.limit}") int FOLLOWING_LIMIT,
+		@Value("${blocking.limit}") int BLOCKING_LIMIT
+	){
 		this.userMapper = userMapper;
-		this.messageMapper = messageMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.redisTemplate = redisTemplate;
 		this.regexUtil = regexUtil;
+		this.FOLLOWING_LIMIT = FOLLOWING_LIMIT;
+		this.BLOCKING_LIMIT = BLOCKING_LIMIT;
 	}
 	
 	public void checkAccessToken(String old_user_accesstoken, String user_accesstoken) {
