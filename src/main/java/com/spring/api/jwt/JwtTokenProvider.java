@@ -1,40 +1,41 @@
 package com.spring.api.jwt;
 
-import java.util.Collection;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
 
 @Component
+@Getter
 public class JwtTokenProvider {
-	private static String PRIVATE_KEY = null;
-	private final static long ACCESSTOKEN_EXPIRATION_TIME = 2 * 60 * 60 * 1000L;
-	private final static long REFRESHTOKEN_EXPIRATION_TIME = 14 * 24 * 60 * 60 * 1000L;
-	
-	@Value("${jwt.privatekey}")
-	public void setPRIVATE_KEY(String PRIVATE_KEY) {
+	private final String PRIVATE_KEY;
+	private final long ACCESSTOKEN_EXPIRATION_TIME;
+	private final long REFRESHTOKEN_EXPIRATION_TIME;
+
+	@Autowired
+	JwtTokenProvider(
+		@Value("${jwt.privatekey}") String PRIVATE_KEY,
+		@Value("${jwt.accesstoken.expiration.time}") long ACCESSTOKEN_EXPIRATION_TIME,
+		@Value("${jwt.refreshtoken.expiration.time}") long REFRESHTOKEN_EXPIRATION_TIME
+	){
 		this.PRIVATE_KEY = PRIVATE_KEY;
-	}
-	
-	public long getAccesstokenExpirationTime() {
-		return ACCESSTOKEN_EXPIRATION_TIME;
-	}
-	
-	public long getRefreshtokenExpirationTime() {
-		return REFRESHTOKEN_EXPIRATION_TIME;
+		this.ACCESSTOKEN_EXPIRATION_TIME = ACCESSTOKEN_EXPIRATION_TIME;
+		this.REFRESHTOKEN_EXPIRATION_TIME = REFRESHTOKEN_EXPIRATION_TIME;
 	}
 	
 	public String createToken(Authentication authentication, boolean isAccessToken) {
         Date now = new Date();
         Date expiryDate = null;
+        
+        String user_role = authentication.getAuthorities().iterator().next().getAuthority();
         String token_type = null;
 
         if(isAccessToken) {
@@ -44,9 +45,7 @@ public class JwtTokenProvider {
         	expiryDate = new Date(now.getTime() + REFRESHTOKEN_EXPIRATION_TIME);
         	token_type = "user_refreshtoken";
         }
-
-        String user_role = authentication.getAuthorities().iterator().next().getAuthority();
-
+        
         return Jwts.builder()
                 .setSubject((String) authentication.getPrincipal())
                 .setIssuedAt(new Date())
