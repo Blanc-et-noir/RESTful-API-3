@@ -26,10 +26,7 @@ public class UserEntityRowMapper implements RowMapper<UserEntity>{
 		userEntity.setQuestion_answer(rs.getString("question_answer"));
 		userEntity.setUser_accesstoken(rs.getString("user_accesstoken"));
 		userEntity.setUser_refreshtoken(rs.getString("user_refreshtoken"));
-		
-		
 		userEntity.setQuestion_id(rs.getInt("question_id"));
-		
 		userEntity.setUser_login_time(rs.getTimestamp("user_login_time"));
 		userEntity.setUser_logout_time(rs.getTimestamp("user_logout_time"));
 		userEntity.setUser_register_time(rs.getTimestamp("user_register_time"));

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.code.UserError;
+import com.spring.api.dto.BlockingDTO;
+import com.spring.api.dto.FollowingDTO;
 import com.spring.api.dto.QuestionDTO;
 import com.spring.api.dto.UserDTO;
 import com.spring.api.encrypt.SHA;
@@ -80,6 +82,8 @@ public class UserServiceImpl implements UserService{
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		param.put("user_id", user_id);
 		
+		boolean changeFlag = false;
+		
 		String new_user_gender = param.get("new_user_gender");
 		String new_user_pw = param.get("new_user_pw");
 		String new_user_pw_check = param.get("new_user_pw_check");
@@ -97,22 +101,26 @@ public class UserServiceImpl implements UserService{
 			userCheckUtil.checkUserPwRegex(new_user_pw);
 			userCheckUtil.checkUserPwRegex(new_user_pw_check);
 			userCheckUtil.checkUserPwAndPwCheck(new_user_pw, new_user_pw_check);
+			changeFlag = true;
 		}
 		
 		if(new_user_name!=null) {
 			userCheckUtil.checkUserNameRegex(new_user_name);
 			param.put("user_name", new_user_name);
+			changeFlag = true;
 		}
 		
 		if(new_user_gender!=null) {
 			userCheckUtil.checkUserGender(new_user_gender);
 			param.put("user_gender", new_user_gender);
+			changeFlag = true;
 		}
 		
 		if(new_user_phone!=null) {
 			userCheckUtil.checkUserPhoneRegex(new_user_phone);
 			userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
 			param.put("new_user_phone", new_user_phone);
+			changeFlag = true;
 		}
 		
 		if(new_user_pw!=null&&new_question_id!=null&&new_question_answer!=null) {
@@ -129,13 +137,18 @@ public class UserServiceImpl implements UserService{
 			param.put("new_question_answer", SHA.DSHA512(new_question_answer.replaceAll(" ", ""), new_user_salt));	
 			
 			userMapper.updateUserPwChangeTime(param);
+			changeFlag = true;
 		}else if(new_user_pw==null&&new_question_id==null&&new_question_answer==null) {
 			
 		}else {
 			throw new CustomException(UserError.USER_PW_AND_QUESTION_ID_AND_QUESTION_ANSWER_ARE_NEEDED_AT_THE_SAME_TIME);
 		}
 
-		userMapper.updateMyUserInfo(param);
+		if(changeFlag) {
+			userMapper.updateMyUserInfo(param);
+		}else {
+			throw new CustomException(UserError.CAN_NOT_UPDATE_USER_WITHOUT_ANY_CHANGE);
+		}
 		
 		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
 		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
@@ -218,19 +231,31 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public List<FollowingEntity> readFollowingInfo(HttpServletRequest request) {
+	public List<FollowingDTO> readFollowingInfo(HttpServletRequest request) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		return userMapper.readFollowingInfoBySourceUserId(source_user_id);
+		List<FollowingDTO> followings = new LinkedList<FollowingDTO>();
+		
+		for(FollowingEntity followingEntity : userMapper.readFollowingInfoBySourceUserId(source_user_id)) {
+			followings.add(new FollowingDTO(followingEntity));
+		}
+		
+		return followings;
 	}
 
 	@Override
-	public List<BlockingEntity> readBlockingInfo(HttpServletRequest request) {
+	public List<BlockingDTO> readBlockingInfo(HttpServletRequest request) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		return userMapper.readBlockingInfoBySourceUserId(source_user_id);
+		List<BlockingDTO> blockings = new LinkedList<BlockingDTO>();
+		
+		for(BlockingEntity blockingEntity : userMapper.readBlockingInfoBySourceUserId(source_user_id)) {
+			blockings.add(new BlockingDTO(blockingEntity));
+		}
+		
+		return blockings;
 	}
 
 	@Override
@@ -298,9 +323,6 @@ public class UserServiceImpl implements UserService{
 	public UserDTO readMyUserInfo(HttpServletRequest request) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
-		
-		HashMap param = new HashMap();
-		param.put("user_id", user_id);
 		
 		UserEntity userEntity = userMapper.readUserInfoByUserId(user_id);
 		
