@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,17 +35,22 @@ import net.coobird.thumbnailator.Thumbnails;
 @Service("itemService")
 @Transactional
 public class ItemServiceImpl implements ItemService{
-	private JwtTokenProvider jwtTokenProvider;
-	private ItemCheckUtil itemCheckUtil;
-	private ItemMapper itemMapper;
-	private final String SEP = File.separator;
-	private final String BASE_DIRECTORY_OF_IMAGE_FILES = "C:"+SEP+"georaesangeo"+SEP+"items"+SEP+"images"+SEP;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final ItemCheckUtil itemCheckUtil;
+	private final ItemMapper itemMapper;
+	private final String BASE_DIRECTORY;
 	
 	@Autowired
-	ItemServiceImpl(JwtTokenProvider jwtTokenProvider,ItemMapper itemMapper, ItemCheckUtil itemCheckUtil){
+	ItemServiceImpl(
+		JwtTokenProvider jwtTokenProvider,
+		ItemMapper itemMapper,
+		ItemCheckUtil itemCheckUtil,
+		@Value("${base.directory}") String BASE_DIRECTORY
+	){
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.itemMapper = itemMapper;
 		this.itemCheckUtil = itemCheckUtil;
+		this.BASE_DIRECTORY = BASE_DIRECTORY;
 	}
 	
 	@Override
@@ -243,7 +249,7 @@ public class ItemServiceImpl implements ItemService{
 		ItemWithItemImagesDTO itemWithItemImagesDTO = itemCheckUtil.isItemExistent(param);
 		ItemImageDTO itemImageDTO = itemCheckUtil.isItemImageExistent(itemWithItemImagesDTO, item_image_id);
 		
-		File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+itemImageDTO.getItem_image_stored_name()+"."+itemImageDTO.getItem_image_extension());
+		File file = new File(BASE_DIRECTORY+itemImageDTO.getItem_image_stored_name()+"."+itemImageDTO.getItem_image_extension());
 		BufferedImage imageFile = null;
 		
 		if(item_image_type==null||item_image_type.equals("original")) {
@@ -410,7 +416,7 @@ public class ItemServiceImpl implements ItemService{
 			for(String item_image_name : mappingTable.keySet()) {
 				MultipartFile multipartFile = mappingTable.get(item_image_name);
 				try {
-					File file = new File(BASE_DIRECTORY_OF_IMAGE_FILES+item_image_name);
+					File file = new File(BASE_DIRECTORY+item_image_name);
 
 					if(!file.exists()) {
 						file.mkdirs();
