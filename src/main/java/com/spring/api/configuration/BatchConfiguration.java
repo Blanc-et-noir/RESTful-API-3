@@ -43,10 +43,8 @@ public class BatchConfiguration {
 	private StepBuilderFactory stepBuilderFactory;
 	private DataSource dataSource;
 	private JobRepository jobRepository;
-	
-	private final String SEP = File.separator;
-	private final String BASE_DIRECTORY_OF_IMAGE_FILES = "C:"+SEP+"georaesangeo"+SEP+"items"+SEP+"images"+SEP;
-	private final long BATCH_FREQUENCY;
+	private final String BASE_DIRECTORY;
+	private final long FREQUENCY_BATCH;
 	
 	@Autowired
 	BatchConfiguration(
@@ -54,13 +52,15 @@ public class BatchConfiguration {
 		StepBuilderFactory stepBuilderFactory,
 		DataSource dataSource,
 		JobRepository jobRepository,
-		@Value("${frequency.batch}") long BATCH_FREQUENCY
+		@Value("${batch.frequency}") long FREQUENCY_BATCH,
+		@Value("${base.directory}") String BASE_DIRECTORY
 	){
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.stepBuilderFactory = stepBuilderFactory;
 		this.dataSource = dataSource;
 		this.jobRepository = jobRepository;
-		this.BATCH_FREQUENCY = BATCH_FREQUENCY;
+		this.FREQUENCY_BATCH = FREQUENCY_BATCH;
+		this.BASE_DIRECTORY = BASE_DIRECTORY;
 	}
 	
 	@Bean("asyncJobLauncher")
@@ -75,9 +75,9 @@ public class BatchConfiguration {
 	}
 	
 	@Bean
-	public Job deleteJob() {
+	public Job batchJob() {
 		return this.jobBuilderFactory
-				.get("deleteJob")
+				.get("batchJob")
 				.start(deleteUserStep())
 				.next(deleteMessageStep())
 				.next(deleteItemStep())
@@ -87,6 +87,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@JobScope
+	//회원정보를 삭제하는 스텝
 	public Step deleteUserStep() {
 		return this.stepBuilderFactory
 				.get("deleteUserStep")
@@ -98,6 +99,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@JobScope
+	//상품을 삭제하는 스텝
 	public Step deleteItemStep() {
 		return this.stepBuilderFactory
 				.get("deleteItemStep")
@@ -109,6 +111,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@JobScope
+	//상품이미지를 삭제하는 스텝
 	public Step deleteItemImageStep() {
 		return this.stepBuilderFactory
 				.get("deleteItemImageStep")
@@ -121,6 +124,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@JobScope
+	//메세지를 삭제하는 스텝
 	public Step deleteMessageStep() {
 		return this.stepBuilderFactory
 				.get("deleteMessageStep")
@@ -132,24 +136,25 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//삭제할 메세지를 읽는 reader
 	public JdbcPagingItemReader<MessageEntity> messageEntityReader(DataSource dataSource){
 		try {
 			SqlPagingQueryProviderFactoryBean factoryBean = new SqlPagingQueryProviderFactoryBean();
-			
+
 			factoryBean.setDataSource(dataSource);
 			factoryBean.setSelectClause("SELECT *");
 			factoryBean.setFromClause("FROM messages m");
 			factoryBean.setWhereClause(
 				"WHERE "+
-				"NOT EXISTS(SELECT 1 FROM message_receivers r WHERE m.message_id = r.message_id AND (r.message_receiver_status = 'N' OR (r.message_receiver_status = 'Y' AND TIMESTAMPDIFF(SECOND,r.message_receiver_delete_time, NOW()) < "+BATCH_FREQUENCY+")))"+
+				"NOT EXISTS(SELECT 1 FROM message_receivers r WHERE m.message_id = r.message_id AND (r.message_receiver_status = 'N' OR (r.message_receiver_status = 'Y' AND TIMESTAMPDIFF(SECOND,r.message_receiver_delete_time, NOW()) < "+FREQUENCY_BATCH+")))"+
 				" AND "+
-				"NOT EXISTS(SELECT 1 FROM message_senders s WHERE m.message_id = s.message_id AND (s.message_sender_status = 'N' OR (s.message_sender_status = 'Y' AND TIMESTAMPDIFF(SECOND,s.message_sender_delete_time,NOW()) < "+BATCH_FREQUENCY+")))"
+				"NOT EXISTS(SELECT 1 FROM message_senders s WHERE m.message_id = s.message_id AND (s.message_sender_status = 'N' OR (s.message_sender_status = 'Y' AND TIMESTAMPDIFF(SECOND,s.message_sender_delete_time,NOW()) < "+FREQUENCY_BATCH+")))"
 			);
 			factoryBean.setSortKey("message_id");
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
 			
-			JdbcPagingItemReaderBuilder messageReaderBuilder = new JdbcPagingItemReaderBuilder();
+			JdbcPagingItemReaderBuilder<MessageEntity> messageReaderBuilder = new JdbcPagingItemReaderBuilder<MessageEntity>();
 			
 			messageReaderBuilder.name("messageReaderBuilder");
 			messageReaderBuilder.dataSource(dataSource);
@@ -157,7 +162,7 @@ public class BatchConfiguration {
 			messageReaderBuilder.pageSize(10);
 			messageReaderBuilder.parameterValues(new HashMap());
 			messageReaderBuilder.rowMapper(new MessageEntityRowMapper());
-			
+
 			return messageReaderBuilder.build(); 
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -167,8 +172,9 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//메세지 삭제를 수행하는 writer
 	public JdbcBatchItemWriter<MessageEntity> messageEntityWriter(DataSource dataSource){
-		JdbcBatchItemWriterBuilder messageWriterBuilder = new JdbcBatchItemWriterBuilder();
+		JdbcBatchItemWriterBuilder<MessageEntity> messageWriterBuilder = new JdbcBatchItemWriterBuilder<MessageEntity>();
 		
 		return messageWriterBuilder
 			.dataSource(dataSource)
@@ -179,6 +185,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//삭제할 회원정보를 읽는 reader
 	public JdbcPagingItemReader<UserEntity> userEntityReader(DataSource dataSource){
 		try {
 			SqlPagingQueryProviderFactoryBean factoryBean = new SqlPagingQueryProviderFactoryBean();
@@ -186,12 +193,12 @@ public class BatchConfiguration {
 			factoryBean.setDataSource(dataSource);
 			factoryBean.setSelectClause("SELECT *");
 			factoryBean.setFromClause("FROM users NATURAL JOIN questions NATURAL JOIN user_times");
-			factoryBean.setWhereClause("WHERE user_status = 'Y' AND TIMESTAMPDIFF(DAY, user_withdraw_time, NOW()) >= "+BATCH_FREQUENCY);
+			factoryBean.setWhereClause("WHERE user_status = 'Y' AND TIMESTAMPDIFF(DAY, user_withdraw_time, NOW()) >= "+FREQUENCY_BATCH);
 			factoryBean.setSortKey("user_id");
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
 			
-			JdbcPagingItemReaderBuilder itemReaderBuilder = new JdbcPagingItemReaderBuilder();
+			JdbcPagingItemReaderBuilder<UserEntity> itemReaderBuilder = new JdbcPagingItemReaderBuilder<UserEntity>();
 			
 			itemReaderBuilder.name("itemReaderBuilder");
 			itemReaderBuilder.dataSource(dataSource);
@@ -209,8 +216,9 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//회원정보를 삭제하는 writer
 	public JdbcBatchItemWriter<UserEntity> userEntityWriter(DataSource dataSource){
-		JdbcBatchItemWriterBuilder itemWriterBuilder = new JdbcBatchItemWriterBuilder();
+		JdbcBatchItemWriterBuilder<UserEntity> itemWriterBuilder = new JdbcBatchItemWriterBuilder<UserEntity>();
 		
 		return itemWriterBuilder
 			.dataSource(dataSource)
@@ -221,6 +229,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//삭제할 상품을 읽는 reader
 	public JdbcPagingItemReader<ItemEntity> itemEntityReader(DataSource dataSource){
 		try {
 			SqlPagingQueryProviderFactoryBean factoryBean = new SqlPagingQueryProviderFactoryBean();
@@ -228,12 +237,12 @@ public class BatchConfiguration {
 			factoryBean.setDataSource(dataSource);
 			factoryBean.setSelectClause("SELECT *");
 			factoryBean.setFromClause("FROM items");
-			factoryBean.setWhereClause("WHERE user_id IS NULL OR item_status = 'Y' AND TIMESTAMPDIFF(SECOND,item_delete_time,NOW()) >= "+BATCH_FREQUENCY);
+			factoryBean.setWhereClause("WHERE user_id IS NULL OR item_status = 'Y' AND TIMESTAMPDIFF(SECOND,item_delete_time,NOW()) >= "+FREQUENCY_BATCH);
 			factoryBean.setSortKey("item_id");
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
 			
-			JdbcPagingItemReaderBuilder itemReaderBuilder = new JdbcPagingItemReaderBuilder();
+			JdbcPagingItemReaderBuilder<ItemEntity> itemReaderBuilder = new JdbcPagingItemReaderBuilder<ItemEntity>();
 			
 			itemReaderBuilder.name("itemReaderBuilder");
 			itemReaderBuilder.dataSource(dataSource);
@@ -251,8 +260,9 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//상품을 삭제하는 writer
 	public JdbcBatchItemWriter<ItemEntity> itemEntityWriter(DataSource dataSource){
-		JdbcBatchItemWriterBuilder itemWriterBuilder = new JdbcBatchItemWriterBuilder();
+		JdbcBatchItemWriterBuilder<ItemEntity> itemWriterBuilder = new JdbcBatchItemWriterBuilder<ItemEntity>();
 		
 		return itemWriterBuilder
 			.dataSource(dataSource)
@@ -263,6 +273,7 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//삭제할 상품이미지를 읽는 reader
 	public JdbcPagingItemReader<ItemImageEntity> itemImageEntityReader(DataSource dataSource){
 		try {
 			SqlPagingQueryProviderFactoryBean factoryBean = new SqlPagingQueryProviderFactoryBean();
@@ -275,7 +286,7 @@ public class BatchConfiguration {
 			
 			PagingQueryProvider pagingQueryProvider = factoryBean.getObject();
 			
-			JdbcPagingItemReaderBuilder itemImageReaderBuilder = new JdbcPagingItemReaderBuilder();
+			JdbcPagingItemReaderBuilder<ItemImageEntity> itemImageReaderBuilder = new JdbcPagingItemReaderBuilder<ItemImageEntity>();
 			
 			itemImageReaderBuilder.name("itemImageReaderBuilder");
 			itemImageReaderBuilder.dataSource(dataSource);
@@ -293,8 +304,9 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
+	//상품이미지를 삭제하는 writer
 	public JdbcBatchItemWriter<ItemImageEntity> itemImageEntityWriter(DataSource dataSource){
-		JdbcBatchItemWriterBuilder itemWriterBuilder = new JdbcBatchItemWriterBuilder();
+		JdbcBatchItemWriterBuilder<ItemImageEntity> itemWriterBuilder = new JdbcBatchItemWriterBuilder<ItemImageEntity>();
 		
 		return itemWriterBuilder
 			.dataSource(dataSource)
@@ -303,12 +315,11 @@ public class BatchConfiguration {
 			.build();
 	}
 	
+	//상품이미지 파일을 삭제하는 processor
 	private class ItemImageEntityProcessor implements ItemProcessor<ItemImageEntity,ItemImageEntity>{
-
 		@Override
 		public ItemImageEntity process(ItemImageEntity itemImageEntity) throws Exception {
-			
-			String path = BASE_DIRECTORY_OF_IMAGE_FILES+itemImageEntity.getItem_image_stored_name()+"."+itemImageEntity.getItem_image_extension();
+			String path = BASE_DIRECTORY+itemImageEntity.getItem_image_stored_name()+"."+itemImageEntity.getItem_image_extension();
 			File file = new File(path);
 			
 			if(file.exists()) {
