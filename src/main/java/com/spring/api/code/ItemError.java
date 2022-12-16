@@ -35,7 +35,6 @@ public enum ItemError implements Code{
 	TOO_FREQUENT_TO_CREATE_ITEM("ITEM_025","너무 잦은 상품 등록 요청", HttpStatus.BAD_REQUEST),
 	ALREADY_SOLD_ITEM("ITEM_026","이미 판매된 상품", HttpStatus.BAD_REQUEST);
 	
-	
 	private String code, message;
 	private HttpStatus httpStatus;
 	

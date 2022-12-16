@@ -28,7 +28,9 @@ public enum UserError implements Code{
 	IS_NOT_BLOCKED_USER_ID("USER_020","블락중인 사용자 ID 아님", HttpStatus.BAD_REQUEST),
 	
 	NOT_FOUND_USER("USER_021","사용자 정보 없음", HttpStatus.BAD_REQUEST),
-	NOT_FOUND_QUESTION("USER_022","비밀번호 찾기 질문 정보 없음",HttpStatus.BAD_REQUEST);
+	NOT_FOUND_QUESTION("USER_022","비밀번호 찾기 질문 정보 없음",HttpStatus.BAD_REQUEST),
+	
+	CAN_NOT_UPDATE_USER_WITHOUT_ANY_CHANGE("USER_023","변경할 정보 없음",HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;

@@ -3,7 +3,6 @@ package com.spring.api.code;
 import org.springframework.http.HttpStatus;
 
 public enum AuthError implements Code{
-	
 	NOT_AUTHORIZED("AUTH_001","권한 없음", HttpStatus.UNAUTHORIZED),
 	TOKEN_EXPIRED("AUTH_002","토큰 만료", HttpStatus.UNAUTHORIZED),
 	NOT_FOUND_USER_ACCESSTOKEN("AUTH_003","액세스 토큰 없음", HttpStatus.UNAUTHORIZED),
@@ -17,7 +16,6 @@ public enum AuthError implements Code{
 	NOT_IN_USE_USER_ACCESSTOKEN("AUTH_009","사용중인 액세스 토큰이 아님",HttpStatus.UNAUTHORIZED),
 	IS_LOGGED_OUT_ACCESSTOKEN("AUTH_010","로그아웃된 액세스 토큰",HttpStatus.UNAUTHORIZED),
 	IS_LOGGED_OUT_REFRESHTOKEN("AUTH_011","로그아웃된 리프레쉬 토큰",HttpStatus.UNAUTHORIZED);
-	
 	
 	private String code, message;
 	private HttpStatus httpStatus;
