@@ -73,7 +73,7 @@
 			)
 		</if>
 		ORDER BY i.item_id DESC
-		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
+		LIMIT ${limit} OFFSET ${offset}
 	</select>
 	
 	<select id="readComments" resultType="CommentEntity" parameterType="HashMap">
@@ -90,7 +90,7 @@
 			CASE WHEN user_id IS NULL OR user_status = 'Y' THEN '탈퇴한 사용자' ELSE user_id END "user_id"
 		FROM cte LEFT OUTER JOIN users USING(user_id)
 		ORDER BY top_comment_id DESC, comment_path ASC
-		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;
+		LIMIT ${limit} OFFSET ${offset}
 	</select>
 	
 	<select id="readUserItemTime" resultType="java.sql.Timestamp" parameterType="HashMap">

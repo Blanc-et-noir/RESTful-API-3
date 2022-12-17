@@ -37,6 +37,6 @@
 		SELECT *
 		FROM batch_job_execution
 		ORDER BY job_execution_id DESC
-		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
+		LIMIT ${limit} OFFSET ${offset}
 	</select>
 </mapper>

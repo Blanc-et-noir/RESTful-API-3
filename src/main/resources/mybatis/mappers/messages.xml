@@ -43,7 +43,7 @@
 			AND
 			${owner_user_id} = #{user_id} AND r1.${owner_message_status} = 'N'
 		ORDER BY message_id ${order}
-		OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
+		LIMIT ${limit} OFFSET ${offset}
 	</select>
 	
 	<select id="readMessageByMessageIdAndUserId" resultType="MessageEntity" parameterType="HashMap">
