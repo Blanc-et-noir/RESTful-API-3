@@ -35,7 +35,7 @@ public class ItemController {
 	}
 	
 	@PostMapping("/api/v1/items")
-	public ResponseEntity<HashMap> createItem(MultipartRequest multipartRequest, HttpServletRequest request) {
+	public ResponseEntity<HashMap> createItem(MultipartRequest multipartRequest, HttpServletRequest request) throws IllegalStateException, IOException {
 		HashMap result = resultUtil.createResultMap("상품 등록 성공",true);
 		
 		itemService.createItem(multipartRequest, request);
@@ -56,7 +56,7 @@ public class ItemController {
 	}
 	
 	@PutMapping("/api/v1/items/{item_id}")
-	public ResponseEntity<HashMap> updateItem(MultipartRequest multipartRequest, HttpServletRequest request, @PathVariable("item_id") String item_id) {
+	public ResponseEntity<HashMap> updateItem(MultipartRequest multipartRequest, HttpServletRequest request, @PathVariable("item_id") String item_id) throws IllegalStateException, IOException {
 		HashMap result = resultUtil.createResultMap("상품 수정 성공",true);
 		
 		HashMap param = new HashMap();

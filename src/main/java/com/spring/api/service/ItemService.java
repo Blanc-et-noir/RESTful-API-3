@@ -15,7 +15,7 @@ import com.spring.api.dto.ItemWithItemImagesDTO;
 import com.spring.api.dto.ItemWithItemThumbnailImageDTO;
 
 public interface ItemService {
-	public void createItem(MultipartRequest multipartRequest, HttpServletRequest request);
+	public void createItem(MultipartRequest multipartRequest, HttpServletRequest request) throws IllegalStateException, IOException;
 	public List<ItemWithItemThumbnailImageDTO> readItems(HttpServletRequest request, HashMap param);
 	public void createComment(HttpServletRequest request, HashMap<String,String> param);
 	public void deleteComment(HttpServletRequest request, HashMap<String, String> param);
@@ -26,5 +26,5 @@ public interface ItemService {
 	public void deleteItem(HttpServletRequest request, HashMap<String, String> param);
 	public ItemWithItemImagesDTO readItem(HttpServletRequest request, HashMap<String, String> param);
 	public void sellItem(HttpServletRequest request, HashMap<String, String> param);
-	public void updateItem(MultipartRequest multipartRequest, HttpServletRequest request, HashMap<String, Object> param);
+	public void updateItem(MultipartRequest multipartRequest, HttpServletRequest request, HashMap<String, Object> param) throws IllegalStateException, IOException;
 }
