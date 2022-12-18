@@ -1,6 +1,5 @@
 package com.spring.api.dto;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,9 +13,9 @@ import lombok.Setter;
 public class JobExecutionDTO {
 	private int job_execution_id;
 	
-	private Timestamp create_time;
-	private Timestamp start_time;
-	private Timestamp end_time;
+	private String create_time;
+	private String start_time;
+	private String end_time;
 	
 	private String status;
 	private String exit_code;

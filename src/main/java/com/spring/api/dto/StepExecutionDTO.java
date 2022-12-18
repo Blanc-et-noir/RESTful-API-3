@@ -1,7 +1,5 @@
 package com.spring.api.dto;
 
-import java.sql.Timestamp;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
@@ -15,6 +13,6 @@ public class StepExecutionDTO {
 	private String step_name;
 	private String status;
 	private String exit_code;
-	private Timestamp start_time;
-	private Timestamp end_time;
+	private String start_time;
+	private String end_time;
 }
