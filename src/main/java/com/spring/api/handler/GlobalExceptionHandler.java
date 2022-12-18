@@ -1,5 +1,7 @@
 package com.spring.api.handler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,17 @@ public class GlobalExceptionHandler {
     	log.error("[ ERROR ] : flag : {}",false);
     	log.error("[ ERROR ] : code : {}","SERVER_001");
     	log.error("[ ERROR ] : message : {}","서버 내부 에러");
-
+    	log.error("[ ERROR ] : stacktrace : {}",getPrintStackTrace(e));
+    	
 		return new ResponseEntity<HashMap<String,Object>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+    public static String getPrintStackTrace(Exception e) {
+        
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
+         
+        return errors.toString();
+         
+    }
 }
