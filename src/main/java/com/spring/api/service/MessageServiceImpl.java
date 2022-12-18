@@ -21,7 +21,7 @@ import com.spring.api.util.MessageCheckUtil;
 import com.spring.api.util.UserCheckUtil;
 
 @Service("messageService")
-@Transactional
+@Transactional(rollbackFor= {Exception.class})
 public class MessageServiceImpl implements MessageService{
 	private final MessageMapper messageMapper;
 	private final JwtTokenProvider jwtTokenProvider;

@@ -27,7 +27,7 @@ import com.spring.api.util.RedisUtil;
 import com.spring.api.util.UserCheckUtil;
 
 @Service("userService")
-@Transactional
+@Transactional(rollbackFor= {Exception.class})
 public class UserServiceImpl implements UserService{
 	private final UserMapper userMapper;
 	private final JwtTokenProvider jwtTokenProvider;

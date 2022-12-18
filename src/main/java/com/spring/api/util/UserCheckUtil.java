@@ -227,4 +227,17 @@ public class UserCheckUtil {
 		
 		return userEntity;
 	}
+
+	public void isUserLoggedIn(UserEntity userEntity) {
+		if(userEntity.getUser_accesstoken()==null||userEntity.getUser_refreshtoken()==null) {
+			throw new CustomException(UserError.NOT_LOGGED_IN_USER);
+		}
+		
+	}
+
+	public void isUserAbleToBeLoggedOutByThisToken(UserEntity userEntity, String user_accesstoken) {
+		if(!userEntity.getUser_accesstoken().equals(user_accesstoken)) {
+			throw new CustomException(UserError.NOT_IN_USE_USER_ACCESSTOKEN);
+		}
+	}
 }

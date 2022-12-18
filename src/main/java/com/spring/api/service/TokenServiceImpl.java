@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.auth.UserAuthentication;
+import com.spring.api.code.AuthError;
 import com.spring.api.code.UserError;
-import com.spring.api.dto.UserDTO;
 import com.spring.api.encrypt.SHA;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
@@ -24,7 +24,7 @@ import com.spring.api.util.RedisUtil;
 import com.spring.api.util.UserCheckUtil;
 
 @Service("tokenService")
-@Transactional
+@Transactional(rollbackFor= {Exception.class})
 public class TokenServiceImpl implements TokenService{
 	private final UserMapper userMapper;
     private final RedisUtil redisUtil;
@@ -82,8 +82,17 @@ public class TokenServiceImpl implements TokenService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
+		if(!jwtTokenProvider.validateToken(user_accesstoken)) {
+			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
+		}else if(redisUtil.getData(user_accesstoken)!=null) {
+			throw new CustomException(AuthError.IS_LOGGED_OUT_ACCESSTOKEN);
+		}
+		
 		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 
+		checkUtil.isUserLoggedIn(userEntity);
+		checkUtil.isUserAbleToBeLoggedOutByThisToken(userEntity, user_accesstoken);
+		
 		String old_user_accesstoken = userEntity.getUser_accesstoken();
 		String old_user_refreshtoken = userEntity.getUser_refreshtoken();
 		
@@ -120,7 +129,7 @@ public class TokenServiceImpl implements TokenService{
 		checkUtil.checkAccessToken(old_user_accesstoken, user_accesstoken);
 		checkUtil.checkRefreshToken(old_user_refreshtoken, user_refreshtoken);
 		
-		Authentication authentication = new UserAuthentication(user_id, null, null);
+		Authentication authentication = new UserAuthentication(userEntity.getUser_id(), null, Arrays.asList(new SimpleGrantedAuthority(userEntity.getUser_role())));
 		
 		String new_user_accesstoken = jwtTokenProvider.createToken(authentication, true);
 		String new_user_refreshtoken = jwtTokenProvider.createToken(authentication, false);

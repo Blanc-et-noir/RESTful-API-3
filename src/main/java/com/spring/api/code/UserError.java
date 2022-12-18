@@ -30,7 +30,9 @@ public enum UserError implements Code{
 	NOT_FOUND_USER("USER_021","사용자 정보 없음", HttpStatus.BAD_REQUEST),
 	NOT_FOUND_QUESTION("USER_022","비밀번호 찾기 질문 정보 없음",HttpStatus.BAD_REQUEST),
 	
-	CAN_NOT_UPDATE_USER_WITHOUT_ANY_CHANGE("USER_023","변경할 정보 없음",HttpStatus.BAD_REQUEST);
+	CAN_NOT_UPDATE_USER_WITHOUT_ANY_CHANGE("USER_023","변경할 정보 없음",HttpStatus.BAD_REQUEST), 
+	NOT_LOGGED_IN_USER("USER_024","로그인 상태가 아님",HttpStatus.BAD_REQUEST),
+	NOT_IN_USE_USER_ACCESSTOKEN("USER_025","사용중인 액세스 토큰이 아님",HttpStatus.BAD_REQUEST);
 	
 	private String code, message;
 	private HttpStatus httpStatus;
