@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 public class MessageEntity {
 	private Integer message_id;
-	private Integer message_type_id;
 	
 	private String message_title;
 	private String message_content;

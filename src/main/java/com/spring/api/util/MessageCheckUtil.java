@@ -31,20 +31,6 @@ public class MessageCheckUtil {
 		this.MESSAGE_FREQUENCY = MESSAGE_FREQUENCY;
 	}
 	
-	public void isMessageTypeExistent(int message_type_id) {
-		if(messageMapper.readMessageTypeByMessageTypeId(message_type_id)==null) {
-			throw new CustomException(MessageError.NOT_FOUND_MESSAGE_TYPE);
-		}
-	}	
-	
-	public void checkMessageTypeIdRegex(String message_type_id) {
-		try {
-			Integer.parseInt(message_type_id);
-		}catch(Exception e) {
-			throw new CustomException(MessageError.MESSAGE_TYPE_ID_NOT_MATCHED_TO_REGEX);
-		}
-	}
-	
 	public int checkPageRegex(String page) {
 		int num = 0;
 		

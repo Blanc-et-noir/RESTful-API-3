@@ -17,7 +17,6 @@ public class MessageEntityRowMapper implements RowMapper<MessageEntity>{
 		messageEntity.setMessage_id(rs.getInt("message_id"));
 		messageEntity.setMessage_time(rs.getTimestamp("message_time"));
 		messageEntity.setMessage_title(rs.getString("message_title"));
-		messageEntity.setMessage_type_id(rs.getInt("message_type_id"));
 		
 		return messageEntity;
 	}

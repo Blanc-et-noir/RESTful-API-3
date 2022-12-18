@@ -47,12 +47,10 @@ public class MessageServiceImpl implements MessageService{
 		String message_content = param.get("message_content");
 		String message_receiver_user_id = param.get("message_receiver_user_id");
 		
-		messageCheckUtil.checkMessageTypeIdRegex(message_type_id);
 		messageCheckUtil.checkMessageTitleBytes(message_title);
 		messageCheckUtil.checkMessageContentBytes(message_content);
 		userCheckUtil.checkUserIdRegex(message_receiver_user_id);
 		userCheckUtil.isUserExistent(message_receiver_user_id);
-		messageCheckUtil.isMessageTypeExistent(Integer.parseInt(message_type_id));
 		messageCheckUtil.checkUserMessageTime(messageMapper.readUserMessageTime(param));		
 		
 		param.put("message_id", messageMapper.readNewMessageId()+"");
