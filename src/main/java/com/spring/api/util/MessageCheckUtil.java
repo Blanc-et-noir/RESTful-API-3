@@ -80,9 +80,9 @@ public class MessageCheckUtil {
 	}
 	
 	public String checkMessageBox(String message_box) {
-		if(message_box==null || !Strings.hasText(message_box) || message_box.equalsIgnoreCase("R")) {
+		if(message_box==null || !Strings.hasText(message_box) || message_box.equalsIgnoreCase("receive")) {
 			return "message_receivers";
-		}else if(message_box.equalsIgnoreCase("S")) {
+		}else if(message_box.equalsIgnoreCase("send")) {
 			return "message_senders";
 		}else {
 			throw new CustomException(MessageError.MESSAGE_BOX_NOT_MATCHED_TO_REGEX);
@@ -90,9 +90,9 @@ public class MessageCheckUtil {
 	}
 	
 	public String checkFlag(String flag, String message_box) {
-		if(flag==null || !Strings.hasText(flag) || flag.equalsIgnoreCase("T")) {
+		if(flag==null || !Strings.hasText(flag) || flag.equalsIgnoreCase("message_title")) {
 			return "message_title";
-		}else if(flag.equalsIgnoreCase("C")){
+		}else if(flag.equalsIgnoreCase("message_content")){
 			return "message_content";
 		}else if(flag.equalsIgnoreCase("U")){
 			if(message_box.equalsIgnoreCase("message_receivers")) {
@@ -122,10 +122,10 @@ public class MessageCheckUtil {
 	}
 
 	public String checkOrderRegex(String order) {
-		if(order == null || !Strings.hasText(order) || order.equalsIgnoreCase("D")) {
-			return "DESC";
-		}else if(order.equalsIgnoreCase("A")) {
-			return "ASC";
+		if(order == null || !Strings.hasText(order) || order.equalsIgnoreCase("desc")) {
+			return "desc";
+		}else if(order.equalsIgnoreCase("asc")) {
+			return "asc";
 		}else {
 			throw new CustomException(MessageError.ORDER_NOT_MATCHED_TO_REGEX);
 		}
