@@ -86,9 +86,9 @@
 			FROM comments c1 JOIN cte c2 ON c1.parent_comment_id = c2.comment_id
 		)
 		SELECT comment_id, parent_comment_id, comment_time, comment_depth, item_id,
-			CASE WHEN comment_status = 'Y' THEN '작성자에 의해 삭제된 댓글입니다.' ELSE comment_content END "comment_content",
-			CASE WHEN user_id IS NULL OR user_status = 'Y' THEN '탈퇴한 사용자' ELSE user_id END "user_id"
-		FROM cte LEFT OUTER JOIN users USING(user_id)
+			CASE WHEN user_id IS NULL OR u.user_status = 'Y' THEN '탈퇴한 사용자' ELSE user_id END "user_id",
+			CASE WHEN comment_status = 'Y' THEN '작성자에 의해 삭제된 댓글입니다.' WHEN b.target_user_id IS NOT NULL THEN '블락된 사용자가 작성한 댓글입니다.' ELSE comment_content END "comment_content"
+		FROM cte LEFT OUTER JOIN users u USING(user_id) LEFT OUTER JOIN blockings b ON(u.user_id = b.target_user_id)
 		ORDER BY top_comment_id DESC, comment_path ASC
 		LIMIT ${limit} OFFSET ${offset}
 	</select>

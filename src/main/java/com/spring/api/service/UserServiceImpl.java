@@ -12,12 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.api.code.UserError;
 import com.spring.api.dto.BlockingDTO;
-import com.spring.api.dto.FollowingDTO;
 import com.spring.api.dto.QuestionDTO;
 import com.spring.api.dto.UserDTO;
 import com.spring.api.encrypt.SHA;
 import com.spring.api.entity.BlockingEntity;
-import com.spring.api.entity.FollowingEntity;
 import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 import com.spring.api.exception.CustomException;
@@ -157,26 +155,6 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void createFollowingInfo(HttpServletRequest request, HashMap<String, String> param) {
-		String user_accesstoken = request.getHeader("user_accesstoken");
-		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
-		String target_user_id = param.get("target_user_id");
-		
-		param.put("source_user_id", source_user_id);
-		
-		userCheckUtil.checkUserIdRegex(target_user_id);
-		userCheckUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		userCheckUtil.isUserExistent(target_user_id);
-		userCheckUtil.checkNumberOfFollowingInfo(source_user_id);
-		userCheckUtil.isNotBlocked(source_user_id, target_user_id);
-		userCheckUtil.isNotFollowed(source_user_id, target_user_id);
-
-		userMapper.createFollowingInfo(param);
-		
-		return;
-	}
-
-	@Override
 	public void createBlockingInfo(HttpServletRequest request, HashMap<String, String> param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
@@ -189,26 +167,8 @@ public class UserServiceImpl implements UserService{
 		userCheckUtil.isUserExistent(target_user_id);
 		userCheckUtil.checkNumberOfBlockingInfo(source_user_id);
 		userCheckUtil.isNotBlocked(source_user_id, target_user_id);
-		userCheckUtil.isNotFollowed(source_user_id, target_user_id);
 
 		userMapper.createBlockingInfo(param);
-		
-		return;
-	}
-
-	@Override
-	public void deleteFollowingInfo(HttpServletRequest request, HashMap<String, String> param) {
-		String user_accesstoken = request.getHeader("user_accesstoken");
-		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
-		String target_user_id = param.get("target_user_id");
-		
-		param.put("source_user_id", source_user_id);
-		userCheckUtil.checkUserIdRegex(target_user_id);
-		userCheckUtil.isSourceUserIdAndTargetUserIdNotSame(source_user_id, target_user_id);
-		userCheckUtil.isUserRegistered(target_user_id);
-		userCheckUtil.isFollowed(source_user_id, target_user_id);
-		
-		userMapper.deleteFollowingInfoByBothUserId(param);
 		
 		return;
 	}
@@ -228,20 +188,6 @@ public class UserServiceImpl implements UserService{
 		userMapper.deleteBlockingInfoByBothUserId(param);
 		
 		return;
-	}
-
-	@Override
-	public List<FollowingDTO> readFollowingInfo(HttpServletRequest request) {
-		String user_accesstoken = request.getHeader("user_accesstoken");
-		String source_user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
-		
-		List<FollowingDTO> followings = new LinkedList<FollowingDTO>();
-		
-		for(FollowingEntity followingEntity : userMapper.readFollowingInfoBySourceUserId(source_user_id)) {
-			followings.add(new FollowingDTO(followingEntity));
-		}
-		
-		return followings;
 	}
 
 	@Override

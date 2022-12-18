@@ -26,22 +26,10 @@
 		WHERE question_id = ${question_id}
 	</select>
 	
-	<select id="readFollowingInfoByBothUserId" resultType="FollowingEntity" parameterType="HashMap">
-		SELECT *
-		FROM followings
-		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
-	</select>
-	
 	<select id="readBlockingInfoByBothUserId" resultType="BlockingEntity" parameterType="HashMap">
 		SELECT *
 		FROM blockings
 		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
-	</select>
-	
-	<select id="readFollowingInfoBySourceUserId" resultType="FollowingEntity" parameterType="String">
-		SELECT *
-		FROM followings
-		WHERE source_user_id = #{source_user_id}
 	</select>
 	
 	<select id="readBlockingInfoBySourceUserId" resultType="BlockingEntity" parameterType="String">
@@ -78,10 +66,6 @@
 	<insert id="createUserTime" parameterType="HashMap">
 		INSERT INTO user_times(user_id, user_register_time, user_pw_change_time)
 		VALUES(#{user_id},NOW(),NOW())
-	</insert>
-	
-	<insert id="createFollowingInfo">
-		INSERT INTO followings(source_user_id,target_user_id) VALUES(#{source_user_id},#{target_user_id})
 	</insert>
 	
 	<insert id="createBlockingInfo">
@@ -145,11 +129,6 @@
 		SET user_withdraw_time = NOW()
 		WHERE user_id = #{user_id}
 	</update>
-	
-	<delete id="deleteFollowingInfoByBothUserId" parameterType="HashMap">
-		DELETE FROM followings
-		WHERE source_user_id = #{source_user_id} AND target_user_id = #{target_user_id}
-	</delete>
 	
 	<delete id="deleteBlockingInfoByBothUserId" parameterType="HashMap">
 		DELETE FROM blockings

@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.spring.api.entity.BlockingEntity;
-import com.spring.api.entity.FollowingEntity;
 import com.spring.api.entity.QuestionEntity;
 import com.spring.api.entity.UserEntity;
 
@@ -20,8 +19,6 @@ public interface UserMapper {
 	public void updateMyUserInfo(HashMap<String, String> param);
 	public void updateUserLoginTime(HashMap param);
 	public void updateUserLogoutTime(String user_id);
-	public FollowingEntity readFollowingInfoByBothUserId(HashMap param);
-	public List<FollowingEntity> readFollowingInfoBySourceUserId(String source_user_id);
 	public BlockingEntity readBlockingInfoByBothUserId(HashMap param);
 	public List<BlockingEntity> readBlockingInfoBySourceUserId(String source_user_id);
 	public void createFollowingInfo(HashMap param);

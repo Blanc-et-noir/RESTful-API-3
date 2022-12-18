@@ -56,15 +56,6 @@ public class UserController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@PostMapping("/api/v1/users/me/followings")
-	public ResponseEntity<HashMap> createFollowingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
-		userService.createFollowingInfo(request,param);
-		
-		HashMap result = resultUtil.createResultMap("회원 팔로우 등록 성공",true);
-		
-		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
-	}
-	
 	@PostMapping("/api/v1/users/me/blockings")
 	public ResponseEntity<HashMap> createBlockingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.createBlockingInfo(request,param);
@@ -74,29 +65,11 @@ public class UserController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping("/api/v1/users/me/followings")
-	public ResponseEntity<HashMap> deleteFollowingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
-		userService.deleteFollowingInfo(request,param);
-		
-		HashMap result = resultUtil.createResultMap("회원 팔로우 해제 성공",true);
-		
-		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
-	}
-	
 	@DeleteMapping("/api/v1/users/me/blockings")
 	public ResponseEntity<HashMap> deleteBlockingInfo(HttpServletRequest request, @RequestBody HashMap<String,String> param){
 		userService.deleteBlockingInfo(request,param);
 		
 		HashMap result = resultUtil.createResultMap("회원 블락 해제 성공",true);
-		
-		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
-	}
-	
-	@GetMapping("/api/v1/users/me/followings")
-	public ResponseEntity<HashMap> readFollowingInfo(HttpServletRequest request){
-		HashMap result = resultUtil.createResultMap("회원 팔로우 목록 조회 성공",true);
-		
-		result.put("followings", userService.readFollowingInfo(request));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

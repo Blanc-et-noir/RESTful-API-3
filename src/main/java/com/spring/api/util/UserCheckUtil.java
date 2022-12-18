@@ -22,7 +22,6 @@ public class UserCheckUtil {
 	private final UserMapper userMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final RegexUtil regexUtil;
-	private final int FOLLOWING_LIMIT;
 	private final int BLOCKING_LIMIT;
 	
 	@Autowired
@@ -31,14 +30,12 @@ public class UserCheckUtil {
 		JwtTokenProvider jwtTokenProvider,
 		RedisTemplate redisTemplate,
 		RegexUtil regexUtil,
-		@Value("${following.limit}") int FOLLOWING_LIMIT,
 		@Value("${blocking.limit}") int BLOCKING_LIMIT
 	){
 		this.userMapper = userMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.redisTemplate = redisTemplate;
 		this.regexUtil = regexUtil;
-		this.FOLLOWING_LIMIT = FOLLOWING_LIMIT;
 		this.BLOCKING_LIMIT = BLOCKING_LIMIT;
 	}
 	
@@ -166,12 +163,6 @@ public class UserCheckUtil {
 		}
 	}
 
-	public void checkNumberOfFollowingInfo(String source_user_id) {
-		if(userMapper.readFollowingInfoBySourceUserId(source_user_id).size()>=FOLLOWING_LIMIT) {
-			throw new CustomException(UserError.NUMBER_OF_FOLLOWING_INFO_EXCEED_LIMIT);
-		}
-	}
-
 	public void checkNumberOfBlockingInfo(String source_user_id) {
 		if(userMapper.readBlockingInfoBySourceUserId(source_user_id).size()>=BLOCKING_LIMIT) {
 			throw new CustomException(UserError.NUMBER_OF_BLOCKING_INFO_EXCEED_LIMIT);
@@ -188,16 +179,6 @@ public class UserCheckUtil {
 		}
 	}
 	
-	public void isNotFollowed(String source_user_id, String target_user_id) {
-		HashMap param = new HashMap();
-		param.put("source_user_id", source_user_id);
-		param.put("target_user_id", target_user_id);
-		
-		if(userMapper.readFollowingInfoByBothUserId(param) != null) {
-			throw new CustomException(UserError.DUPLICATE_FOLLOWING_INFO);
-		}
-	}
-	
 	public void isBlocked(String source_user_id, String target_user_id) {
 		HashMap param = new HashMap();
 		param.put("source_user_id", source_user_id);
@@ -205,16 +186,6 @@ public class UserCheckUtil {
 		
 		if(userMapper.readBlockingInfoByBothUserId(param) == null) {
 			throw new CustomException(UserError.IS_NOT_BLOCKED_USER_ID);
-		}
-	}
-	
-	public void isFollowed(String source_user_id, String target_user_id) {
-		HashMap param = new HashMap();
-		param.put("source_user_id", source_user_id);
-		param.put("target_user_id", target_user_id);
-		
-		if(userMapper.readFollowingInfoByBothUserId(param) == null) {
-			throw new CustomException(UserError.IS_NOT_FOLLOWED_USER_ID);
 		}
 	}
 
