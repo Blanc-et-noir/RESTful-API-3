@@ -12,7 +12,7 @@ public enum MessageError implements Code{
 	FLAG_NOT_MATCHED_TO_REGEX("MESSAGE_007","메세지 검색 기준이 형식에 맞지 않음",HttpStatus.BAD_REQUEST),
 	
 	MESSAGE_TITLE_EXCEED_MAX_BYTES("MESSAGE_008","메세지 제목이 1 ~ 120 바이트 크기여야함",HttpStatus.BAD_REQUEST),
-	MESSAGE_CONTENT_EXCEED_MAX_BYTES("MESSAGE_09","메세지 내용이 1 ~ 600 바이트 크기여야함",HttpStatus.BAD_REQUEST),
+	MESSAGE_CONTENT_EXCEED_MAX_BYTES("MESSAGE_009","메세지 내용이 1 ~ 600 바이트 크기여야함",HttpStatus.BAD_REQUEST),
 	SEARCH_EXCEED_MAX_BYTES("MESSAGE_010","메세지 검색 내용이 1 ~ 120 바이트 크기여야함",HttpStatus.BAD_REQUEST),
 
 	NOT_FOUND_MESSAGE("MESSAGE_011","메세지 정보 없음",HttpStatus.BAD_REQUEST),
