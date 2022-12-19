@@ -50,23 +50,11 @@ public class MessageController {
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
-	@GetMapping("/api/v1/messages/{message_id}")
-	public ResponseEntity<HashMap> readMessage(HttpServletRequest request, @PathVariable String message_id){
-		
-		HashMap result = resultUtil.createResultMap("메세지 읽기 성공",true);
-		HashMap param = new HashMap();
-		param.put("message_id", message_id);
-		
-		result.put("message", messageService.readMessage(request, param));
-		
-		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
-	}
-	
 	@GetMapping("/api/v1/messages/me")
-	public ResponseEntity<HashMap> readBulkMessage(HttpServletRequest request, @RequestParam HashMap<String,String> param){
+	public ResponseEntity<HashMap> readMessages(HttpServletRequest request, @RequestParam HashMap<String,String> param){
 		
 		HashMap result = resultUtil.createResultMap("메세지 읽기 성공",true);
-		result.put("messages", messageService.readBulkMessage(request, param));
+		result.put("messages", messageService.readMessages(request, param));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}

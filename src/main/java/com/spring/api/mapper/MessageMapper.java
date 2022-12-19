@@ -12,7 +12,6 @@ import com.spring.api.entity.MessageEntity;
 public interface MessageMapper {
 	public void createMessage(HashMap param);
 	public int readNewMessageId();
-	public HashMap readMessageTypeByMessageTypeId(int message_type_id);
 	public void createMessageSender(HashMap param);
 	public void createMessageReceiver(HashMap param);
 	public List<MessageEntity> readMessages(HashMap<String, String> param);

@@ -11,10 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.spring.api.dto.DetailedMessageDTO;
 import com.spring.api.dto.MessageDTO;
 import com.spring.api.entity.MessageEntity;
-import com.spring.api.exception.CustomException;
 import com.spring.api.jwt.JwtTokenProvider;
 import com.spring.api.mapper.MessageMapper;
 import com.spring.api.util.MessageCheckUtil;
@@ -78,19 +76,7 @@ public class MessageServiceImpl implements MessageService{
 	}
 
 	@Override
-	public DetailedMessageDTO readMessage(HttpServletRequest request, HashMap<String, String> param) {
-		String user_accesstoken = request.getHeader("user_accesstoken");
-		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
-		String message_id = param.get("message_id");
-		param.put("user_id", user_id);
-		
-		MessageEntity messageEntity = messageCheckUtil.isMessageExistent(param);
-		
-		return new DetailedMessageDTO(messageEntity);
-	}
-
-	@Override
-	public List<MessageDTO> readBulkMessage(HttpServletRequest request, HashMap<String, String> param) {
+	public List<MessageDTO> readMessages(HttpServletRequest request, HashMap<String, String> param) {
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		param.put("user_id", user_id);
