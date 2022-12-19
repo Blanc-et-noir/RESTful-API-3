@@ -56,7 +56,7 @@ public class AuthServiceImpl implements AuthService{
 	@Override
 	public void getAuthcode(HashMap<String,String> param) throws Exception{
 		String user_phone = param.get("user_phone");
-		System.out.println(createRandomAuthcode(this.authcodeDigit));
+		
 		userCheckUtil.checkUserPhoneRegex(user_phone);
 		userCheckUtil.isUserPhoneDuplicate(user_phone);
 		
