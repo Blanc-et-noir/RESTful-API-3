@@ -12,7 +12,6 @@ public class UserDTO {
 	private String user_name;
 	private String user_phone;
 	private String user_role;
-	private String user_cert;
 	private String user_status;
 	private String user_gender;
 	private String question_content;
@@ -24,7 +23,6 @@ public class UserDTO {
 		this.user_phone = userEntity.getUser_phone();
 		this.user_gender = userEntity.getUser_id();
 		this.user_role = userEntity.getUser_role();
-		this.user_cert = userEntity.getUser_cert();
 		this.user_status = userEntity.getUser_status();
 		this.user_gender = userEntity.getUser_gender();
 		this.question_id = userEntity.getQuestion_id();

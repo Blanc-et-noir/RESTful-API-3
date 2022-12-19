@@ -20,7 +20,6 @@ public class UserEntityRowMapper implements RowMapper<UserEntity>{
 		userEntity.setUser_salt(rs.getString("user_salt"));
 		userEntity.setUser_gender(rs.getString("user_gender"));
 		userEntity.setUser_role(rs.getString("user_role"));
-		userEntity.setUser_cert(rs.getString("user_salt"));
 		userEntity.setUser_status(rs.getString("user_status"));
 		userEntity.setQuestion_content(rs.getString("user_name"));
 		userEntity.setQuestion_answer(rs.getString("question_answer"));

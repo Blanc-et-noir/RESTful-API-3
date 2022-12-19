@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -20,7 +19,7 @@ import com.spring.api.mapper.UserMapper;
 public class UserCheckUtil {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserMapper userMapper;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
     private final RegexUtil regexUtil;
 	private final int BLOCKING_LIMIT;
 	
@@ -28,13 +27,13 @@ public class UserCheckUtil {
 	UserCheckUtil(
 		UserMapper userMapper,
 		JwtTokenProvider jwtTokenProvider,
-		RedisTemplate redisTemplate,
+		RedisUtil redisUtil,
 		RegexUtil regexUtil,
 		@Value("${blocking.limit}") int BLOCKING_LIMIT
 	){
 		this.userMapper = userMapper;
 		this.jwtTokenProvider = jwtTokenProvider;
-		this.redisTemplate = redisTemplate;
+		this.redisUtil = redisUtil;
 		this.regexUtil = regexUtil;
 		this.BLOCKING_LIMIT = BLOCKING_LIMIT;
 	}
@@ -46,7 +45,7 @@ public class UserCheckUtil {
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
 		}else if(!jwtTokenProvider.getTokenType(user_accesstoken).equals("user_accesstoken")) {
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
-		}else if(redisTemplate.opsForValue().get(user_accesstoken)!=null){
+		}else if(redisUtil.getData(user_accesstoken)!=null){
 			throw new CustomException(AuthError.IS_LOGGED_OUT_ACCESSTOKEN);
 		}else if(old_user_accesstoken==null) {
 			throw new CustomException(AuthError.NOT_FOUND_STORED_USER_ACCESSTOKEN);
@@ -62,7 +61,7 @@ public class UserCheckUtil {
 			throw new CustomException(AuthError.INVALID_USER_REFRESHTOKEN);
 		}else if(!jwtTokenProvider.getTokenType(user_refreshtoken).equals("user_refreshtoken")) {
 			throw new CustomException(AuthError.INVALID_USER_REFRESHTOKEN);
-		}else if(redisTemplate.opsForValue().get(user_refreshtoken)!=null){
+		}else if(redisUtil.getData(user_refreshtoken)!=null){
 			throw new CustomException(AuthError.IS_LOGGED_OUT_REFRESHTOKEN);
 		}else if(old_user_refreshtoken==null) {
 			throw new CustomException(AuthError.NOT_FOUND_STORED_USER_REFRESHTOKEN);
@@ -149,6 +148,12 @@ public class UserCheckUtil {
 		}
 	}
 	
+	public void isUserPhoneDuplicate(String user_phone) {
+		if(userMapper.readUserInfoByUserPhone(user_phone)!=null) {
+			throw new CustomException(UserError.DUPLICATE_USER_PHONE);
+		}
+	}
+	
 	public void isQuestionExistent(int question_id) {
 		QuestionEntity questionEntity = userMapper.readQuestionByQuestionId(question_id);
 		
@@ -209,6 +214,22 @@ public class UserCheckUtil {
 	public void isUserAbleToBeLoggedOutByThisToken(UserEntity userEntity, String user_accesstoken) {
 		if(!userEntity.getUser_accesstoken().equals(user_accesstoken)) {
 			throw new CustomException(UserError.NOT_IN_USE_USER_ACCESSTOKEN);
+		}
+	}
+
+	public void checkUserAuthcodeRegex(String user_authcode) {
+		if(!regexUtil.checkRegex(user_authcode, regexUtil.getUSER_AUTHCODE_REGEX())) {
+			throw new CustomException(AuthError.USER_AUTHCODE_NOT_MATCHED_TO_REGEX);
+		}
+	}
+
+	public void checkUserAuthcode(String user_authcode, String user_phone) {
+		String stored_user_authcode = redisUtil.getData(user_phone);
+		
+		if(stored_user_authcode==null) {
+			throw new CustomException(AuthError.NOT_FOUND_USER_AUTHCODE);
+		}else if(!stored_user_authcode.equals(user_authcode)){
+			throw new CustomException(AuthError.USER_AUTHCODE_NOT_EQUAL_TO_STORED_USER_AUTHCODE);
 		}
 	}
 }

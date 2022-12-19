@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService{
 		String question_id = param.get("question_id");
 		String question_answer = param.get("question_answer");
 		String user_gender = param.get("user_gender");
+		String user_authcode = param.get("user_authcode");
 		
 		userCheckUtil.checkUserIdRegex(user_id);
 		userCheckUtil.checkUserPwRegex(user_pw);
@@ -60,6 +61,9 @@ public class UserServiceImpl implements UserService{
 		userCheckUtil.checkQuestionIdRegex(question_id);
 		userCheckUtil.checkQuestionAnswerBytes(question_answer);
 		userCheckUtil.checkUserGender(user_gender);
+		userCheckUtil.checkUserAuthcodeRegex(user_authcode);
+		userCheckUtil.checkUserAuthcode(user_authcode, user_phone);
+		
 		userCheckUtil.isUserIdDuplicate(userMapper.readUserInfoByUserId(user_id));
 		userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(user_phone));
 		userCheckUtil.isQuestionExistent(Integer.parseInt(question_id));
@@ -71,6 +75,8 @@ public class UserServiceImpl implements UserService{
 		
 		userMapper.createUser(param);
 		userMapper.createUserTime(param);
+		
+		redisUtil.delete(user_phone);
 		return;
 	}
 
@@ -90,6 +96,7 @@ public class UserServiceImpl implements UserService{
 		String new_question_id = param.get("new_question_id");
 		String new_question_answer = param.get("new_question_answer");
 		String question_answer = param.get("question_answer");
+		String user_authcode = param.get("user_authcode");
 		
 		UserEntity userEntity = userCheckUtil.isUserExistent(user_id);
 		String user_salt = userEntity.getUser_salt();
@@ -117,6 +124,9 @@ public class UserServiceImpl implements UserService{
 		if(new_user_phone!=null) {
 			userCheckUtil.checkUserPhoneRegex(new_user_phone);
 			userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
+			userCheckUtil.checkUserAuthcodeRegex(user_authcode);
+			userCheckUtil.checkUserAuthcode(user_authcode, new_user_phone);
+			
 			param.put("new_user_phone", new_user_phone);
 			changeFlag = true;
 		}
@@ -150,6 +160,7 @@ public class UserServiceImpl implements UserService{
 		
 		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
 		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
+		redisUtil.delete(new_user_phone);
 		
 		return;
 	}

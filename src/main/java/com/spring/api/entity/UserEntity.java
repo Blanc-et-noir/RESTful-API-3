@@ -19,7 +19,6 @@ public class UserEntity {
 	private String user_salt;
 	private String user_gender;
 	private String user_role;
-	private String user_cert;
 	private String user_status;
 	
 	private Timestamp user_login_time;

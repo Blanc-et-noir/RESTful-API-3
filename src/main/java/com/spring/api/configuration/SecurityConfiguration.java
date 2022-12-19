@@ -54,6 +54,7 @@ public class SecurityConfiguration {
         .antMatchers(HttpMethod.GET,"/api/v1/users/*/questions").permitAll()
         .antMatchers(HttpMethod.PUT,"/api/v1/users/*/passwords").permitAll()
         .antMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
+        .antMatchers(HttpMethod.POST,"/api/v1/auth").permitAll()
         .antMatchers("/api/v1/batches/**").hasRole("ADMIN")
         .anyRequest().authenticated().and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
