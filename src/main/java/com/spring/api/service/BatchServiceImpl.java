@@ -46,10 +46,12 @@ public class BatchServiceImpl implements BatchService{
 	public List<JobExecutionDTO> readBatches(HashMap param) {
 		int page = batchCheckUtil.checkPageRegex((String)param.get("page"));
 		int limit = batchCheckUtil.checkLimitRegex((String)param.get("limit"));
-
+		String order = batchCheckUtil.checkOrderRegex((String)param.get("order"));
+		
 		param.put("page", page);
 		param.put("limit", limit);
 		param.put("offset", page*limit);
+		param.put("order", order);
 		
 		return batchMapper.readBatches(param);
 	}

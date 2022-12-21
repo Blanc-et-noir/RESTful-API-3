@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.spring.api.code.BatchError;
+import com.spring.api.code.ItemError;
 import com.spring.api.dto.JobExecutionDTO;
 import com.spring.api.exception.CustomException;
 import com.spring.api.mapper.BatchMapper;
+
+import io.jsonwebtoken.lang.Strings;
 
 @Component
 public class BatchCheckUtil {
@@ -71,6 +74,16 @@ public class BatchCheckUtil {
 			throw new CustomException(BatchError.NOT_FOUND_JOB_EXECUTION);
 		}else {
 			return jobExecutionDTO;
+		}
+	}
+	
+	public String checkOrderRegex(String order) {
+		if(order == null || !Strings.hasText(order) || order.equalsIgnoreCase("desc")) {
+			return "desc";
+		}else if(order.equalsIgnoreCase("asc")) {
+			return "asc";
+		}else {
+			throw new CustomException(BatchError.ORDER_NOT_MATCHED_TO_REGEX);
 		}
 	}
 }

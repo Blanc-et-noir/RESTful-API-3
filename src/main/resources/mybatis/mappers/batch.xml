@@ -36,7 +36,7 @@
 	<select id="readBatches" resultMap="JobExecutionDTOMap" parameterType="HashMap">
 		SELECT *
 		FROM batch_job_execution
-		ORDER BY job_execution_id DESC
+		ORDER BY job_execution_id ${order}
 		LIMIT ${limit} OFFSET ${offset}
 	</select>
 </mapper>
