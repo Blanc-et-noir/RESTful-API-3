@@ -72,7 +72,7 @@
 				WHERE i.item_id = h.item_id AND REPLACE(h.hashtag_content,' ', '') IN <foreach collection="hashtag_contents" open="(" close=")" item="value" separator=",">REPLACE(#{value},' ', '')</foreach>
 			)
 		</if>
-		ORDER BY i.item_id DESC
+		ORDER BY ${flag} ${order}
 		LIMIT ${limit} OFFSET ${offset}
 	</select>
 	

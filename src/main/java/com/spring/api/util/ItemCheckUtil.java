@@ -19,6 +19,8 @@ import com.spring.api.entity.CommentEntity;
 import com.spring.api.exception.CustomException;
 import com.spring.api.mapper.ItemMapper;
 
+import io.jsonwebtoken.lang.Strings;
+
 @Component
 public class ItemCheckUtil {
 	private ItemMapper itemMapper;
@@ -304,6 +306,16 @@ public class ItemCheckUtil {
 		}
 	}
 
+	public String checkOrderRegex(String order) {
+		if(order == null || !Strings.hasText(order) || order.equalsIgnoreCase("desc")) {
+			return "desc";
+		}else if(order.equalsIgnoreCase("asc")) {
+			return "asc";
+		}else {
+			throw new CustomException(ItemError.ORDER_NOT_MATCHED_TO_REGEX);
+		}
+	}
+	
 	public void checkItemImageType(String item_image_type) {
 		if(item_image_type==null) {
 			return;
@@ -312,11 +324,13 @@ public class ItemCheckUtil {
 		}
 	}
 
-	public void checkFlagRegex(String flag) {
-		if(flag == null) {
-			return;
-		}else if(flag != null && !(flag.equals("user_id")||flag.equals("item_name"))) {
+	public String checkFlagRegex(String flag) {
+		if(flag == null || !Strings.hasText(flag)) {
+			return "item_name";
+		}else if(!(flag.equals("user_id")||flag.equals("item_name"))) {
 			throw new CustomException(ItemError.FLAG_NOT_MATCHED_TO_REGEX);
+		}else {
+			return flag;
 		}
 	}
 
