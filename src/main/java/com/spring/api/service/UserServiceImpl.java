@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService{
 			changeFlag = true;
 		}
 		
-		if(new_user_pw!=null&&new_question_id!=null&&new_question_answer!=null) {
+		if(question_answer!=null&&new_user_pw!=null&&new_question_id!=null&&new_question_answer!=null) {
 			userCheckUtil.checkQuestionIdRegex(new_question_id);
 			userCheckUtil.checkQuestionAnswerBytes(new_question_answer);
 			userCheckUtil.checkQuestionAnswerBytes(question_answer);

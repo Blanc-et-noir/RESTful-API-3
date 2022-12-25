@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
         if(!StringUtils.hasText(user_accesstoken)) {
         	request.setAttribute("customException", new CustomException(AuthError.NOT_FOUND_USER_ACCESSTOKEN));
-        }else if(!jwtTokenProvider.validateToken(user_accesstoken)) {
+        }else if(!jwtTokenProvider.validateToken(user_accesstoken, false)) {
         	request.setAttribute("customException", new CustomException(AuthError.INVALID_USER_ACCESSTOKEN));
         }else {
             String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);

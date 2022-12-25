@@ -82,12 +82,6 @@ public class TokenServiceImpl implements TokenService{
 		String user_accesstoken = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_accesstoken);
 		
-		if(!jwtTokenProvider.validateToken(user_accesstoken)) {
-			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
-		}else if(redisUtil.getData(user_accesstoken)!=null) {
-			throw new CustomException(AuthError.IS_LOGGED_OUT_ACCESSTOKEN);
-		}
-		
 		UserEntity userEntity = checkUtil.isUserExistent(user_id);
 
 		checkUtil.isUserLoggedIn(userEntity);
@@ -145,7 +139,7 @@ public class TokenServiceImpl implements TokenService{
 
 	@Override
 	public HashMap readToken(HttpServletRequest request) {
-		String user_token = request.getHeader("user_token");
+		String user_token = request.getHeader("user_accesstoken");
 		String user_id = jwtTokenProvider.getUserIdFromJWT(user_token);
 
 		HashMap tokenInfo = new HashMap();

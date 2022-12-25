@@ -41,7 +41,7 @@ public class UserCheckUtil {
 	public void checkAccessToken(String old_user_accesstoken, String user_accesstoken) {
 		if(!StringUtils.hasText(user_accesstoken)) {
 			throw new CustomException(AuthError.NOT_FOUND_USER_ACCESSTOKEN);
-		}else if(!jwtTokenProvider.validateToken(user_accesstoken)) {
+		}else if(!jwtTokenProvider.validateToken(user_accesstoken, true)) {
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
 		}else if(!jwtTokenProvider.getTokenType(user_accesstoken).equals("user_accesstoken")) {
 			throw new CustomException(AuthError.INVALID_USER_ACCESSTOKEN);
@@ -57,7 +57,7 @@ public class UserCheckUtil {
 	public void checkRefreshToken(String old_user_refreshtoken, String user_refreshtoken) {
 		if(!StringUtils.hasText(user_refreshtoken)) {
 			throw new CustomException(AuthError.NOT_FOUND_USER_REFRESHTOKEN);
-		}else if(!jwtTokenProvider.validateToken(user_refreshtoken)) {
+		}else if(!jwtTokenProvider.validateToken(user_refreshtoken, false)) {
 			throw new CustomException(AuthError.INVALID_USER_REFRESHTOKEN);
 		}else if(!jwtTokenProvider.getTokenType(user_refreshtoken).equals("user_refreshtoken")) {
 			throw new CustomException(AuthError.INVALID_USER_REFRESHTOKEN);

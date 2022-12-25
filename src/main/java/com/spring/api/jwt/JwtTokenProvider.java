@@ -27,8 +27,8 @@ public class JwtTokenProvider {
 		@Value("${jwt.refreshtoken.expiration.time}") long REFRESHTOKEN_EXPIRATION_TIME
 	){
 		this.PRIVATE_KEY = PRIVATE_KEY;
-		this.ACCESSTOKEN_EXPIRATION_TIME = ACCESSTOKEN_EXPIRATION_TIME;
-		this.REFRESHTOKEN_EXPIRATION_TIME = REFRESHTOKEN_EXPIRATION_TIME;
+		this.ACCESSTOKEN_EXPIRATION_TIME = ACCESSTOKEN_EXPIRATION_TIME*1000;
+		this.REFRESHTOKEN_EXPIRATION_TIME = REFRESHTOKEN_EXPIRATION_TIME*1000;
 	}
 	
 	public String createToken(Authentication authentication, boolean isAccessToken) {
@@ -56,10 +56,16 @@ public class JwtTokenProvider {
                 .compact();
     }
 	
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, boolean timeout) {
         try {
             Jwts.parser().setSigningKey(PRIVATE_KEY).parseClaimsJws(token);
             return true;
+        }catch(ExpiredJwtException e) {
+        	if(timeout) {
+        		return true;
+        	}else {
+        		return false;
+        	}
         }catch(Exception e) {
         	return false;
         }
