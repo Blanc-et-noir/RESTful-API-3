@@ -333,14 +333,16 @@ public class ItemCheckUtil {
 			return flag;
 		}
 	}
-
+	
 	public String checkSearchRegex(String flag, String search) {
-		if(flag == null) {
-			return null;
-		}else if(flag.equals("user_id") && !regexUtil.checkRegex(search, regexUtil.getUSER_ID_REGEX())) {
+		if(flag.equals("user_id") && !regexUtil.checkRegex(search, regexUtil.getUSER_ID_REGEX())) {
 			throw new CustomException(UserError.USER_ID_NOT_MATCHED_TO_REGEX);
-		}else if(flag.equals("item_name") && !regexUtil.checkBytes(search, regexUtil.getITEM_NAME_MAX_BYTES())) {
-			throw new CustomException(ItemError.ITEM_NAME_EXCEED_MAX_BYTES);
+		}else if(flag.equals("item_name")) {
+			if(search==null) {
+				return "";
+			}else if(!regexUtil.checkBytes(search, regexUtil.getITEM_NAME_MAX_BYTES())){
+				throw new CustomException(ItemError.ITEM_NAME_EXCEED_MAX_BYTES);
+			}
 		}
 		return search.replaceAll(" ", "");
 	}
