@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.spring.api.code.AuthError;
 import com.spring.api.code.UserError;
 import com.spring.api.dto.BlockingDTO;
 import com.spring.api.dto.QuestionDTO;
@@ -31,7 +32,8 @@ public class UserServiceImpl implements UserService{
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserCheckUtil userCheckUtil;
     private final RedisUtil redisUtil;
-	
+    private final String PREFIX_VERIFICATION_CODE = "verification_code:";
+    
 	@Autowired
 	UserServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider, UserCheckUtil checkUtil, RedisUtil redisUtil){
 		this.userMapper = userMapper;
@@ -41,7 +43,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	@Override
-	public void createUser(HashMap<String,String> param) throws CustomException {
+	public void createUser(HashMap<String,String> param){
 		String user_id = param.get("user_id");
 		String user_pw = param.get("user_pw");
 		String user_pw_check = param.get("user_pw_check");
@@ -50,7 +52,7 @@ public class UserServiceImpl implements UserService{
 		String question_id = param.get("question_id");
 		String question_answer = param.get("question_answer");
 		String user_gender = param.get("user_gender");
-		String user_authcode = param.get("user_authcode");
+		String verification_code = param.get("verification_code");
 		
 		userCheckUtil.checkUserIdRegex(user_id);
 		userCheckUtil.checkUserPwRegex(user_pw);
@@ -61,11 +63,18 @@ public class UserServiceImpl implements UserService{
 		userCheckUtil.checkQuestionIdRegex(question_id);
 		userCheckUtil.checkQuestionAnswerBytes(question_answer);
 		userCheckUtil.checkUserGender(user_gender);
-		userCheckUtil.checkUserAuthcodeRegex(user_authcode);
-		userCheckUtil.checkUserAuthcode(user_authcode, user_phone);
+		userCheckUtil.checkUserAuthcodeRegex(verification_code);
 		
-		userCheckUtil.isUserIdDuplicate(userMapper.readUserInfoByUserId(user_id));
-		userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(user_phone));
+		String stored_verification_code = redisUtil.getData(PREFIX_VERIFICATION_CODE+user_phone);
+		
+		if(stored_verification_code==null) {
+			throw new CustomException(AuthError.NOT_FOUND_VERIFICATION_CODE);
+		}
+		
+		userCheckUtil.checkVerificationcodeAndStoredVerificationcode(verification_code, stored_verification_code);
+		
+		userCheckUtil.isUserIdNotDuplicate(userMapper.readUserInfoByUserId(user_id));
+		userCheckUtil.isUserPhoneNotDuplicate(userMapper.readUserInfoByUserPhone(user_phone));
 		userCheckUtil.isQuestionExistent(Integer.parseInt(question_id));
 		
 		String user_salt = SHA.getSalt();
@@ -76,7 +85,7 @@ public class UserServiceImpl implements UserService{
 		userMapper.createUser(param);
 		userMapper.createUserTime(param);
 		
-		redisUtil.delete(user_phone);
+		redisUtil.delete(PREFIX_VERIFICATION_CODE+user_phone);
 		return;
 	}
 
@@ -96,7 +105,7 @@ public class UserServiceImpl implements UserService{
 		String new_question_id = param.get("new_question_id");
 		String new_question_answer = param.get("new_question_answer");
 		String question_answer = param.get("question_answer");
-		String user_authcode = param.get("user_authcode");
+		
 		
 		UserEntity userEntity = userCheckUtil.isUserExistent(user_id);
 		String user_salt = userEntity.getUser_salt();
@@ -122,10 +131,18 @@ public class UserServiceImpl implements UserService{
 		}
 		
 		if(new_user_phone!=null) {
+			String verification_code = param.get("verification_code");
+			String stored_verification_code = redisUtil.getData(PREFIX_VERIFICATION_CODE+new_user_phone);
+			
 			userCheckUtil.checkUserPhoneRegex(new_user_phone);
-			userCheckUtil.isUserPhoneDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
-			userCheckUtil.checkUserAuthcodeRegex(user_authcode);
-			userCheckUtil.checkUserAuthcode(user_authcode, new_user_phone);
+			userCheckUtil.isUserPhoneNotDuplicate(userMapper.readUserInfoByUserPhone(new_user_phone));
+			userCheckUtil.checkUserAuthcodeRegex(verification_code);
+			
+			if(stored_verification_code==null) {
+				throw new CustomException(AuthError.NOT_FOUND_VERIFICATION_CODE);
+			}
+			
+			userCheckUtil.checkVerificationcodeAndStoredVerificationcode(verification_code, stored_verification_code);
 			
 			param.put("new_user_phone", new_user_phone);
 			changeFlag = true;
@@ -160,7 +177,7 @@ public class UserServiceImpl implements UserService{
 		
 		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
 		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
-		redisUtil.delete(new_user_phone);
+		redisUtil.delete(PREFIX_VERIFICATION_CODE+new_user_phone);
 		
 		return;
 	}
@@ -304,5 +321,19 @@ public class UserServiceImpl implements UserService{
 		
 		redisUtil.setData(user_accesstoken, "removed", jwtTokenProvider.getRemainingTime(user_accesstoken));
 		redisUtil.setData(user_refreshtoken, "removed", jwtTokenProvider.getRemainingTime(user_refreshtoken));
+	}
+
+	@Override
+	public void checkDuplicateUserId(HashMap param) {
+		String user_id = (String) param.get("user_id");
+		userCheckUtil.checkUserIdRegex(user_id);
+		userCheckUtil.isUserIdNotDuplicate(user_id);
+	}
+
+	@Override
+	public void checkDuplicateUserPhone(HashMap param) {
+		String user_phone = (String) param.get("user_phone");
+		userCheckUtil.checkUserPhoneRegex(user_phone);
+		userCheckUtil.isUserPhoneNotDuplicate(user_phone);
 	}
 }

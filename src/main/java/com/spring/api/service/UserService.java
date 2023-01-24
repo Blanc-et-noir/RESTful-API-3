@@ -20,4 +20,6 @@ public interface UserService{
 	public void updateUserPw(HttpServletRequest request, HashMap<String, String> param);
 	public UserDTO readMyUserInfo(HttpServletRequest request);
 	public void deleteMyUserInfo(HttpServletRequest request);
+	public void checkDuplicateUserId(HashMap param);
+	public void checkDuplicateUserPhone(HashMap param);
 }

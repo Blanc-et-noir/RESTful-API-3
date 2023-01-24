@@ -136,19 +136,25 @@ public class UserCheckUtil {
 		return userEntity;
 	}
 	
-	public void isUserIdDuplicate(UserEntity userEntity) {
+	public void isUserIdNotDuplicate(UserEntity userEntity) {
 		if(userEntity!=null) {
 			throw new CustomException(UserError.DUPLICATE_USER_ID);
 		}
 	}
 	
-	public void isUserPhoneDuplicate(UserEntity userEntity) {
+	public void isUserIdNotDuplicate(String user_id) {
+		if(userMapper.readUserInfoByUserId(user_id)!=null) {
+			throw new CustomException(UserError.DUPLICATE_USER_ID);
+		}
+	}
+	
+	public void isUserPhoneNotDuplicate(UserEntity userEntity) {
 		if(userEntity!=null) {
 			throw new CustomException(UserError.DUPLICATE_USER_PHONE);
 		}
 	}
 	
-	public void isUserPhoneDuplicate(String user_phone) {
+	public void isUserPhoneNotDuplicate(String user_phone) {
 		if(userMapper.readUserInfoByUserPhone(user_phone)!=null) {
 			throw new CustomException(UserError.DUPLICATE_USER_PHONE);
 		}
@@ -217,19 +223,27 @@ public class UserCheckUtil {
 		}
 	}
 
-	public void checkUserAuthcodeRegex(String user_authcode) {
-		if(!regexUtil.checkRegex(user_authcode, regexUtil.getUSER_AUTHCODE_REGEX())) {
-			throw new CustomException(AuthError.USER_AUTHCODE_NOT_MATCHED_TO_REGEX);
+	public void checkUserAuthcodeRegex(String auth_code) {
+		if(!regexUtil.checkRegex(auth_code, regexUtil.getAUTHCODE_REGEX())) {
+			throw new CustomException(AuthError.AUTH_CODE_NOT_MATCHED_TO_REGEX);
+		}
+	}
+	
+	public void checkUserVerificationcodeRegex(String verification_code) {
+		if(!regexUtil.checkRegex(verification_code, regexUtil.getVERIFICATIONCODE_REGEX())) {
+			throw new CustomException(AuthError.VERIFICATION_CODE_NOT_MATCHED_TO_REGEX);
 		}
 	}
 
-	public void checkUserAuthcode(String user_authcode, String user_phone) {
-		String stored_user_authcode = redisUtil.getData(user_phone);
-		
-		if(stored_user_authcode==null) {
-			throw new CustomException(AuthError.NOT_FOUND_USER_AUTHCODE);
-		}else if(!stored_user_authcode.equals(user_authcode)){
-			throw new CustomException(AuthError.USER_AUTHCODE_NOT_EQUAL_TO_STORED_USER_AUTHCODE);
+	public void checkAuthcodeAndStoredAuthcode(String stored_auth_code, String auth_code) {
+		if(!stored_auth_code.equals(auth_code)) {
+			throw new CustomException(AuthError.AUTH_CODE_NOT_EQUAL_TO_STORED_AUTH_CODE);
+		}
+	}
+	
+	public void checkVerificationcodeAndStoredVerificationcode(String stored_verification_code, String verification_code) {
+		if(!stored_verification_code.equals(verification_code)) {
+			throw new CustomException(AuthError.VERIFICATION_CODE_NOT_EQUAL_TO_STORED_VERIFICATION_CODE);
 		}
 	}
 }

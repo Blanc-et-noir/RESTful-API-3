@@ -17,7 +17,8 @@ public class RegexUtil {
 	private final String USER_NAME_REGEX = "^[가-힣]{2,5}$";
 	private final String DATE_REGEX = "^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$";
 	private final String USER_GENDER_REGEX = "[mfMF]";
-	private final String USER_AUTHCODE_REGEX;
+	private final String AUTHCODE_REGEX;
+	private final String VERIFICATIONCODE_REGEX;
 	
 	private final int QUESTION_ANSWER_MAX_BYTES = 120;
 	private final int MESSAGE_TITLE_MAX_BYTES = 120;
@@ -31,17 +32,21 @@ public class RegexUtil {
 	private final int MAX_LIMIT;
 	private final int MIN_LIMIT;
 	private final int AUTHCODE_DIGIT;
+	private final int VERIFICATIONCODE_DIGIT;
 	
 	@Autowired
 	RegexUtil(
 		@Value("${min.limit}") int MIN_LIMIT,
 		@Value("${max.limit}") int MAX_LIMIT,
-		@Value("${sms.authcodeDigit}") int AUTHCODE_DIGIT
+		@Value("${sms.auth.digit}") int AUTHCODE_DIGIT,
+		@Value("${sms.verification.digit}") int VERIFICATIONCODE_DIGIT
 	){
 		this.MIN_LIMIT = MIN_LIMIT;
 		this.MAX_LIMIT = MAX_LIMIT;
 		this.AUTHCODE_DIGIT = AUTHCODE_DIGIT;
-		this.USER_AUTHCODE_REGEX = "[0-9]{"+AUTHCODE_DIGIT+"}";
+		this.VERIFICATIONCODE_DIGIT = VERIFICATIONCODE_DIGIT;
+		this.AUTHCODE_REGEX = "[0-9]{"+AUTHCODE_DIGIT+"}";
+		this.VERIFICATIONCODE_REGEX = "[0-9]{"+VERIFICATIONCODE_DIGIT+"}";
 	}
 	
 	public boolean checkBytes(String str, final int maxLength) {

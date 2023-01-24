@@ -29,6 +29,30 @@ public class UserController {
 		this.resultUtil = resultUtil;
 	}
 	
+	@GetMapping("/api/v1/checks/users/{user_id}")
+	public ResponseEntity<HashMap> checkDuplicateUserId(@PathVariable("user_id") String user_id){
+		HashMap param = new HashMap();
+		param.put("user_id", user_id);
+		
+		userService.checkDuplicateUserId(param);
+		
+		HashMap result = resultUtil.createResultMap("중복되지 않은 회원 ID",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("/api/v1/checks/users/phones/{user_phone}")
+	public ResponseEntity<HashMap> checkDuplicateUserPhone(@PathVariable("user_phone") String user_phone){
+		HashMap param = new HashMap();
+		param.put("user_phone", user_phone);
+		
+		userService.checkDuplicateUserPhone(param);
+		
+		HashMap result = resultUtil.createResultMap("중복되지 않은 회원 전화번호",true);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
 	@PostMapping("/api/v1/users")
 	public ResponseEntity<HashMap> createUserInfo(@RequestBody HashMap<String,String> param){
 		userService.createUser(param);

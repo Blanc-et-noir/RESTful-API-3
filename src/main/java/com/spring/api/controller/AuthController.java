@@ -23,11 +23,19 @@ public class AuthController {
 		this.resultUtil = resultUtil;
 	}
 	
-	@PostMapping("/api/v1/auth")
+	@PostMapping("/api/v1/auths")
 	public ResponseEntity<HashMap> getAuthcode(@RequestBody HashMap<String,String> param) throws Exception{
 		HashMap result = resultUtil.createResultMap("인증코드 요청 성공",true);
 		
 		authService.getAuthcode(param);
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
+	}
+	
+	@PostMapping("/api/v1/verifications")
+	public ResponseEntity<HashMap> getVerficationcode(@RequestBody HashMap<String,String> param) throws Exception{
+		HashMap result = resultUtil.createResultMap("인증코드 검증 성공",true);
+		result.put("verification_code", authService.getVerficationcode(param));
 		
 		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
