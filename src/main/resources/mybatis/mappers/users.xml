@@ -7,7 +7,11 @@
 		FROM users NATURAL JOIN questions
 		WHERE user_id = #{user_id} AND user_status = 'N'
 	</select>
-
+	<select id="readUserInfoByNotWithdrawedUserPhone" resultType="UserEntity" parameterType="String">
+		SELECT *
+		FROM users NATURAL JOIN questions
+		WHERE user_phone = #{user_phone} AND user_status = 'N'
+	</select>
 	<select id="readUserInfoByUserId" resultType="UserEntity" parameterType="String">
 		SELECT *
 		FROM users NATURAL JOIN questions

@@ -69,7 +69,6 @@ public class AuthServiceImpl implements AuthService{
 		String user_phone = param.get("user_phone");
 		
 		userCheckUtil.checkUserPhoneRegex(user_phone);
-		userCheckUtil.isUserPhoneNotDuplicate(user_phone);
 		
 		String apiUrl = "https://sens.apigw.ntruss.com/sms/v2/services/"+serviceId+"/messages";
 		String method = "POST";

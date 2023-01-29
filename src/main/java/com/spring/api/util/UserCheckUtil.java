@@ -143,7 +143,7 @@ public class UserCheckUtil {
 	}
 	
 	public void isUserIdNotDuplicate(String user_id) {
-		if(userMapper.readUserInfoByUserId(user_id)!=null) {
+		if(userMapper.readUserInfoByNotWithdrawedUserId(user_id)!=null) {
 			throw new CustomException(UserError.DUPLICATE_USER_ID);
 		}
 	}
@@ -155,7 +155,7 @@ public class UserCheckUtil {
 	}
 	
 	public void isUserPhoneNotDuplicate(String user_phone) {
-		if(userMapper.readUserInfoByUserPhone(user_phone)!=null) {
+		if(userMapper.readUserInfoByNotWithdrawedUserPhone(user_phone)!=null) {
 			throw new CustomException(UserError.DUPLICATE_USER_PHONE);
 		}
 	}
@@ -244,6 +244,12 @@ public class UserCheckUtil {
 	public void checkVerificationcodeAndStoredVerificationcode(String stored_verification_code, String verification_code) {
 		if(!stored_verification_code.equals(verification_code)) {
 			throw new CustomException(AuthError.VERIFICATION_CODE_NOT_EQUAL_TO_STORED_VERIFICATION_CODE);
+		}
+	}
+
+	public void checkUserPhones(String user_phone1, String user_phone2) {
+		if(!user_phone1.equals(user_phone2)) {
+			throw new CustomException(UserError.USER_PHONES_NOT_EQUAL_TO_EACH_OTHER);
 		}
 	}
 }

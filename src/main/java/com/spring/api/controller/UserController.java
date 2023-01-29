@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.api.service.UserService;
@@ -27,6 +28,14 @@ public class UserController {
 	UserController(UserService userService, ResultUtil resultUtil){
 		this.userService = userService;
 		this.resultUtil = resultUtil;
+	}
+	
+	@GetMapping("/api/v1/users/user-ids")
+	public ResponseEntity<HashMap> findUserId(@RequestParam HashMap param){
+		HashMap result = resultUtil.createResultMap("회원 ID 조회 성공",true);
+		result.put("user_id", userService.findUserId(param));
+		
+		return new ResponseEntity<HashMap>(result,HttpStatus.OK);
 	}
 	
 	@GetMapping("/api/v1/checks/users/{user_id}")

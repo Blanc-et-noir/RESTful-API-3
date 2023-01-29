@@ -22,4 +22,5 @@ public interface UserService{
 	public void deleteMyUserInfo(HttpServletRequest request);
 	public void checkDuplicateUserId(HashMap param);
 	public void checkDuplicateUserPhone(HashMap param);
+	public String findUserId(HashMap<String, String> param);
 }
